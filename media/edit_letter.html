@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block mess_list %}
+    <div id="bodyc">
+    	<form action="{% url edit_letter %}" method="post" enctype="multipart/form-data">
+       		{% csrf_token %}
+ 			{{form}}
+        	<input type="image" name="submit" src=/media/img/btn-submit.gif />
+ 		</form>
+	</div>
+{% endblock %}

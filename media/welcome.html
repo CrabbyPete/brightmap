@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block mess_list %}
+    <div id="bodyc">
+    	<div id="welcom">
+    		Welcome {{user}}<br/>
+    		<menu>
+    		{% if user.is_staff %}
+    		<li><a href = '{% url show_chapter %}?organizer=all' >All Organizers</a></li>
+    		<li><a href = '{% url show_buyer%}?buyer=all' >All LeadBuyers</a></li>
+    		<li><a href = '{% url show_connection%}?connection=all' >All Connections</a></li>
+    		{% endif %}
+
+    		<li><a href ='{% url edit_profile %}' >Edit Profile</a></li>
+
+    		{% if user.get_profile.is_organizer %}
+    		<li><a href = '{% url edit_chapter %}'   >Add New Organization</a></li>
+    		<li><a href = '{% url show_chapter %}'   >My Organizations</a></li>
+    		<li><a href = '{% url edit_buyer     %}' >Add A New Buyer</a>
+    		<li><a href = '{% url edit_interest  %}' >Edit Interests</a></li>
+    		{% endif %}
+
+    		{% if user.get_profile.is_attendee %}
+    		<li>Search Events</li>
+    		{% endif %}
+
+    		{% if user.get_profile.is_leadbuyer %}
+    		<li>Search Events</li>
+    		<li>View Deals</a></li>
+    		{% endif %}
+    		 <li><a href = '{% url logout %}' >Logout</a></li>
+    		</menu>
+    	</div>
+	</div>
+{% endblock %}

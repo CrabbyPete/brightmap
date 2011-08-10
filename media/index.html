@@ -1,0 +1,23 @@
+
+{% extends 'base.html' %}
+{% load smartif %}
+
+{% block body_block %}
+	{% if profile.user.is_authenticated %}
+		<p><a href="{{ profile.user.profile_url }}"><img src="http://graph.facebook.com/{{ user.profile.facebook_id }}/picture"/></a></p>
+      	<p>You are logged in as {{ current_user.name|escape }}</p>
+	{% else %}
+		<div class="formContainer">
+			<h2 class="login">Login</h2>
+				<form action="{% url login %}" method="post" name="login" id="login">
+					{% csrf_token %}
+					{{ form.username }}{{ form.username.errors }}
+					{{ form.password }}
+					<input type="image" src="/media/img/btn-submit.gif" name="signup" title="submit" class="signup" id="button" />
+
+				</form>
+				or
+				<a href={% url signup %}><img src='/media/img/btn-signup.gif'/></a>
+		</div>
+	{% endif %}
+{% endblock %}

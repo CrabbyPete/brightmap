@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block mess_list %}
+    <div id="bodyc">
+        {% for attendee in event.attendees.all %}
+  			<ul><a href='{%url show_connection%}?user={{attendee.pk}}'>{{attendee.first_name}} {{attendee.last_name}}</a>
+        	{% if attendee in connections %}
+        			*
+        	{% endif %}
+        	</ul><br/>
+        {% endfor %}
+	</div>
+{% endblock %}

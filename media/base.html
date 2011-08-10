@@ -1,0 +1,40 @@
+<!DOCTYPE html >
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>BrightMap.com</title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+<link href="/media/css/style.css" rel="stylesheet" type="text/css" />
+<link href="/media/css/form.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+  {% load i18n %}
+  {% load smartif %}
+  {% block js %}
+  {% endblock %}
+
+<!--mainContainer start -->
+    <h1> BrightMap </h1>
+    <div id="mainContainer">
+
+      {% block page_menu %}
+      {% endblock %}
+	  {% block body_block %}
+	  {% endblock %}
+
+      {% block mess_list %}
+      {% endblock %}
+      {% block profile %}
+      {% endblock %}
+
+	<!--footer start -->
+		<div id="footer">
+			<p>&copy; 2011 BrightMap, All Rights Reserved.</p>
+		</div>
+	<!--footer end -->
+	</div>
+<!--mainContaainer end -->
+</body>
+</html>

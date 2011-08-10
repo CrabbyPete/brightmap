@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load smartif %}
+
+{% block body_block %}
+    <div id = siteform >
+    	<form action="{% url edit_buyer %}" method="post">
+       		{% csrf_token %}
+            <fieldset>
+    		  {{form.first_name.label}}{{form.first_name}}{{form.first_name.errors}}<br/>
+    		  {{form.last_name.label}}{{form.last_name}}{{form.last_name.errors}}<br/>
+    		  {{form.company.label}}{{form.company}}{{form.company.errors}}<br/>
+    		  {{form.title.label}}{{form.title}}{{form.title.errors}}<br/>
+    		  {{form.website.label}}{{form.website}}{{form.website.errors}}<br/>
+    		  {{form.phone.label}}{{form.phone}}{{form.phone.errors}}<br/>
+    		  {{form.email.label}}{{form.email}}{{form.email.errors}}<br/>
+            	<input type="image" name="submit" src=/media/img/btn-submit.gif />
+            </fieldset>
+    	</form>
+    </div>
+{% endblock %}

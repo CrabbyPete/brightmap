@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% load smartif %}
+
+{% block body_block %}
+ 	{% for organization in organizations %}
+        <h3>{{organization.name}}</h3>
+        {% for chapter in organization.get_chapters %}
+            <a href='{% url edit_chapter %}?chapter={{chapter.pk}}'>{{ chapter.name }}</a><br/>
+ 	  {% endfor %}
+    {% endfor %}
+{% endblock %}
