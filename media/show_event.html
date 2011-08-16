@@ -2,9 +2,9 @@
 
 {% block mess_list %}
     <div id="bodyc">
-        {% for attendee in event.attendees.all %}
+        {% for attendee, value in attendees.items %}
   			<ul><a href='{%url show_connection%}?user={{attendee.pk}}'>{{attendee.first_name}} {{attendee.last_name}}</a>
-        	{% if attendee in connections %}
+        	{% if value > 0 %}
         			*
         	{% endif %}
         	</ul><br/>

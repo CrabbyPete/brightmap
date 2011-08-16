@@ -84,9 +84,11 @@ def signup(request):
         c = {'form':form }
         return render_to_response('signup.html', c, context_instance=RequestContext(request))
 
+    #GET
     if request.method == 'GET':
         return submit_form(SignUpForm())
 
+    # POST
     form = SignUpForm(request.POST)
     if not form.is_valid():
         return submit_form(form)
@@ -158,7 +160,7 @@ def  edit_profile(request):
     profile = user.get_profile()
     default_password ='3dhl4df6ajhhd9ir'
 
-    # Here for the first time, show the currents values
+    # GET: Here for the first time, show the currents values
     if request.method == 'GET':
 
         # Set up a default password, to see if the user tried to change passwords
@@ -241,6 +243,7 @@ def show_chapter(request):
         c = {'organizations':organizations}
         return render_to_response( 'show_chapter.html', c,
                                    context_instance=RequestContext(request) )
+    # GET: All organizations
     organizations = Organization.objects.all()
     return submit_form(organizations)
 
@@ -251,7 +254,8 @@ def edit_chapter( request ):
         c = {'form':form}
         return render_to_response( 'edit_chapter.html', c,
                                    context_instance=RequestContext(request) )
-    # GET
+
+    # GET: Edit a chapter or create a new one
     if request.method == 'GET':
         if 'chapter' in request.GET:
             chapter = Chapter.objects.get(pk = request.GET['chapter'])
@@ -260,7 +264,7 @@ def edit_chapter( request ):
         else:
             return submit_form(ChapterForm())
 
-    # POST
+    # POST: Change the requested chapter or create it
     form = ChapterForm(request.POST)
     if not form.is_valid():
         return submit_form(form)
@@ -268,9 +272,12 @@ def edit_chapter( request ):
     user_key        = form.cleaned_data['user_key']
     organizer_id    = form.cleaned_data['organizer_id']
     organization    = form.cleaned_data['organization']
+
+    # Edit an existing chapter
     try:
         organizer = Organizer.objects.get(organizer_id = organizer_id)
 
+    # Create a new one
     except Organizer.DoesNotExist:
         organizer = Organizer( user         = request.user,
                                user_key     = user_key,
@@ -292,9 +299,9 @@ def edit_interest( request ):
         c = {'form':form }
         return render_to_response( 'edit_interest.html', c,
                                    context_instance=RequestContext(request) )
-    # GET
+    # GET: All the current interests
     if request.method == 'GET':
-        interests = Interest.objects.filter()
+        interests = Interest.objects.all()
         interest_str = ''
         for interest in interests:
             interest_str += interest.interest+'\r\n'
@@ -302,7 +309,7 @@ def edit_interest( request ):
         form = InterestForm( {'interests':interest_str} )
         return submit_form(form)
 
-    # POST
+    # POST: Check out each to see if any are new
     form = InterestForm(request.POST)
     if not form.is_valid():
         return submit_form(form)
@@ -321,23 +328,19 @@ def edit_interest( request ):
 # Show details of a single event
 def show_event(request):
 
-    def submit_form(event, connections):
-        c = {'event':event, 'connections':connections }
+    def submit_form(event, attendees ):
+        c = { 'event'      :event,
+              'attendees'  :attendees,
+            }
+
         return render_to_response( 'show_event.html', c,
                                    context_instance=RequestContext(request) )
 
-   # GET
+   # GET: All the attendees for a given event
     if request.method == 'GET' and 'event' in request.GET:
         event = Event.objects.get(pk = request.GET['event'])
-
-        attendees = []
-        connections = Connection.objects.filter(event=event)
-        for attendee in event.attendees.all():
-            for connection in connections:
-                if connection.attendee == attendee:
-                    attendees.append(attendee)
-
-        return submit_form(event, attendees)
+        attendees   = event.attendees()
+        return submit_form(event, attendees )
 
 
 # List the users current events
@@ -347,22 +350,18 @@ def show_events(request):
         c = {'events':events }
         return render_to_response( 'show_events.html', c,
                                    context_instance=RequestContext(request) )
-    # GET
+
+    # GET: All events or events for a specific chapter
     if request.method == 'GET':
         if 'chapter' in request.GET:
 
             # All or specific organizers?
             if request.GET['chapter'] == 'all':
-                events = Event.objects.filter()
+                events = Event.objects.all()
             else:
                 chapter = Chapter.objects.get(pk = request.GET['chapter'])
-                events  = Event.objects.filter(chapter = chapter)
-            event_list = []
-            for event in events:
-                connections = Connection.objects.filter(event = event)
-                event_list.append( {'event':event,'connections':connections.count()} )
-
-            return submit_form(event_list)
+                events  = chapter.events()
+            return submit_form(events)
 
  # Create a new
 def edit_deal(request):
@@ -395,7 +394,7 @@ def edit_deal(request):
             #Log an error
             pass
 
-    # POST
+    # POST:
     form = DealForm(request.POST)
     terms = TermForm(request.POST)
 
@@ -503,7 +502,6 @@ def cancel_term(request):
 
 
 def show_buyer(request):
-
     def submit_form(buyers,connections = None):
         c = {'buyers':buyers,
              'connections':connections}
@@ -623,7 +621,7 @@ def show_connection(request):
             connections = []
             events = Event.objects.filter(chapter = request.GET['chapter'])
             for event in events:
-                for c in Connection.objects.filter(event = event):
+                for c in event.connections():
                     connections.append(c)
             return submit_form(connections)
 

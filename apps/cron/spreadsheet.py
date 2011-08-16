@@ -216,7 +216,7 @@ def spreadsheet( email, password ):
                                   )
                     term.save()
 
-
+import cProfile
 if __name__ == '__main__':
 
     import optparse
@@ -230,4 +230,4 @@ if __name__ == '__main__':
         password = args[1]
 
     # Pass in gmail address and password
-    spreadsheet(email, password)
+    cProfile.run( spreadsheet(email, password) )

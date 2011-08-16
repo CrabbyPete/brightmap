@@ -2,11 +2,11 @@
 
 {% block mess_list %}
     <div id="bodyc">
-        {% for event in events %} 
-             <a href='{% url show_event %}?event={{event.event.pk}}'>{{ event.event }}</a>
-              {{event.event.date|date:"d M Y" }}
-              {{event.event.attendees.count}} - 
-              {{event.connections}} <br/>
+        {% for event in events %}
+             <a href='{% url show_event %}?event={{event.pk}}'>{{ event.describe }}</a>
+              {{event.date|date:"d M Y" }}
+              {{event.attendees|length}} -
+              {{event.connections|length}} <br/>
         {% endfor %}
 	</div>
 {% endblock %}

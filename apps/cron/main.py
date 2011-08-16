@@ -17,24 +17,53 @@ import settings
 setup_environ(settings)
 
 # From here on through its treated as a normal django module
-
 from django.contrib.auth.models     import User
 from django.db.models               import Q
 from django.template                import loader, Context
-from django.core.mail               import send_mail,EmailMessage, \
-                                           EmailMultiAlternatives
+
 # Local libraries
 from client                         import EventbriteClient
 from base.models                    import *
+from mail                           import Mailer
 
-# Get all the attendees for an event from Eventbrite
+"""
+# Open SMTP emailer
+mailer  = Mailer( server   = settings.EMAIL_HOST,
+                  user     = settings.EMAIL_HOST_USER,
+                  password = settings.EMAIL_HOST_PASSWORD
+                )
+
+"""
+# Open Amazon emailer
+mailer  = Mailer ( mailer = 'amazon',
+                   access_key = settings.AMAZON['AccessKeyId'],
+                   secret_key = settings.AMAZON['SecretKey']
+                 )
+
+def log(message):
+    """
+    Time stamp all messages
+    """
+    return datetime.today().strftime("%Y-%m-%d %H:%M")+ ' ' + message
+
+
 def get_attendees( evb, event_id ):
+    """
+    Get all the attendees for an event from Eventbrite
+    """
     attendee_list = []
 
     # Get all the attendees of each event (New York, Boston, Toronto ..)
-    attendees = evb.list_event_attendees( event_id = int(event_id) )
+    try:
+        attendees = evb.list_event_attendees( event_id = int(event_id) )
+    except:
+        print log('Eventbrite Error: No attendees for event id ' + event_id )
+        return []
+
     if 'error' in attendees:
-        print attendees['error']['error_message']
+        print log( 'Eventbrite Error: ' + attendees['error']['error_message'] +
+                   ' event id ' + str( event_id )
+                 )
         return []
 
     # Append attendee interests note:Eventbrite adds redundant levels
@@ -43,51 +72,70 @@ def get_attendees( evb, event_id ):
 
     return attendee_list
 
-# Return all the interests from the survey
+
 def check_survey(attendee):
+    """
+     Return all the interests from the survey
+    """
     if not 'answers' in attendee:
-        return []
+        return [], False
+
+    leadbuyer = False
 
     # If so parse the survey answers and email attendee and sponser
     answers = attendee['answers']
     for answer in answers:
+        if 'Check this box' in answer['answer']['question']:
+            leadbuyer = True
 
         # Did they ask for help
         if 'Do you need help' in answer['answer']['question']:
-            return answer['answer']['answer_text'].split('|')
+            return answer['answer']['answer_text'].split('|'), leadbuyer
 
     # No survey answered
-    return []
+    return [], leadbuyer
+
 
 def get_latest_events(evb, organizer_id, date = None):
-    # Search for the latest event
-    events = evb.list_organizer_events(organizer_id = organizer_id)
-
-    # Compare to todays date and find all events ending after today
-    if date != None:
-        today = date
-    else:
-        today = datetime.today()
-
-    # Check if this is right for errors
-    if 'errors' in events:
-        print Error + events['errors']
+    """
+    Search for the latest events
+    """
+    try:
+        events = evb.list_organizer_events(organizer_id = organizer_id)
+    except:
+        print log( 'Eventbrite Error: Events for ' + organizer_id )
         return []
 
-    # Look through all events
+    # Check if you get an error from Eventbrite
+    if 'error' in events:
+        print log( 'Eventbrite Error: ' +             \
+                    events['error']['error_type'] +   \
+                    ' for ' + str(organizer_id)
+                  )
+        return []
+
+    # Compare to todays date and find all events ending after today
+    if date == None:
+        today = datetime.today()
+    elif isinstance(date, datetime):
+        today = date
+
+    # Look through all events and keep all future events
     event_ids = []
     for event in events['events']:
 
         # Make sure these are not past events
-        end_date = datetime.strptime(event['event']['end_date'], "%Y-%m-%d %H:%M:%S")
+        end_date = datetime.strptime(event['event']['end_date'],
+                                     "%Y-%m-%d %H:%M:%S")
         delta = end_date - today
 
-        # This assumes monthly meetings and meetings are 30 days apart
-        if delta.days >= 0 and delta.days < 30:
-            event_ids.append([event['event']['title'],event['event']['id'],end_date])
-            print today.strftime("%Y-%m-%d %H:%M") + ' ' +\
-                  event['event']['title'] + " " + str(delta.days)
-
+        # Only get next months events
+        if delta.days >= 0:
+            event_ids.append([ event['event']['title'],
+                               event['event']['id'],
+                               end_date
+                              ]
+                             )
     return event_ids
 
 # Put latest event in the database
@@ -99,7 +147,7 @@ def database_events(organizer, evb = None):
                                 user_key = organizer.user_key     )
 
     # This is for testing
-    date = datetime.strptime('2011-06-01', "%Y-%m-%d")
+    date = datetime.strptime('2011-08-01', "%Y-%m-%d")
 
     # Get the latest from Eventbrite
     events = get_latest_events(evb, int(organizer.organizer_id) )
@@ -124,7 +172,7 @@ def database_events(organizer, evb = None):
 
 
 # Generator to put the attendees in the database
-def database_attendees(evb, event):
+def database_attendees( evb, event ):
 
     # Get all the attendees for the event from Eventbrite
     attendees = get_attendees( evb, event.event_id )
@@ -132,9 +180,13 @@ def database_attendees(evb, event):
     # Add all attendees to the database
     for attendee in attendees:
 
+        # Check if they are a user
         try:
             user = User.objects.get( Q(email = attendee['email']) )
+
+        # If not create a new user
         except User.DoesNotExist:
+
             # Create a temporary password and username which is 30 chars max
             password = attendee['last_name']+'$'+attendee['first_name'],
             username = attendee['email'][0:30]
@@ -149,116 +201,165 @@ def database_attendees(evb, event):
         else:
             profile = user.get_profile()
 
+        # Update any profile changes
         profile.is_attendee = True
 
-        # Update any profile changes
         if 'company' in attendee:
             profile.company = attendee['company']
         if 'cell_phone' in attendee:
             profile.phone = attendee['cell_phone']
         profile.save()
 
-        # Add the user to the list if not in attendee list already
-        event.attendees.add(user)
-
         # Return attendees who answered the survey
-        interests = check_survey( attendee )
+        interests, leadbuyer = check_survey( attendee )
 
+        # If they checked they want leads they are a leadbuyer
+        if leadbuyer:
+            profile.is_leadbuyer = True
+            profile.save()
 
-        yield user, interests
+        # Add the attendee with out interests to the event
+        if len(interests) == 0:
+            query = Survey.objects.filter( event = event,
+                                           attendee = user
+                                         )
+            if query.count() == 0:
+                survey  = Survey( event    = event,
+                                  attendee = user
+                                )
+                survey.save()
+
+            # Continue to the next attendee
+            continue
+
+        # If the user has interests checked return them
+        surveys = []
+        for interest in interests:
+
+            # Normalize the interest and see if you have it
+            normal_interest = Interest.objects.close_to( interest )
+
+            # Is this a new interest?
+            if normal_interest == None:
+                print log( "New Interest: " + interest )
+                Interest( interest = interest )
+
+            try:
+                survey = Survey.objects.get( event = event,
+                                             interest = normal_interest,
+                                             attendee = user
+                                            )
+
+            # If not create it and a blank connection with interests
+            except Survey.DoesNotExist:
+                survey  = Survey( event = event,
+                                  interest = normal_interest,
+                                  attendee = user
+                                 )
+                survey.save()
+            surveys.append(survey)
+
+        # Yield all the surveys for this user
+        yield surveys
 
     return
 
-# This is essentially send_mail, but adds attachments.
-def mail_to(subject, message, from_email, recipient_list, attachments = None ):
-
-    mail = EmailMessage(subject, message, from_email, recipient_list )
-    if attachments != None:
-        for attach in attachments:
-            mail.attach_file(attach)
-    #mail.send()
-
-def make_contact( event, interest, deal, attendee, template ):
-    terms = Term.objects.filter( deal = deal )
-    for term in terms:
-        if not term.execute(event = event):
+MAX_SURVEY_SEND = 10
+def make_contact( survey, deal, template ):
+    for term in deal.terms():
+        if not term.execute( event = survey.event ):
             continue
 
-        sponser = term.buyer
-        today = datetime.today()
-        c = Context({'interest':interest,
-                     'attendee':attendee,
-                     'sponser':sponser,
-                     'organizer':event.chapter.organizer
+        # Don't spam user
+        survey.email += 1
+        if survey.mails_for() > MAX_SURVEY_SEND:
+            continue
+
+        sponser   = term.buyer
+        attendee  = survey.attendee
+        interest  = deal.interest
+        organizer = survey.event.chapter.organizer
+
+        c = Context({'interest' :interest,
+                     'attendee' :attendee,
+                     'sponser'  :sponser,
+                     'organizer':organizer
                      })
 
         message = template.render(c)
-        print today.strftime("%Y-%m-%d %H:%M")+ \
-                             " Connecting: " +                \
-                             attendee.first_name + ' ' +      \
-                             attendee.last_name +  ' - ' +    \
-                             attendee.email + ' with ' +      \
-                             sponser.first_name + ' ' +       \
-                             sponser.last_name+ ' - ' +       \
-                             sponser.email +' for ' +         \
-                             interest
+        print_connection( attendee, sponser, interest )
 
-        subject = event.describe + '-' + interest
-        recipients = [ attendee.email, sponser.email,
+        subject = survey.event.describe + '-' + interest.interest
+
+        recipients = [ attendee.email,
+                       sponser.email,
                        event.chapter.organizer.email ]
-        mail_to( subject, message, event.chapter.organizer.email, recipients)
 
+        # TESTING
+        recipients = ['pete.douma@gmail.com']
+        mailer.email_to( message,
+                         recipients,
+                         'newsletter@brightmap.com',
+                         subject
+                        )
+
+def print_event(event):
+    delta = event.date - datetime.today()
+    print log('Event - ' +  event.describe + ' ' + str(delta.days) )
+
+# Print the log message
+def print_connection( attendee, sponser, interest ):
+    print log(
+               " Connecting: " +             \
+               attendee.first_name + ' ' +   \
+               attendee.last_name +  ' - ' + \
+               attendee.email + ' with ' +   \
+               sponser.first_name + ' ' +    \
+               sponser.last_name + ' - ' +   \
+               sponser.email +' for ' +      \
+               interest.interest
+              )
 
 # This is the main routine
 def main():
-
-    # Get the mail
-    #mailbox = MailBox()
-    #mailbox.login('fish@spotburn.com','fishf00l')
-
     # Get all organizers
     organizations = Organization.objects.filter()
     for organization in organizations:
-        chapters = Chapter.objects.filter(organization = organization)
-        for chapter in chapters:
+        for chapter in organization.chapter_set.all():
+
             # Open a new Eventbrite client
             tickets = chapter.get_eventbrite()
             for ticket in tickets:
-                evb = EventbriteClient( app_key  = settings.EVENTBRITE['APP_KEY' ],
-                                        user_key = ticket.user_key     )
+                app_key  = settings.EVENTBRITE['APP_KEY' ]
+                user_key = ticket.user_key
+                evb = EventbriteClient( app_key = app_key, user_key = user_key )
 
                 #Get the email template for this organization
                 letter = chapter.letter
                 if letter != None:
                     template = loader.get_template(letter.letter)
                 else:
-                    template = loader.get_template_from_string(
-                            '/media/letters/Ultra Light Startups (New York).tmp')
+                    template = loader.get_template( 'letters/default.tmpl' )
 
                 # Get the attendess of each event < 30 day away for each city
-                for event in database_events(ticket, evb):
+                for event in database_events( ticket, evb ):
 
-                    # Put all attendees in the db and return those who answered the survey
-                    attendees = database_attendees( evb, event )
-                    while True:
-                        try:
-                            attendee, interests  = attendees.next()
-                        except StopIteration:
-                            break
+                    # Log the events
+                    print_event(event)
+
+                    # Put all attendees in the db, but only return those that
+                    #     answered the survey
+                    for surveys in database_attendees( evb, event ):
 
                         # For each interest match sponsers
-                        for interest in interests:
+                        for survey in surveys:
 
-                            # Return a sponser list and a normalized interest
-                            deals = event.get_deals( interest = interest )
+                            # Get all the deals for this chapter
+                            deals = chapter.deals( interest = survey.interest )
                             for deal in deals:
-                                if event.add_connection( attendee, deal ):
-                                    make_contact( event,
-                                                  interest,
-                                                  deal,
-                                                  attendee,
-                                                  template
-                                            )
+                                if event.add_connection( survey, deal ):
+                                    make_contact( survey, deal, template )
+
 
 if __name__ == '__main__':
     main()

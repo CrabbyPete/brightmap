@@ -139,17 +139,18 @@ class GoogleSpreadSheet():
 class Gmailer(object):
 
     # Initialize with Gmail address and password
-    def __init__( self, email, password ):
-        self.gmail = self.email_connect( username = email,
-                                         password = password )
+    def __init__( self, user, password, server = 'smtp.gmail.com' ):
+        self.gmail = self.email_connect( username = user,
+                                         password = password,
+                                         server   = server     )
 
     # Connect to the gmail stmp server
     def email_connect( self,
-                       server = 'smtp.gmail.com',
                        username = None,
-                       password = None            ):
+                       password = None,
+                       server   = 'smtp.gmail.com' ):
 
-        em = SMTP('smtp.gmail.com', 587)
+        em = SMTP(server, 587)
 
         em.set_debuglevel(False)
         em.ehlo()
@@ -169,11 +170,7 @@ class Gmailer(object):
         msg['To'] = COMMASPACE.join(to)
         if not self.gmail:
             self.gmail = email_connect(username = username, password = password)
-        """
-        if EMAIL:
-            pdb.settrace()
-            self.gmail.sendmail(me, to, msg.as_string())
-        """
+            #self.gmail.sendmail(me, to, msg.as_string())
 
 class GoogleOAuth(object):
 

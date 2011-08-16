@@ -37,8 +37,8 @@ class Organization( models.Model ):
     """
     name          = models.CharField( unique = True, max_length = 255 )
 
-    def get_chapters(self):
-        return Chapter.objects.filter(organization = self)
+    def chapters(self):
+        return self.chapter_set.all()
 
     def __unicode__(self):
         return self.name
@@ -54,6 +54,14 @@ class Chapter( models.Model ):
     logo          = models.URLField(            default = None, null = True )
     letter        = models.ForeignKey('Letter', default = None, null = True )
     website       = models.URLField(            default = None, null = True )
+
+    def deals(self, interest = None ):
+        if interest == None:
+            return self.deal_set.all()
+        return self.deal_set.filter( interest = interest )
+
+    def events(self):
+        return self.event_set.all()
 
     def get_eventbrite(self):
         tickets = Eventbrite.objects.filter( chapter = self )
@@ -92,11 +100,35 @@ class LeadBuyer( models.Model ):
     def __unicode__(self):
         return user.email
 
+class InterestManager( models.Manager ):
+    """
+    Model manager for Interest
+    """
+    def close_to(self, interest, ratio = .90 ):
+        for i in self.all( ):
+            seq = SequenceMatcher( None, interest, i.interest )
+            if round( seq.ratio(), 2 ) >= ratio:
+                return i
+        return None
+
+    def leads(self, event = None):
+        interests = {}
+        for survey in Survey.objects.all():
+            if survey.interest == None:
+                continue
+            if survey.interest in interests:
+                interests[survey.interest] += 1
+            else:
+                interests[survey.interest] = 1
+        return interests
+
+
 class Interest(models.Model):
     """
     List of unique interests
     """
     interest        = models.CharField(unique = True, max_length = 255 )
+    objects         = InterestManager()
 
     def __unicode__(self):
         return self.interest
@@ -109,6 +141,12 @@ class Deal(models.Model):
     interest     = models.ForeignKey( Interest )
     chapter      = models.ForeignKey( Chapter )
     max_sell     = models.IntegerField(default = 1)
+
+    def connections(self):
+        return self.connection_set.all()
+
+    def terms(self):
+        return self.term_set.all()
 
     def __unicode__(self):
         return self.interest.interest
@@ -123,26 +161,16 @@ class Term( models.Model ):
     cost      = models.CharField( max_length = 10, blank = True, null = True )
     buyer     = models.ForeignKey( User, blank = True, null = True )
 
-    # Check whether to execute this deal
+    # Each subclass overides this
     def execute(self, **kwargs):
-        # If the subterm does not exist each one blows up
-        try:
-            return self.cancel.execute()
-        except:
-            pass
-        try:
-            return self.expire.execute()
-        except:
-            pass
-        try:
-            return self.count.execute(event = kwargs['event'])
-        except:
-            pass
-
-        return False
-
-    def __unicode__(self):
-        return str(self.pk)
+        if self.cancel:
+            return self.cancel.execute( **kwargs )
+        if self.count:
+            return self.count.execute( **kwargs )
+        if self.expire:
+            return self.expire.execute( **kwargs )
+        if self.connects:
+            return self.connects.execute( **kwargs )
 
 class Expire( Term ):
     """
@@ -153,7 +181,7 @@ class Expire( Term ):
     def execute(self, **kwargs):
         if self.buyer == None or self.canceled:
             return False
-        # relativedelta(datetime1, datetime2)
+
         delta = self.date - date.today()
         if delta.days >= 0:
             return True
@@ -200,10 +228,11 @@ class Count( Term ):
     def __unicode__(self):
         return '<Count:'+ str(self.number)+ '>'
 
-class Connects(Term):
+class Connects( Term ):
     """
     Subclass of Term that is good for a set number of connections
     """
+
     number      = models.IntegerField()
     remaining   = models.IntegerField()
 
@@ -216,6 +245,8 @@ class Connects(Term):
             return True
         return False
 
+    def __unicode__(self):
+        return '<Connects:'+ str(self.number)+ '>'
 
 class Letter( models.Model ):
     """
@@ -226,11 +257,13 @@ class Letter( models.Model ):
     def __unicode__(self):
         return self.letter
 
+
 class EventManager(models.Manager):
     """
     Event class object manager
     """
     pass
+
 
 class Event(models.Model):
     """
@@ -240,50 +273,93 @@ class Event(models.Model):
     event_id     = models.IntegerField( unique = True )
     describe     = models.TextField()
     date         = models.DateTimeField()
-    attendees    = models.ManyToManyField(User, related_name = 'event_attendee')
     letter       = models.ForeignKey( Letter,  blank = True, null = True )
     objects      = EventManager()
 
 
-    def get_deals( self, interest ):
+    def connections(self):
+        return self.connection_set.all()
+
+    def attendees(self, attendee = None):
         """
-        Get deals for this event
+        Return attendess for this event. If attendee is None return all
         """
 
-        # The interest may not be exactly the same, so check all
-        for db_interest in Interest.objects.all( ):
-            seq = SequenceMatcher( None, interest, db_interest.interest )
+        # Return surveys for a specific attendee
+        if attendee:
+            return self.survey_set.filter(attendee = attendee)
 
-            # Found the closely matching interest, now find deals
-            if round( seq.ratio(), 2 ) >= .90:
-                try:
-                    deals = Deal.objects.get( Q(chapter = self.chapter    ),
-                                              Q(interest = db_interest    )
-                                            )
-                except Deal.DoesNotExist:
-                    return []
+        # Return all attendees for this event
+        attendees = {}
+        for survey in self.survey_set.all():
+            if not survey.attendee in attendees.keys():
+                if survey.interest != None:
+                    attendees[survey.attendee] = 1
                 else:
-                    return [deals]
+                    attendees[survey.attendee] = 0
+            else:
+                attendees[survey.attendee] += 1
 
-        # If you are here no interests were found
-        return []
+        return attendees
+
+    def interests(self, attendee = None ):
+        """
+        Return the interests for this event, and the number of each
+        If attendee return interests for the attendee otherwise return all
+        """
+        interests = {}
+        for survey in self.survey_set.all():
+
+            # Ignore None
+            if survey.interest == None:
+                continue
+
+            # If new add it
+            if not survey.interest.interest in interests:
+                interests[survey.interest.interest] = 1
+            else:
+                interests[survey.interest.interest] += 1
+        return interests
+
+    def connections(self):
+        connections = []
+        for survey in self.survey_set.all():
+            if not survey.interest:
+                continue
+            for c in Connection.objects.filter(survey = survey):
+                connections.append(c)
+        return connections
 
 
-    def add_connection( self, attendee, deal ):
+    def deals( self, interest ):
+        """
+        Get deals for a normalized interest for this event
+        """
+        deal_list = []
+        normal_interest = Interest.objects.close_to( interest )
+        deals = Deal.objects.filter( chapter  = self.chapter,
+                                     interest = normal_interest
+                                   )
+        for deal in deals:
+            for event in deal.chapter.events():
+                if event == self:
+                    deal_list.append(deal)
+
+        return deal_list
+
+
+    def add_connection( self, survey, deal ):
         """
         Add a connection to an Event and an attendee
         """
         # Look for any existing deals
         try:
-            connection  = Connection.objects.get( Q(event = self),
-                                                  Q(deal  = deal),
-                                                  Q(attendee = attendee)
-                                                )
-        # Not found, create a new one
+            connection  = Connection.objects.get( survey = survey,
+                                                  deal   = deal
+                                                 )
+            # Not found, create a new one
         except Connection.DoesNotExist:
-            connection = Connection( event     = self,
-                                     deal     =  deal,
-                                     attendee = attendee )
+            connection = Connection( survey = survey, deal = deal )
             connection.save()
             return True
 
@@ -292,11 +368,35 @@ class Event(models.Model):
     def __unicode__(self):
         return self.describe
 
+
+class Survey(models.Model):
+    event       = models.ForeignKey( Event )
+    attendee    = models.ForeignKey( User )
+    interest    = models.ForeignKey( Interest, default = None, null = True )
+    mailed      = models.IntegerField( default = 0 )
+
+    def connections(self):
+        return self.connection_set.all()
+
+    def mails_for(self):
+        total_mails = 0
+        mails = Survey.objects.filter( event    = self.event,
+                                       attendee = self.attendee )
+        for mail in mails:
+            total_mails += mail.mailed
+        return total_mails
+
+
+    def __unicode__(self):
+        name = self.attendee.email+':'+ self.event.descibe
+        if self.interest != None:
+            name += '(' + self.interest + ')'
+        return name
+
 class ConnectionManager(models.Manager):
     """
     Model Manager for Connection class
     """
-
     def for_user(self, user ):
         """
         Get Connections for a particular user
@@ -312,22 +412,30 @@ class ConnectionManager(models.Manager):
                     connections.append(c)
 
         if profile.is_attendee:
-            for c in self.filter(attendee = user):
-                connections.append(c)
+            surveys = Survey.objects.filter( attendee = user )
+            for survey in surveys:
+                for c in self.filter( survey = survey ):
+                    connections.append(c)
+
         return connections
+
+    def for_event(self, event ):
+        """
+        Get all Connections for an event
+        """
+        self.filter(event.survey)
 
 class Connection(models.Model):
     """
     Describes a connection for an Event, Deal, and attendee
     """
-    event           = models.ForeignKey(Event)
-    deal            = models.ForeignKey(Deal)
-    attendee        = models.ForeignKey( User )
-    date            = models.DateTimeField(auto_now = True)
+    survey          = models.ForeignKey( Survey )
+    deal            = models.ForeignKey( Deal )
+    date            = models.DateTimeField( auto_now = True )
 
     objects         = ConnectionManager()
 
-    def get_buyers(self):
+    def buyers(self):
         """
         Who was the buyer of this Deal
         """
@@ -343,27 +451,12 @@ class Connection(models.Model):
         """
         if self.attendee == user:
             return True
-        terms = Term.objects.filter(buyer = user)
+        terms = Term.objects.filter( buyer = user )
         if terms.count() > 0:
             return True
 
         return False
 
     def __unicode__(self):
-        return self.attendee.email +' '+self.event.describe
-
-"""
-class Lead(models.Model):
-    user            = models.ForeignKey(User)
-    vendor_type     = models.CharField(max_length=100,  blank = True, null = True )
-    budget          = models.CharField(max_length=100,  blank = True, null = True )
-    timeframe       = models.CharField(max_length=100,  blank = True, null = True )
-    published_date  = models.DateTimeField(auto_now = True)
-    expires_date    = models.DateTimeField()
-    description     = models.TextField()
-
-
-    def __unicode__(self):
-        return self.user.email +'-'+str(self.pk)
-"""
+        return self.survey.attendee.email + '-' + self.deal.interest.interest
 

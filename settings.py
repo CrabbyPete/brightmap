@@ -8,7 +8,18 @@ ADMINS = (
 )
 
 MANAGERS = ADMINS
-
+"""
+DATABASES = {
+    'default': {
+        'ENGINE'  : 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME'    : 'brightmap',                # Or path to database file if using sqlite3.
+        'USER'    : 'PeteD',                    # Not used with sqlite3.
+        'PASSWORD': 'g00dd0g',                  # Not used with sqlite3.
+        'HOST'    : 'firstinstance.cfbsndnshc5a.us-east-1.rds.amazonaws.com',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT'    : '3306',                     # Set to empty string for default. Not used with sqlite3.
+    }
+}
+"""
 DATABASES = {
     'default': {
         'ENGINE'  : 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
@@ -27,6 +38,11 @@ MEETUP = {
 
 EVENTBRITE = {
     'APP_KEY'       :'MDlmYmM4OTNiNDAx',    # Eventbrite APP_KEY
+}
+
+AMAZON = {
+    'AccessKeyId' :'AKIAJCK3GLV6WBISCSXA',
+    'SecretKey'   :'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'
 }
 
 # Local time zone for this installation. Choices can be found here:
@@ -131,8 +147,16 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.admindocs',
-    'base'
+    'base',
+    'south'
 )
+
+EMAIL_HOST          = 'in.mailjet.com'
+EMAIL_PORT          = 25
+EMAIL_HOST_USER     = 'd21668dd0d4bb01c19f3845e45cfa5a3'
+EMAIL_HOST_PASSWORD = 'fa2934689303dcab990c72d0838c6ef1'
+EMAIL_USE_TL        = True
+
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

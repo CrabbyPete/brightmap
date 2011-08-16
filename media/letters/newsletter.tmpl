@@ -1,0 +1,26 @@
+BrightMap makes introductions between attendees of business networking events and business service providers, based on the stated interest of the event attendees.
+
+The list below shows the leads available on BrightMap this week.  To buy these leads, click the "BUY LEADS" link at the bottom of any section.
+
+Leads by Interest
+{% for interest, number in leads.items %}
+    {{number}} leads for {{interest.interest}}
+{% endfor %}
+
+Leads by Event
+{% for event, interests in report.items %}
+{% if interests|length > 0 %} {{event.describe}} for {{event.chapter.organization}} {{event.date|date:"M d, Y"}}
+        {% for interest, value in interests.items %}
+            {{ value }} {% if value == 1 %} lead {% else %} leads {% endif %} for {{ interest }}
+        {% endfor %}
+    {% endif %}
+{% endfor %}
+
+[BUY LEADS] Click here if you are an <interest provider name> and would like to buy any of the above <interest name> leads
+{end foreach}
+
+
+Copyright (c) 2011 BrightMap, All rights reserved.
+Our mailing address is: BrightMap LLC 160 Varick St, 12th floor New York, NY 10013
+
+To unsubscribe from this list http://brightmap.com/base/unsubscribe
