@@ -18,17 +18,17 @@ from django.core.urlresolvers       import  reverse
 from models                         import *
 from forms                          import *
 
-
-# Homepage
 def homepage( request ):
+    # Homepage
     if request.user.is_authenticated():
         return welcome(request)
 
     return login(request)
 
-# Login in users, if registered bring the to their page
+
 @csrf_protect
 def welcome( request ):
+    # Login in users, if registered bring the to their page
 
     def submit_form( ):
         c = {}
@@ -39,6 +39,7 @@ def welcome( request ):
 
 @csrf_protect
 def login(request):
+    # Login users
 
     def submit_form(form):
         c = {'form':form}
@@ -76,9 +77,10 @@ def login(request):
         form._errors['username']  = ErrorList(["User does not exist or wrong password"])
         return submit_form(form)
 
-# Sign up for an account
+
 @csrf_protect
 def signup(request):
+    # Sign up for an account
 
     def submit_form(form):
         c = {'form':form }
@@ -151,6 +153,8 @@ def signup(request):
 
 @csrf_protect
 def  edit_profile(request):
+    # Edit a users profile
+
     def submit_form(form):
         c = {'form':form }
         return render_to_response('edit_profile.html', c, context_instance=RequestContext(request))
@@ -230,25 +234,34 @@ def  edit_profile(request):
 
     return HttpResponseRedirect('/')
 
-# Log out a user
+
 @csrf_protect
 def logout(request):
+    # Log out a user
     auth.logout(request)
     return HttpResponseRedirect('/')
 
 @csrf_protect
 def show_chapter(request):
+    # Show Chapter details
 
     def submit_form(organizations):
         c = {'organizations':organizations}
         return render_to_response( 'show_chapter.html', c,
                                    context_instance=RequestContext(request) )
     # GET: All organizations
-    organizations = Organization.objects.all()
+    if 'organizer' in request.GET:
+        return submit_form(Organization.objects.all())
+
+    organizations = []
+    for chapter in Chapter.objects.filter(organizer = request.user):
+        organizations.append(chapter.organization)
+
     return submit_form(organizations)
 
 @csrf_protect
 def edit_chapter( request ):
+    # Edit Chapter details
 
     def submit_form(form):
         c = {'form':form}
@@ -294,6 +307,7 @@ def edit_chapter( request ):
 
 @csrf_protect
 def edit_interest( request ):
+    # Edit Interest
 
     def submit_form(form):
         c = {'form':form }
@@ -325,9 +339,9 @@ def edit_interest( request ):
 
     return HttpResponseRedirect('/')
 
-# Show details of a single event
-def show_event(request):
 
+def show_event(request):
+    # Show details of a single event
     def submit_form(event, attendees ):
         c = { 'event'      :event,
               'attendees'  :attendees,
@@ -343,9 +357,9 @@ def show_event(request):
         return submit_form(event, attendees )
 
 
-# List the users current events
-def show_events(request):
 
+def show_events(request):
+    # List the users current events
     def submit_form(events):
         c = {'events':events }
         return render_to_response( 'show_events.html', c,
@@ -363,8 +377,9 @@ def show_events(request):
                 events  = chapter.events()
             return submit_form(events)
 
- # Create a new
+
 def edit_deal(request):
+    # Create or edit a Deal
 
     def submit_form(form, terms):
         c = {'form': form, 'terms':terms }
@@ -468,6 +483,7 @@ def edit_deal(request):
     return HttpResponseRedirect(reverse('show_organizer'))
 
 def show_deals(request):
+    # Show a list of Deals
 
     def submit_form(deals):
         c = { 'deals':deals }
@@ -475,14 +491,19 @@ def show_deals(request):
                                    context_instance=RequestContext(request) )
 
     if request.method == 'GET':
+        if 'open' in request.GET:
+            open = request.GET['open']
+
         if 'chapter' in request.GET:
-            deals = Deal.objects.filter(chapter=request.GET['chapter'])
+            chapter = request.GET['chapter']
+            deals = chapter.deals()
         else:
             deals = Deal.objects.all()
 
         return submit_form(deals)
 
 def show_deal(request):
+    # Show specific details for a Deal
 
     def submit_form( deal ):
         c = {'deal':deal }
@@ -494,6 +515,8 @@ def show_deal(request):
         return submit_form(deal)
 
 def cancel_term(request):
+    # Cancel Terms of a Deal
+
     if request.method == 'GET' and 'term' in request.GET:
         term = Term.objects.get(pk = request.GET['term'])
         term.canceled = True
@@ -502,6 +525,8 @@ def cancel_term(request):
 
 
 def show_buyer(request):
+    # Show LeadBuyer details
+
     def submit_form(buyers,connections = None):
         c = {'buyers':buyers,
              'connections':connections}
@@ -525,6 +550,8 @@ def show_buyer(request):
             return HttpResponseRedirect('/')
 
 def edit_buyer(request):
+    # Edit LeadBuyer details
+
     def submit_form(form):
         c = {'form':form }
         return render_to_response( 'edit_buyer.html', c,
@@ -577,6 +604,7 @@ def edit_buyer(request):
     return HttpResponseRedirect('/')
 
 def add_buyer(request):
+    # Add a LeadBuyer
 
     def submit_form( form ):
         c = {'form':form }
@@ -601,8 +629,37 @@ def add_buyer(request):
 
         return HttpResponseRedirect('/')
 
+def show_survey(request):
+    # Show what surveys were answered
+
+    def submit_form( surveys ):
+        return render_to_response( 'show_survey.html',
+                                   {'surveys':surveys },
+                                    context_instance=RequestContext(request) )
+    if 'event' in request.GET:
+        event = Event.objects.get( pk = request.GET['event'] )
+
+        if 'open' in request.GET:
+            open = request.GET['open']
+        else:
+            open = True
+
+        surveys = []
+        for survey in event.surveys():
+            if survey.interest == None:
+                continue
+
+            connects = survey.connections()
+            if open and connects.count() > 0:
+                continue
+            surveys.append( survey )
+        return submit_form( surveys )
+
+    return HttpResponseRedirect('/')
 
 def show_connection(request):
+    # Show details of a Connections
+
     def submit_form( connections ):
         c = {'connections':connections }
         return render_to_response( 'show_connection.html', c,
@@ -635,6 +692,8 @@ def show_connection(request):
 # Edit/Upload an Email template
 @csrf_protect
 def edit_letter(request):
+    # Edit the current Chapter Letter
+
     def submit_form(form):
         c = {'form':form }
         return render_to_response( 'edit_letter.html', c,
@@ -670,4 +729,6 @@ def edit_letter(request):
     letter.save()
     return HttpResponseRedirect('/')
 
-
+def buy_leads(request):
+    # Buy a specific lead
+    return HttpResponseRedirect('/')

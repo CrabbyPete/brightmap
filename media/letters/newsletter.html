@@ -1,0 +1,61 @@
+<!DOCTYPE html >
+<html>
+<head>
+  <title>BrightMap Newsletter</title>
+  <style type="text/css">
+  /*<![CDATA[*/
+
+  body {
+    font-family: sans-serif;
+    font-size: medium;
+    background-color: #99CCFF
+}
+
+  img {
+    border: none;
+  }
+  #hello {
+  font-weight: 200
+}
+  #help {
+    font-size:10px;
+    font-weight: lighter;
+    font-style: italic
+  }
+  /*]]>*/
+  </style>
+</head>
+
+<body>
+
+    <a href="http://brightmap.com">
+        <img src='/media/img/logo.png' width="200" height="115" alt="BrightMap" />
+    </a>
+    <div id="hello">
+        <p>BrightMap makes introductions between attendees of business networking events and business service providers, based on the stated interest of the event attendees
+           The list below shows the leads available on BrightMap this week.  To buy these leads, click the "BUY LEADS" link at the bottom of any section.
+        </p>
+        <p>Leads by Interest</p>
+        {% for interest, number in leads.items %}
+        <p>{{number}} leads for {{interest.interest}}</p>
+        {% endfor %}
+        <p>Leads by Event</p>
+        {% for event, interests in report.items %}
+            {% if interests|length > 0 %} 
+            	{{event.describe}} for {{event.chapter.organization}} {{event.date|date:"M d, Y"}}<br/>
+                {% for interest, value in interests.items %}
+                    {{ value }} {% if value == 1 %} lead {% else %} leads {% endif %} for {{ interest }}<br/>
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div id="help">
+        <p>Hit reply and we'll contact you or:</p>
+        <p>or:
+            <a href='{% url buy_leads %}'>
+                Click here if you are would like to buy any of the above leads
+            </a>
+        </p>
+    </div>
+</body>
+</html>

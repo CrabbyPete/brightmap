@@ -25,6 +25,8 @@ from django.template                import loader, Context
 from client                         import EventbriteClient
 from base.models                    import *
 from mail                           import Mailer
+from meetup                         import MeetUpAPI
+from social.models                  import MeetupProfile
 
 """
 # Open SMTP emailer
@@ -218,7 +220,7 @@ def database_attendees( evb, event ):
             profile.is_leadbuyer = True
             profile.save()
 
-        # Add the attendee with out interests to the event
+        # Add the attendee with or with out interests to the event
         if len(interests) == 0:
             query = Survey.objects.filter( event = event,
                                            attendee = user
@@ -237,6 +239,7 @@ def database_attendees( evb, event ):
         for interest in interests:
 
             # Normalize the interest and see if you have it
+            interest = interest.lstrip().rstrip()
             normal_interest = Interest.objects.close_to( interest )
 
             # Is this a new interest?
@@ -250,7 +253,7 @@ def database_attendees( evb, event ):
                                              attendee = user
                                             )
 
-            # If not create it and a blank connection with interests
+            # If not create it with interests
             except Survey.DoesNotExist:
                 survey  = Survey( event = event,
                                   interest = normal_interest,
@@ -271,12 +274,15 @@ def make_contact( survey, deal, template ):
             continue
 
         # Don't spam user
-        survey.email += 1
+        survey.mailed += 1
+        survey.save()
+
         if survey.mails_for() > MAX_SURVEY_SEND:
             continue
 
         sponser   = term.buyer
         attendee  = survey.attendee
+        event     = survey.event
         interest  = deal.interest
         organizer = survey.event.chapter.organizer
 
@@ -296,13 +302,14 @@ def make_contact( survey, deal, template ):
                        event.chapter.organizer.email ]
 
         # TESTING
+        """
         recipients = ['pete.douma@gmail.com']
         mailer.email_to( message,
                          recipients,
                          'newsletter@brightmap.com',
                          subject
                         )
-
+        """
 def print_event(event):
     delta = event.date - datetime.today()
     print log('Event - ' +  event.describe + ' ' + str(delta.days) )
@@ -326,7 +333,12 @@ def main():
     organizations = Organization.objects.filter()
     for organization in organizations:
         for chapter in organization.chapter_set.all():
-
+            # Check for meetups
+            """
+            meetup = MeetUpAPI( user = chapter.organizer )
+            if meetup:
+                meetup.get_groups()
+            """
             # Open a new Eventbrite client
             tickets = chapter.get_eventbrite()
             for ticket in tickets:
@@ -353,13 +365,19 @@ def main():
 
                         # For each interest match sponsers
                         for survey in surveys:
+                            try:
+                                deal = chapter.deal( survey.interest )
 
-                            # Get all the deals for this chapter
-                            deals = chapter.deals( interest = survey.interest )
-                            for deal in deals:
-                                if event.add_connection( survey, deal ):
-                                    make_contact( survey, deal, template )
+                            # This can happen if no deal for a survey item
+                            except Deal.DoesNotExist:
+                                print log( chapter.name +        \
+                                           ' has no deal for ' + \
+                                           survey.interest.interest
+                                          )
+                                continue
 
+                            if event.add_connection( survey, deal ):
+                                make_contact( survey, deal, template )
 
 if __name__ == '__main__':
     main()

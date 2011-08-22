@@ -21,7 +21,7 @@ import settings
 setup_environ(settings)
 
 from django.db.models           import Q
-from django.core.mail           import send_mail,EmailMessage
+from django.core.mail           import send_mail,EmailMessage,EmailMultiAlternatives
 from django.contrib             import auth
 from django.contrib.auth.models import User
 from django.template            import loader, Context
@@ -31,27 +31,15 @@ from base.models                import *
 from pycron                     import pycron
 from mail                       import Mailer
 
-"""
-# Open SMTP emailer
-mailer  = Mailer( server   = settings.EMAIL_HOST,
-                  user     = settings.EMAIL_HOST_USER,
-                  password = settings.EMAIL_HOST_PASSWORD
-                )
-"""
-"""
-# Open SMTP emailer
-mailer  = Mailer( server   = 'smtp.sendgrid.net',
-                  user     = 'brightmap',
-                  password = '8jcgjg93j'
-                )
-"""
 
+"""
 # Open Amazon emailer
 mailer  = Mailer ( mailer = 'amazon',
                    access_key = settings.AMAZON['AccessKeyId'],
                    secret_key = settings.AMAZON['SecretKey']
                  )
 
+"""
 
 def report_interests(date = None):
     """
@@ -79,7 +67,7 @@ def report_interests(date = None):
                     continue
 
                 # Get all the interests for this event
-                interests = event.interests()
+                interests = event.interests( open = True )
                 report[event] = interests
 
     # You are done return the report
@@ -90,22 +78,17 @@ def cronjob():
     date = datetime.today()
     print 'Mailing @' + date.strftime("%Y-%m-%d %H:%M")
 
+    # Send email to every user who subscribes and is a leadbuyer
     qry = Profile.objects.filter( newsletter = True, is_leadbuyer = True )
-
-    # Send email to every user who subscibes
     spam=[]
-
-    # Get the latest report
-    # This is for testing
-    date = datetime.strptime('2011-08-01', "%Y-%m-%d")
-    report = report_interests( date )
-    leads = Interest.objects.leads()
-
-    # Get who gets the letter
     for profile in qry:
         spam.append(profile.user.email)
 
-    # Email the message
+    # Get the latest report
+    report = report_interests()
+    leads = Interest.objects.leads()
+
+    # TESTING TESTING TESTING TESTING
     spam = ['pete.douma@gmail.com','graham@ultralightstartups.com']
 
     # Create the messsage from the email template
@@ -114,15 +97,26 @@ def cronjob():
                   'report': report
                 })
 
-    t = loader.get_template('letters/newsletter.tmpl')
-    message = t.render(c)
+    # Create a text and html version
+    text = loader.get_template('letters/newsletter.tmpl').render(c)
+    html = loader.get_template('letters/newsletter.html').render(c)
     subject = "BrightMap Leads for the week of " + date.strftime("%Y-%m-%d")
 
+    msg = EmailMultiAlternatives( subject,
+                                  text,
+                                  'newsletter@brightmap.com',
+                                  spam
+                                )
+    msg.attach_alternative(html, "text/html")
+    msg.send( fail_silently = False )
+
+    """ For Amazon
     mailer.email_to( message,
                      spam,
                      'newsletter@brightmap.com',
                      subject
                     )
+    """
     return
 
 

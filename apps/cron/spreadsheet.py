@@ -80,7 +80,7 @@ def spreadsheet( email, password ):
 
             # Create a temporary password and username which is 30 chars max
             first,last = organizer.split()
-            password = first + '$' + last,
+            password = first + '$' + last
             username = email[0:30]
             user = User.objects.create_user(  username = username,
                                               email    = email,
@@ -185,6 +185,7 @@ def spreadsheet( email, password ):
                 try:
                     interest = Interest.objects.get(interest = key)
                 except Interest.DoesNotExist:
+                    key = key.lstrip().rstrip()
                     interest = Interest( interest = key )
                     interest.save()
 
@@ -200,7 +201,7 @@ def spreadsheet( email, password ):
                 except Deal.DoesNotExist:
                     deal = Deal( chapter = d_chapter,
                                  interest = interest,
-                                 max_sell = 1
+                                 max_sell = 3
                                 )
                     deal.save()
 
@@ -230,4 +231,5 @@ if __name__ == '__main__':
         password = args[1]
 
     # Pass in gmail address and password
-    cProfile.run( spreadsheet(email, password) )
+    #cProfile.run( 'spreadsheet(email, password)' )
+    spreadsheet(email, password)

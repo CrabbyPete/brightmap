@@ -6,7 +6,9 @@
              <a href='{% url show_event %}?event={{event.pk}}'>{{ event.describe }}</a>
               {{event.date|date:"d M Y" }}
               {{event.attendees|length}} -
-              {{event.connections|length}} <br/>
+              {{event.connections|length}}
+             <a href='{% url show_survey %}?event={{event.pk}}'>Surveys</a>
+              <br/>
         {% endfor %}
 	</div>
 {% endblock %}

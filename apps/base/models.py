@@ -5,6 +5,8 @@ from django.db                              import models
 from django.db.models                       import Q
 from django.contrib.auth.models             import User
 from django.contrib.localflavor.us.models   import PhoneNumberField
+from django.contrib.contenttypes.models     import ContentType
+
 
 class Profile( models.Model ):
     """
@@ -55,15 +57,20 @@ class Chapter( models.Model ):
     letter        = models.ForeignKey('Letter', default = None, null = True )
     website       = models.URLField(            default = None, null = True )
 
-    def deals(self, interest = None ):
-        if interest == None:
-            return self.deal_set.all()
-        return self.deal_set.filter( interest = interest )
+    def deals( self ):
+        # Get all the deals for this chapter
+        return self.deal_set.all()
 
-    def events(self):
+    def deal( self, interest ):
+        # Get the deal for a specific interest
+        return self.deal_set.get( interest = interest )
+
+    def events( self ):
+        # Get all the events for this chapter
         return self.event_set.all()
 
-    def get_eventbrite(self):
+    def get_eventbrite( self ):
+        # Get the Eventbrite ticket for this chapter
         tickets = Eventbrite.objects.filter( chapter = self )
         return tickets
 
@@ -105,6 +112,7 @@ class InterestManager( models.Manager ):
     Model manager for Interest
     """
     def close_to(self, interest, ratio = .90 ):
+        # Return the closest interest in the database
         for i in self.all( ):
             seq = SequenceMatcher( None, interest, i.interest )
             if round( seq.ratio(), 2 ) >= ratio:
@@ -112,6 +120,7 @@ class InterestManager( models.Manager ):
         return None
 
     def leads(self, event = None):
+        # Return all the leads for this Interest
         interests = {}
         for survey in Survey.objects.all():
             if survey.interest == None:
@@ -127,7 +136,8 @@ class Interest(models.Model):
     """
     List of unique interests
     """
-    interest        = models.CharField(unique = True, max_length = 255 )
+    interest        = models.CharField( unique = True, max_length = 255 )
+    occupation      = models.CharField( max_length = 255, default = None, null = True )
     objects         = InterestManager()
 
     def __unicode__(self):
@@ -140,12 +150,14 @@ class Deal(models.Model):
     """
     interest     = models.ForeignKey( Interest )
     chapter      = models.ForeignKey( Chapter )
-    max_sell     = models.IntegerField(default = 1)
+    max_sell     = models.IntegerField(default = 3)
 
     def connections(self):
+        # Return all the connections for all Deals
         return self.connection_set.all()
 
     def terms(self):
+        # Return all the Terms for this Deal
         return self.term_set.all()
 
     def __unicode__(self):
@@ -156,21 +168,32 @@ class Term( models.Model ):
     """
     A Term are the terms of a Deal. There can be many Terms for each Deal
     """
+
     deal      = models.ForeignKey( Deal )
-    canceled  = models.BooleanField(default = False)
+    canceled  = models.BooleanField( default = False )
     cost      = models.CharField( max_length = 10, blank = True, null = True )
     buyer     = models.ForeignKey( User, blank = True, null = True )
 
-    # Each subclass overides this
+
     def execute(self, **kwargs):
-        if self.cancel:
-            return self.cancel.execute( **kwargs )
-        if self.count:
-            return self.count.execute( **kwargs )
-        if self.expire:
-            return self.expire.execute( **kwargs )
-        if self.connects:
-            return self.connects.execute( **kwargs )
+        # Determine whether this Deal should be connected.
+        try:
+            return self.cancel.execute()
+        except:
+            pass
+        try:
+            return self.expire.execute()
+        except:
+            pass
+        try:
+            return self.count.execute()
+        except:
+            pass
+        try:
+            return self.connects.execute()
+        except:
+            return False
+
 
 class Expire( Term ):
     """
@@ -194,7 +217,9 @@ class Cancel( Term ):
     """
     Subclass of Term that the Term is good until canceled
     """
+
     def execute(self, **kwargs):
+        # Has this Term been canceled
         if self.buyer == None or self.canceled:
             return False
         return True
@@ -232,7 +257,6 @@ class Connects( Term ):
     """
     Subclass of Term that is good for a set number of connections
     """
-
     number      = models.IntegerField()
     remaining   = models.IntegerField()
 
@@ -277,15 +301,15 @@ class Event(models.Model):
     objects      = EventManager()
 
 
+    def surveys(self):
+        return self.survey_set.all()
+
     def connections(self):
         return self.connection_set.all()
 
     def attendees(self, attendee = None):
-        """
-        Return attendess for this event. If attendee is None return all
-        """
+        # Return attendess for this event. If attendee is None return all
 
-        # Return surveys for a specific attendee
         if attendee:
             return self.survey_set.filter(attendee = attendee)
 
@@ -302,7 +326,7 @@ class Event(models.Model):
 
         return attendees
 
-    def interests(self, attendee = None ):
+    def interests(self, open = False ):
         """
         Return the interests for this event, and the number of each
         If attendee return interests for the attendee otherwise return all
@@ -314,7 +338,17 @@ class Event(models.Model):
             if survey.interest == None:
                 continue
 
-            # If new add it
+            # Just return open deals
+            if open:
+                # Only exclude those connected with an exclusive deal : max_deal = 1
+                try:
+                    deal = self.chapter.deal( survey.interest )
+                except Deal.DoesNotExist:
+                    pass
+                else:
+                    if deal.max_sell == 1:
+                        continue
+
             if not survey.interest.interest in interests:
                 interests[survey.interest.interest] = 1
             else:
@@ -368,6 +402,9 @@ class Event(models.Model):
     def __unicode__(self):
         return self.describe
 
+class SurveyManager(models.Manager):
+    pass
+
 
 class Survey(models.Model):
     event       = models.ForeignKey( Event )
@@ -388,9 +425,9 @@ class Survey(models.Model):
 
 
     def __unicode__(self):
-        name = self.attendee.email+':'+ self.event.descibe
+        name = self.attendee.email+':'+ self.event.describe
         if self.interest != None:
-            name += '(' + self.interest + ')'
+            name += '(' + self.interest.interest + ')'
         return name
 
 class ConnectionManager(models.Manager):

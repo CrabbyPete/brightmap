@@ -45,6 +45,27 @@ AMAZON = {
     'SecretKey'   :'D8nvA3Fa+6qpiaNd64uOKPyQR9P3ZWeOB0vT8ybi'
 }
 
+FACEBOOK = {
+    'APP_ID'      :'120430474708449',
+    'APP_SECRET'  :'50b5981464d0479d3ac42b2444602368',
+    'API_KEY'     :'eacf7066ac1352b7cb6c44f4bb3f35cf',
+}
+
+LINKEDIN = {
+	'APP_SECRET'  :'4VS_aL1q-bMq8P89u__iZ8opgDMEE0dXlRStMdo6zSjL5R_0EB0MJT72WcoTgEZR',
+	'API_KEY'     :'GJyyr8vb9ToPBzI7gcp7sQOH81Ol9fcfJ_UB8o7p9KYrxSjw_5ZxwsSHucPZllPG',
+}
+
+TWITTER = {
+    'APP_SECRET'  :'4e6cjsUN6vbkicTSbBuOtoZqBYOaOUbQfpA0Cciy310',
+    'API_KEY'     :'SJxbc6vHy92dZyrcTbmDqQ',
+}
+
+GOOGLE = {
+    'APP_SECRET'  :'LZRYvy7fvtJcA977DloSQVB0',
+    'API_KEY'     :'184266804193-fh72k1hcdjfi1shrkrdi34jvb41oultm.apps.googleusercontent.com'
+}
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -148,15 +169,22 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'base',
+    'social',
     'south'
 )
-
+""" MailJet Settings
 EMAIL_HOST          = 'in.mailjet.com'
 EMAIL_PORT          = 25
 EMAIL_HOST_USER     = 'd21668dd0d4bb01c19f3845e45cfa5a3'
 EMAIL_HOST_PASSWORD = 'fa2934689303dcab990c72d0838c6ef1'
 EMAIL_USE_TL        = True
+"""
 
+EMAIL_HOST          = 'smtp.sendgrid.net'
+EMAIL_PORT          = 587
+EMAIL_HOST_USER     = 'brightmap'
+EMAIL_HOST_PASSWORD = '8jcgjg93j'
+EMAIL_USE_TL        = True
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
