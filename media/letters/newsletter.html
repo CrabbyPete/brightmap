@@ -8,7 +8,7 @@
   body {
     font-family: sans-serif;
     font-size: medium;
-    background-color: #99CCFF
+    background-color: white;
 }
 
   img {
@@ -41,8 +41,11 @@
         {% endfor %}
         <p>Leads by Event</p>
         {% for event, interests in report.items %}
-            {% if interests|length > 0 %} 
+            {% if interests|length > 0 %}
+                <br/>
+                <h3>
             	{{event.describe}} for {{event.chapter.organization}} {{event.date|date:"M d, Y"}}<br/>
+                </h3>
                 {% for interest, value in interests.items %}
                     {{ value }} {% if value == 1 %} lead {% else %} leads {% endif %} for {{ interest }}<br/>
                 {% endfor %}

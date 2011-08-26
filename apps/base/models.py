@@ -174,25 +174,17 @@ class Term( models.Model ):
     cost      = models.CharField( max_length = 10, blank = True, null = True )
     buyer     = models.ForeignKey( User, blank = True, null = True )
 
+    def get_child(self):
+        for related in self._meta.get_all_related_objects():
+            try:
+                return getattr(self, related.get_accessor_name())
+            except:
+                pass
+        return None
 
     def execute(self, **kwargs):
-        # Determine whether this Deal should be connected.
-        try:
-            return self.cancel.execute()
-        except:
-            pass
-        try:
-            return self.expire.execute()
-        except:
-            pass
-        try:
-            return self.count.execute()
-        except:
-            pass
-        try:
-            return self.connects.execute()
-        except:
-            return False
+        term = self.get_child()
+        return term.execute()
 
 
 class Expire( Term ):
@@ -211,13 +203,12 @@ class Expire( Term ):
         return False
 
     def __unicode__(self, **kwargs):
-        return '<Expire:'+ self.date.strftime("%Y-%m-%d") + '>'
+        return 'expire:'+ self.date.strftime("%Y-%m-%d")
 
 class Cancel( Term ):
     """
     Subclass of Term that the Term is good until canceled
     """
-
     def execute(self, **kwargs):
         # Has this Term been canceled
         if self.buyer == None or self.canceled:
@@ -225,7 +216,7 @@ class Cancel( Term ):
         return True
 
     def __unicode__(self):
-        return '<Cancel>'
+        return 'cancel'
 
 class Count( Term ):
     """
@@ -251,7 +242,7 @@ class Count( Term ):
 
 
     def __unicode__(self):
-        return '<Count:'+ str(self.number)+ '>'
+        return 'count:'+ str(self.number)
 
 class Connects( Term ):
     """
@@ -270,7 +261,7 @@ class Connects( Term ):
         return False
 
     def __unicode__(self):
-        return '<Connects:'+ str(self.number)+ '>'
+        return 'connects:'+ str(self.number)
 
 class Letter( models.Model ):
     """
@@ -444,8 +435,7 @@ class ConnectionManager(models.Manager):
         if profile.is_leadbuyer:
             terms = Term.objects.filter(buyer = user)
             for term in terms:
-                deal = term
-                for c in self.filter(deal = deal):
+                for c in self.filter(deal = term.deal):
                     connections.append(c)
 
         if profile.is_attendee:

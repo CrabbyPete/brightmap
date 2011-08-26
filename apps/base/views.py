@@ -495,7 +495,7 @@ def show_deals(request):
             open = request.GET['open']
 
         if 'chapter' in request.GET:
-            chapter = request.GET['chapter']
+            chapter = Chapter.objects.get( pk = request.GET['chapter'])
             deals = chapter.deals()
         else:
             deals = Deal.objects.all()

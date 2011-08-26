@@ -63,12 +63,14 @@ def report_interests(date = None):
 
                 # Ignore old events
                 delta = event.date - today
-                if delta.days < 0:
-                    continue
+                # Sometimes the time is off
+                if delta.days >= -1:
+                    if delta.days == -1 and event.date.day != today.day:
+                        continue
 
-                # Get all the interests for this event
-                interests = event.interests( open = True )
-                report[event] = interests
+                    # Get all the interests for this event
+                    interests = event.interests( open = True )
+                    report[event] = interests
 
     # You are done return the report
     return report
@@ -88,9 +90,6 @@ def cronjob():
     report = report_interests()
     leads = Interest.objects.leads()
 
-    # TESTING TESTING TESTING TESTING
-    spam = ['pete.douma@gmail.com','graham@ultralightstartups.com']
-
     # Create the messsage from the email template
     c = Context({ 'date'  : date,
                   'leads' : leads,
@@ -102,6 +101,9 @@ def cronjob():
     html = loader.get_template('letters/newsletter.html').render(c)
     subject = "BrightMap Leads for the week of " + date.strftime("%Y-%m-%d")
 
+
+    # TESTING TESTING TESTING TESTING
+    spam = ['pete.douma@gmail.com', 'graham@ultralightstartups.com']
     msg = EmailMultiAlternatives( subject,
                                   text,
                                   'newsletter@brightmap.com',
@@ -119,18 +121,20 @@ def cronjob():
     """
     return
 
-
+"""
 def main():
     # Set the cron job to send mail every day at 12:00AM
     cron = pycron(latency = 30)
-    cron.add_job('*/2 * * * * *', cronjob )
+    cron.add_job('* * * * * *', cronjob )
 
     # Continually poll
     while True:
-        time.sleep(2)
+        time.sleep(30)
         for call in cron.get_matched_jobs():
             call()
 
+"""
+
 if __name__ == "__main__":
-    main()
+    cronjob()
 

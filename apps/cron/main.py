@@ -3,6 +3,7 @@ import sys
 from datetime                   import datetime
 from os.path                    import abspath, dirname, join,split
 from site                       import addsitedir
+from dateutils                  import relativedelta
 
 # Set up the environment to run on it own.
 APP_ROOT, tail = split(abspath(dirname(__file__)))
@@ -20,27 +21,28 @@ setup_environ(settings)
 from django.contrib.auth.models     import User
 from django.db.models               import Q
 from django.template                import loader, Context
+from django.core.mail               import send_mail,\
+                                           EmailMessage,EmailMultiAlternatives
 
 # Local libraries
 from client                         import EventbriteClient
 from base.models                    import *
-from mail                           import Mailer
+
 from meetup                         import MeetUpAPI
 from social.models                  import MeetupProfile
 
-"""
-# Open SMTP emailer
-mailer  = Mailer( server   = settings.EMAIL_HOST,
-                  user     = settings.EMAIL_HOST_USER,
-                  password = settings.EMAIL_HOST_PASSWORD
-                )
 
-"""
-# Open Amazon emailer
-mailer  = Mailer ( mailer = 'amazon',
-                   access_key = settings.AMAZON['AccessKeyId'],
-                   secret_key = settings.AMAZON['SecretKey']
-                 )
+AMAZON_SES = False
+if AMAZON_SES:
+
+    from mail                           import Mailer
+
+    # Open Amazon emailer
+    mailer  = Mailer ( mailer = 'amazon',
+                       access_key = settings.AMAZON['AccessKeyId'],
+                       secret_key = settings.AMAZON['SecretKey']
+                      )
+
 
 def log(message):
     """
@@ -129,10 +131,18 @@ def get_latest_events(evb, organizer_id, date = None):
         # Make sure these are not past events
         end_date = datetime.strptime(event['event']['end_date'],
                                      "%Y-%m-%d %H:%M:%S")
+
         delta = end_date - today
 
         # Only get next months events
-        if delta.days >= 0:
+        if delta.days >= -1:
+
+            # Sometimes they do not set the hour and it defaults to 2am
+            if delta.days == -1:
+                rdelta = relativedelta( end_date, today )
+                if rdelta.days < 0:
+                    continue
+
             event_ids.append([ event['event']['title'],
                                event['event']['id'],
                                end_date
@@ -140,8 +150,11 @@ def get_latest_events(evb, organizer_id, date = None):
                              )
     return event_ids
 
-# Put latest event in the database
+
 def database_events(organizer, evb = None):
+    """
+    Put the latest event in the database
+    """
     if evb == None:
 
         # Open a new Eventbrite client
@@ -172,9 +185,11 @@ def database_events(organizer, evb = None):
     # Return the events list
     return event_list
 
-
-# Generator to put the attendees in the database
 def database_attendees( evb, event ):
+    """
+    Generator to put the attendees in the database, returns attendees who
+    answered the survey
+    """
 
     # Get all the attendees for the event from Eventbrite
     attendees = get_attendees( evb, event.event_id )
@@ -269,7 +284,12 @@ def database_attendees( evb, event ):
 
 MAX_SURVEY_SEND = 10
 def make_contact( survey, deal, template ):
+    """
+    Send an email to those attendees who answered the survey and have a
+    corresponding lead buyer for an interest
+    """
     for term in deal.terms():
+        # Determine whether to execute this deal
         if not term.execute( event = survey.event ):
             continue
 
@@ -280,6 +300,7 @@ def make_contact( survey, deal, template ):
         if survey.mails_for() > MAX_SURVEY_SEND:
             continue
 
+        # Set up the email template
         sponser   = term.buyer
         attendee  = survey.attendee
         event     = survey.event
@@ -292,30 +313,49 @@ def make_contact( survey, deal, template ):
                      'organizer':organizer
                      })
 
+        # Render the message and log it
         message = template.render(c)
         print_connection( attendee, sponser, interest )
 
         subject = survey.event.describe + '-' + interest.interest
-
         recipients = [ attendee.email,
                        sponser.email,
                        event.chapter.organizer.email ]
 
-        # TESTING
-        """
-        recipients = ['pete.douma@gmail.com']
-        mailer.email_to( message,
-                         recipients,
-                         'newsletter@brightmap.com',
-                         subject
-                        )
-        """
+
+        # Send the email
+        if settings.SEND_EMAIL:
+            if AMAZON_SES:
+                mailer.email_to( message,
+                                 recipients,
+                                 'newsletter@brightmap.com',
+                                 subject
+                                )
+            else:
+                msg = EmailMultiAlternatives( subject,
+                                              text,
+                                              'newsletter@brightmap.com',
+                                              spam
+                                             )
+                #msg.attach_alternative(html, "text/html")
+                try:
+                    msg.send( fail_silently = False )
+                except:
+                    print log("Email Error")
+
+
 def print_event(event):
+    """
+    Print Event details
+    """
     delta = event.date - datetime.today()
     print log('Event - ' +  event.describe + ' ' + str(delta.days) )
 
-# Print the log message
+
 def print_connection( attendee, sponser, interest ):
+    """
+    Print Connection details
+    """
     print log(
                " Connecting: " +             \
                attendee.first_name + ' ' +   \
@@ -327,10 +367,9 @@ def print_connection( attendee, sponser, interest ):
                interest.interest
               )
 
-# This is the main routine
 def main():
     # Get all organizers
-    organizations = Organization.objects.filter()
+    organizations = Organization.objects.all()
     for organization in organizations:
         for chapter in organization.chapter_set.all():
             # Check for meetups
@@ -353,14 +392,13 @@ def main():
                 else:
                     template = loader.get_template( 'letters/default.tmpl' )
 
-                # Get the attendess of each event < 30 day away for each city
+                # Get the attendess of each event
                 for event in database_events( ticket, evb ):
 
                     # Log the events
                     print_event(event)
 
-                    # Put all attendees in the db, but only return those that
-                    #     answered the survey
+                    # Put all attendees in the db and return surveys
                     for surveys in database_attendees( evb, event ):
 
                         # For each interest match sponsers
@@ -376,6 +414,7 @@ def main():
                                           )
                                 continue
 
+                            # Connect attendees and mail contacts
                             if event.add_connection( survey, deal ):
                                 make_contact( survey, deal, template )
 

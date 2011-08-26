@@ -139,7 +139,6 @@ def spreadsheet( email, password ):
                 company = sponser['Sponsor Company']
                 title   = sponser['Sponsor Title']
                 website = sponser['Sponsor Website']
-
             except KeyError, e:
                 print "Key Error: " + e.message
                 continue
@@ -178,10 +177,17 @@ def spreadsheet( email, password ):
             # Any key that does not start with Sponsor is an interest
             keys = sponser.keys()
             for key in keys:
+
+                # Check optional sponsor details
                 if 'Sponsor' in key:
+                    if key == 'Sponsor Deal':
+                        deal_term = sponser['Sponsor Deal']
                     continue
 
-                # Get or create an interest
+                # Get or create an interest, make sure their is an 'x' in the box
+                if sponser[key] != 'x':
+                    continue
+                
                 try:
                     interest = Interest.objects.get(interest = key)
                 except Interest.DoesNotExist:
@@ -206,16 +212,79 @@ def spreadsheet( email, password ):
                     deal.save()
 
                 # Get or create a term
-                terms = Term.objects.filter(deal = deal)
-                if terms.count() > 0:
-                    for term in terms:
-                        pass
-                else:
-                    term = Cancel( deal = deal,
-                                   buyer = user,
-                                   cost = 0
-                                  )
+                term_type, cost = deal_term.split(',')
+                term_type = term_type.split(':')
+                try:
+                    term = Term.objects.get( deal = deal, buyer = user )
+                except Term.DoesNotExist:
+                    # Good til Canceled
+                    if 'cancel' == term_type[0]:
+                        term = Cancel( deal = deal,
+                                       buyer = user,
+                                       cost = cost
+                                      )
+                    # Good til exires
+                    elif 'expire' == term_type[0]:
+                        date = datetime.strptime(term_type[1],"%m/%d/%y")
+                        term = Expire( deal = deal,
+                                       buyer = user,
+                                       cost = cost,
+                                       date = date
+                                     )
+
+                    # Good for x number of events
+                    elif 'count'  == term_type[0]:
+                        try:
+                            number = int(term_type[1])
+                        except ValueError:
+                            pass
+                        else:
+                            term = Count( deal      = deal,
+                                          buyer     = user,
+                                          cost      = cost,
+                                          number    = number,
+                                          remaining = number,
+                                        )
+
+                    # Good for x number of connections
+                    elif 'connects' == term_type[0]:
+                        try:
+                            number = int(term_type[1])
+                        except ValueError:
+                            pass
+                        else:
+                            term = Connects( deal      = deal,
+                                             buyer     = user,
+                                             cost      = cost,
+                                             number    = number,
+                                             remaining = number
+                                            )
+                    else:
+                        print "Error No Deal Type: ", + term_type[1]
+
                     term.save()
+                else:
+                    # Determine child type
+                    cterm = term.get_child()
+                    # This should never be None, unless a term bombed while save
+                    if cterm != None:
+                        cterm.cost = cost
+                        if isinstance(cterm,Expire):
+                            cterm.date = datetime.strptime( term_type[1],
+                                                            "%m/%d/%y"
+                                                          )
+                        elif isinstance(cterm,Count) or \
+                             isinstance(cterm,Connects):
+                            try:
+                                number = int(term_type[1])
+                            except ValueError:
+                                pass
+                            else:
+                                cterm.number    = int(term_type[1])
+                                cterm.remaining = int(term_type[1])
+                                cterm.save()
+                    else:
+                        print "No Terms for : "+ term
 
 import cProfile
 if __name__ == '__main__':

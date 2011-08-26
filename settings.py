@@ -3,6 +3,8 @@
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+SEND_EMAIL = False
+
 ADMINS = (
      ('PeteD', 'pete@brightmap.com'),
 )
