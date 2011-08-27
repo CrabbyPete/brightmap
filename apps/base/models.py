@@ -78,6 +78,9 @@ class Chapter( models.Model ):
         return self.name
 
 class Eventbrite( models.Model ):
+    """
+    Information needed to access Eventbrite API
+    """
     chapter       = models.ForeignKey( Chapter )
     user_key      = models.CharField( default = None, max_length = 45 )
     organizer_id  = models.CharField( default = None, max_length = 45 )
@@ -88,6 +91,9 @@ class Eventbrite( models.Model ):
 
 
 class MeetUp( models.Model ):
+    """
+    Information needed to access Meetup API
+    """
     chapter    = models.ForeignKey( Chapter )
     member_id  = models.CharField( max_length = 45, default = None, null = True )
     token	   = models.CharField( max_length = 45, default = None, null = True )
@@ -101,8 +107,10 @@ class LeadBuyer( models.Model ):
     """
     Lead buyer interests
     """
-    user            = models.ForeignKey( User )
-    interests       = models.ManyToManyField( 'Interest' )
+    user        = models.ForeignKey( User )
+    interests   = models.ManyToManyField( 'Interest' )
+    letter      = models.ForeignKey( 'Letter',  blank = True, null = True )
+    budget      = models.CharField( max_length = 45, default = None, null = True )     
 
     def __unicode__(self):
         return user.email
@@ -163,7 +171,7 @@ class Deal(models.Model):
     def __unicode__(self):
         return self.interest.interest
 
-# Term describes the terms for each Deal
+
 class Term( models.Model ):
     """
     A Term are the terms of a Deal. There can be many Terms for each Deal
@@ -173,6 +181,7 @@ class Term( models.Model ):
     canceled  = models.BooleanField( default = False )
     cost      = models.CharField( max_length = 10, blank = True, null = True )
     buyer     = models.ForeignKey( User, blank = True, null = True )
+    monthly   = models.BooleanField( default = False )
 
     def get_child(self):
         for related in self._meta.get_all_related_objects():
@@ -357,9 +366,8 @@ class Event(models.Model):
 
 
     def deals( self, interest ):
-        """
-        Get deals for a normalized interest for this event
-        """
+        # Get deals for a normalized interest for this event
+
         deal_list = []
         normal_interest = Interest.objects.close_to( interest )
         deals = Deal.objects.filter( chapter  = self.chapter,
@@ -374,9 +382,8 @@ class Event(models.Model):
 
 
     def add_connection( self, survey, deal ):
-        """
-        Add a connection to an Event and an attendee
-        """
+        # Add a connection to an Event and an attendee
+        
         # Look for any existing deals
         try:
             connection  = Connection.objects.get( survey = survey,
@@ -398,6 +405,9 @@ class SurveyManager(models.Manager):
 
 
 class Survey(models.Model):
+    """
+    Information for each survey filled out for an event by an attendee
+    """
     event       = models.ForeignKey( Event )
     attendee    = models.ForeignKey( User )
     interest    = models.ForeignKey( Interest, default = None, null = True )
@@ -426,9 +436,8 @@ class ConnectionManager(models.Manager):
     Model Manager for Connection class
     """
     def for_user(self, user ):
-        """
-        Get Connections for a particular user
-        """
+        # Get Connections for a particular user
+
         profile = user.get_profile()
         connections = []
 
@@ -447,9 +456,8 @@ class ConnectionManager(models.Manager):
         return connections
 
     def for_event(self, event ):
-        """
-        Get all Connections for an event
-        """
+        # Get all Connections for an event
+
         self.filter(event.survey)
 
 class Connection(models.Model):
@@ -463,9 +471,8 @@ class Connection(models.Model):
     objects         = ConnectionManager()
 
     def buyers(self):
-        """
-        Who was the buyer of this Deal
-        """
+        # Who was the buyer of this Deal
+        
         buyers = []
         for term in self.deal.terms:
             if term.buyer != None:
@@ -473,9 +480,8 @@ class Connection(models.Model):
         return buyers
 
     def is_connected(self, user ):
-        """
-        Returns whether a user is part of this connection
-        """
+        #Returns whether a user is part of this connection
+    
         if self.attendee == user:
             return True
         terms = Term.objects.filter( buyer = user )

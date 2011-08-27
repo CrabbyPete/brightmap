@@ -167,7 +167,7 @@ def spreadsheet( email, password ):
             profile.is_leadbuyer = True
             profile.save()
 
-            # Get or create a leadbuy for this user
+            # Get or create a lead buyer for this user
             try:
                 lb = LeadBuyer.objects.get(user = user)
             except LeadBuyer.DoesNotExist:
@@ -176,6 +176,9 @@ def spreadsheet( email, password ):
 
             # Any key that does not start with Sponsor is an interest
             keys = sponser.keys()
+            
+            # Default deal is good til cancel
+            deal_term = "cancel: ,20"
             for key in keys:
 
                 # Check optional sponsor details
