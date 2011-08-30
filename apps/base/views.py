@@ -1,8 +1,6 @@
 # Python imports
 import settings
 
-from dateutil.parser import *
-
 # Django imports
 from django.contrib                 import  auth
 from django.http                    import  HttpResponseRedirect
@@ -10,7 +8,6 @@ from django.forms.util              import  ErrorList
 from django.shortcuts               import  render_to_response
 from django.template                import  RequestContext
 from django.views.decorators.csrf   import  csrf_protect, csrf_exempt
-from django.db.models               import  Q
 from django.contrib.auth.models     import  User
 from django.core.urlresolvers       import  reverse
 
@@ -58,10 +55,10 @@ def login(request):
     password = form.cleaned_data['password']
 
     try:
-        user = User.objects.get(Q(username = username))
+        user = User.objects.get(username = username)
     except User.DoesNotExist:
         try:
-            user = User.objects.get(Q(email = username))
+            user = User.objects.get(email = username)
         except User.DoesNotExist:
             form._errors['username']  = ErrorList(["User does not exist or wrong password"])
             return submit_form(form)
@@ -332,7 +329,7 @@ def edit_interest( request ):
     interests = interests.split('\r\n')
     for interest in interests:
         try:
-            in_interest = Interest.objects.get( Q(interest = interest) )
+            in_interest = Interest.objects.get( interest = interest )
         except Interest.DoesNotExist:
             in_interest = Interest( interest = interest )
             in_interest.save()

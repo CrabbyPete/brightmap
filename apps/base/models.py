@@ -2,10 +2,8 @@ from difflib                                import SequenceMatcher
 from datetime                               import date
 
 from django.db                              import models
-from django.db.models                       import Q
 from django.contrib.auth.models             import User
 from django.contrib.localflavor.us.models   import PhoneNumberField
-from django.contrib.contenttypes.models     import ContentType
 
 
 class Profile( models.Model ):
@@ -110,8 +108,10 @@ class LeadBuyer( models.Model ):
     user        = models.ForeignKey( User )
     interests   = models.ManyToManyField( 'Interest' )
     letter      = models.ForeignKey( 'Letter',  blank = True, null = True )
-    budget      = models.CharField( max_length = 45, default = None, null = True )     
-
+    budget      = models.DecimalField( max_digits= 12 , decimal_places = 2,
+                                       blank = True, null = True 
+                                     )
+    
     def __unicode__(self):
         return user.email
 
@@ -158,7 +158,7 @@ class Deal(models.Model):
     """
     interest     = models.ForeignKey( Interest )
     chapter      = models.ForeignKey( Chapter )
-    max_sell     = models.IntegerField(default = 3)
+    exclusive    = models.BooleanField( default = False )
 
     def connections(self):
         # Return all the connections for all Deals
@@ -179,9 +179,9 @@ class Term( models.Model ):
 
     deal      = models.ForeignKey( Deal )
     canceled  = models.BooleanField( default = False )
-    cost      = models.CharField( max_length = 10, blank = True, null = True )
+    cost      = models.DecimalField( max_digits=8, decimal_places=2, default = 0.00 )
     buyer     = models.ForeignKey( User, blank = True, null = True )
-    monthly   = models.BooleanField( default = False )
+    monthly   = models.BooleanField( default = True )
 
     def get_child(self):
         for related in self._meta.get_all_related_objects():

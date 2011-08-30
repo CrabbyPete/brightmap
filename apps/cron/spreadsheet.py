@@ -210,7 +210,6 @@ def spreadsheet( email, password ):
                 except Deal.DoesNotExist:
                     deal = Deal( chapter = d_chapter,
                                  interest = interest,
-                                 max_sell = 3
                                 )
                     deal.save()
 
@@ -221,17 +220,32 @@ def spreadsheet( email, password ):
                     term = Term.objects.get( deal = deal, buyer = user )
                 except Term.DoesNotExist:
                     # Good til Canceled
-                    if 'cancel' == term_type[0]:
+                    if 'cancel'    == term_type[0] or \
+                       'sponsored' == term_type[0] or \
+                       'exclusive' == term_type[0]     :
+                        try:
+                            number = int(term_type[1])
+                        except ValueError:
+                            number = 0
+                        
+                        lb.budget = number
+                        lb.save()
+                    
                         term = Cancel( deal = deal,
                                        buyer = user,
                                        cost = cost
                                       )
+                        
+                        if 'exclusive' == term_type[0]:
+                            deal.exclusive = True
+                            deal.save()
+                            
                     # Good til exires
                     elif 'expire' == term_type[0]:
                         date = datetime.strptime(term_type[1],"%m/%d/%y")
                         term = Expire( deal = deal,
                                        buyer = user,
-                                       cost = cost,
+                                       cost = 0,
                                        date = date
                                      )
 
@@ -240,32 +254,34 @@ def spreadsheet( email, password ):
                         try:
                             number = int(term_type[1])
                         except ValueError:
-                            pass
-                        else:
-                            term = Count( deal      = deal,
-                                          buyer     = user,
-                                          cost      = cost,
-                                          number    = number,
-                                          remaining = number,
-                                        )
+                            number = 0
+                    
+                        term = Count( deal      = deal,
+                                      buyer     = user,
+                                      cost      = cost,
+                                      number    = number,
+                                      remaining = number,
+                                     )
 
                     # Good for x number of connections
                     elif 'connects' == term_type[0]:
                         try:
                             number = int(term_type[1])
                         except ValueError:
-                            pass
-                        else:
-                            term = Connects( deal      = deal,
-                                             buyer     = user,
-                                             cost      = cost,
-                                             number    = number,
-                                             remaining = number
-                                            )
+                            number = 0
+                        
+                        term = Connects( deal      = deal,
+                                         buyer     = user,
+                                         cost      = cost,
+                                         number    = number,
+                                         remaining = number
+                                        )
                     else:
                         print "Error No Deal Type: ", + term_type[1]
 
                     term.save()
+                
+                # Update an existing deal
                 else:
                     # Determine child type
                     cterm = term.get_child()
