@@ -294,7 +294,7 @@ def make_contact( survey, deal, template ):
     """
     for term in deal.terms():
         # Determine whether to execute this deal
-        if not term.execute( event = survey.event ):
+        if term == None or not term.execute( event = survey.event ):
             continue
 
         # Determine if you did this or not
