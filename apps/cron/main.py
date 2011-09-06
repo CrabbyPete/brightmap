@@ -292,6 +292,9 @@ def make_contact( survey, deal, template ):
     Send an email to those attendees who answered the survey and have a
     corresponding lead buyer for an interest
     """
+    if deal == None:
+        return 
+    
     for term in deal.terms():
         # Determine whether to execute this deal
         if term == None or not term.execute( event = survey.event ):
