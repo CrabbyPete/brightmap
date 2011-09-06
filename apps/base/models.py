@@ -22,6 +22,7 @@ class Profile( models.Model ):
     linkedin   = models.URLField(                    blank = True, null = True )
     photo      = models.URLField(                    blank = True, null = True )
 
+    is_ready      = models.BooleanField( default = False )
     is_organizer  = models.BooleanField( default = False )
     is_leadbuyer  = models.BooleanField( default = False )
     is_attendee   = models.BooleanField( default = False )
@@ -61,7 +62,11 @@ class Chapter( models.Model ):
 
     def deal( self, interest ):
         # Get the deal for a specific interest
-        return self.deal_set.get( interest = interest )
+        try:
+            return self.deal_set.get( interest = interest )
+        except:
+            return None
+            
 
     def events( self ):
         # Get all the events for this chapter
@@ -106,12 +111,20 @@ class LeadBuyer( models.Model ):
     Lead buyer interests
     """
     user        = models.ForeignKey( User )
-    interests   = models.ManyToManyField( 'Interest' )
     letter      = models.ForeignKey( 'Letter',  blank = True, null = True )
-    budget      = models.DecimalField( max_digits= 12 , decimal_places = 2,
-                                       blank = True, null = True 
+
+    budget      = models.DecimalField( max_digits= 12,
+                                       decimal_places = 2,
+                                       blank = True, null = True
                                      )
+
+    def deals(self):
+        return Term.objects.filter(buyer = self.user)
     
+    def connections(self):
+        return Connection.objects.for_user(self.user)
+        
+        
     def __unicode__(self):
         return user.email
 
@@ -128,7 +141,7 @@ class InterestManager( models.Manager ):
         return None
 
     def leads(self, event = None):
-        # Return all the leads for this Interest
+        # Return all Interests and a count for all Interest
         interests = {}
         for survey in Survey.objects.all():
             if survey.interest == None:
@@ -150,7 +163,32 @@ class Interest(models.Model):
 
     def __unicode__(self):
         return self.interest
-
+    
+    def events(self, day = None, open = False ):
+        # Return all the events that have this interest
+        report = {}
+        if day == None:
+            day = date.today()
+            
+        for survey in Survey.objects.filter(interest = self):
+            # Check is exclusive
+            if open:
+                deal = survey.event.chapter.deal( self )
+                if deal and deal.exclusive():
+                    continue
+            
+            # Don't report past events
+            if date < survey.event.date:
+                continue
+            
+            # Count
+            if survey.event in report:
+                report[survey.event] += 1
+            else:
+                report[survey.event] = 1
+        
+        return report
+                
 class Deal(models.Model):
     """
     Deal is a link between an Interest and a Chapter. There should only be one
@@ -158,7 +196,6 @@ class Deal(models.Model):
     """
     interest     = models.ForeignKey( Interest )
     chapter      = models.ForeignKey( Chapter )
-    exclusive    = models.BooleanField( default = False )
 
     def connections(self):
         # Return all the connections for all Deals
@@ -168,21 +205,40 @@ class Deal(models.Model):
         # Return all the Terms for this Deal
         return self.term_set.all()
 
+    def exclusive ( self ):
+        # Return the excluve for this deal, None if none
+        for term in self.terms():
+            if term.exclusive and term.status == 'approved':
+                return term
+        return None
+            
     def __unicode__(self):
         return self.interest.interest
 
+TERM_STATUS = ((0,'canceled' ),
+               (1,'pending'  ),
+               (2,'approved' ),
+               (3,'rejected' ),
+               (4,'sponsored')
+               )
 
 class Term( models.Model ):
     """
     A Term are the terms of a Deal. There can be many Terms for each Deal
     """
-
     deal      = models.ForeignKey( Deal )
-    canceled  = models.BooleanField( default = False )
-    cost      = models.DecimalField( max_digits=8, decimal_places=2, default = 0.00 )
+    cost      = models.DecimalField( max_digits = 10, decimal_places = 2, default = 0.00 )
     buyer     = models.ForeignKey( User, blank = True, null = True )
-    monthly   = models.BooleanField( default = True )
-
+    exclusive = models.BooleanField( default = False )
+    status    = models.CharField( max_length = 20, default ='pending', null = True )
+    """
+    Valid Status:
+        pending   - a lead buyer wants this deal, but not approved
+        approved  - this deal approved by the organizer
+        rejected  - this deal rejected
+        canceled  - this deal canceled
+        sponsored - free, but only one
+    """
     def get_child(self):
         for related in self._meta.get_all_related_objects():
             try:
@@ -203,7 +259,7 @@ class Expire( Term ):
     date        = models.DateField()
 
     def execute(self, **kwargs):
-        if self.buyer == None or self.canceled:
+        if self.buyer == None or self.status != 'approved':
             return False
 
         delta = self.date - date.today()
@@ -220,12 +276,39 @@ class Cancel( Term ):
     """
     def execute(self, **kwargs):
         # Has this Term been canceled
-        if self.buyer == None or self.canceled:
+        if self.buyer == None or self.status != 'approved':
             return False
+
         return True
 
     def __unicode__(self):
         return 'cancel'
+
+class Budget( Term ):
+    
+    remaining   = models.DecimalField( max_digits= 12,
+                                       decimal_places = 2,
+                                       blank = True, 
+                                       null = True
+                                     )   
+    def execute(self, **kwargs):
+        # Has this Term been canceled
+        if self.buyer == None or self.status != 'approved':
+            return False
+        
+        # Refill on day 1
+        today = date.today()
+        if today.day == 1:
+            remaining = buyer.budget
+        
+        # Is money left to do this?
+        if self.remaining < self.cost:
+            return False
+    
+        # Deduct the money and do it.
+        self.remaining -= self.cost
+        self.save()
+        return True
 
 class Count( Term ):
     """
@@ -236,7 +319,7 @@ class Count( Term ):
     last_event   = models.ForeignKey('Event',  blank = True, null = True )
 
     def execute(self, **kwargs):
-        if self.buyer == None or self.canceled:
+        if self.buyer == None or self.status != 'approved':
             return False
 
         if self.last_event == None:
@@ -247,6 +330,7 @@ class Count( Term ):
             if self.remaining > 0:
                 self.last_event = kwargs['event']
                 self.remaining -= 1
+                self.save()
         return True
 
 
@@ -261,16 +345,20 @@ class Connects( Term ):
     remaining   = models.IntegerField()
 
     def execute(self, **kwargs):
-        if self.buyer == None or self.canceled:
+        if self.buyer == None or self.status != 'approved':
             return False
 
-        if self.remaining > 0:
-            self.remaining -= 1
-            return True
-        return False
+        if self.remaining <= 0:
+            return False
+        
+        self.remaining -= 1
+        self.save()    
+        return True
+ 
 
     def __unicode__(self):
         return 'connects:'+ str(self.number)
+
 
 class Letter( models.Model ):
     """
@@ -346,7 +434,8 @@ class Event(models.Model):
                 except Deal.DoesNotExist:
                     pass
                 else:
-                    if deal.max_sell == 1:
+                    # There are no deals or the deal has an exclusive
+                    if deal == None or deal.exclusive() != None:
                         continue
 
             if not survey.interest.interest in interests:
@@ -367,6 +456,7 @@ class Event(models.Model):
 
     def deals( self, interest ):
         # Get deals for a normalized interest for this event
+        # If exclusive return only exclusive deals
 
         deal_list = []
         normal_interest = Interest.objects.close_to( interest )
@@ -375,15 +465,14 @@ class Event(models.Model):
                                    )
         for deal in deals:
             for event in deal.chapter.events():
-                if event == self:
-                    deal_list.append(deal)
-
+                deal_list.append(deal)
+ 
         return deal_list
 
 
     def add_connection( self, survey, deal ):
         # Add a connection to an Event and an attendee
-        
+
         # Look for any existing deals
         try:
             connection  = Connection.objects.get( survey = survey,
@@ -472,7 +561,7 @@ class Connection(models.Model):
 
     def buyers(self):
         # Who was the buyer of this Deal
-        
+
         buyers = []
         for term in self.deal.terms:
             if term.buyer != None:
@@ -481,7 +570,7 @@ class Connection(models.Model):
 
     def is_connected(self, user ):
         #Returns whether a user is part of this connection
-    
+
         if self.attendee == user:
             return True
         terms = Term.objects.filter( buyer = user )

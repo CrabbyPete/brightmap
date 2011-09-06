@@ -200,6 +200,11 @@ LOGGING = {
         'mail_admins': {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler'
+        },
+        'main': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler', # set the logging class to log to a file
+            'filename': './main.log'        # log file
         }
     },
     'loggers': {
@@ -208,5 +213,10 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
+        'main.py': {
+            'handlers': ['main'],
+            'level': 'DEBUG',
+            'propagate': True,
+        }
     }
 }

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block mess_list %}
+{% block body_block %}
     <div id="bodyc">
         {% for deal in deals %} 
              <a href='{% url show_deal %}?deal={{deal.pk}}'>{{ deal.interest }} </a> {{deal.organizer.organization}}<br/>

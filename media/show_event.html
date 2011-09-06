@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block mess_list %}
+{% block body_block %}
     <div id="bodyc">
         {% for attendee, value in attendees.items %}
   			<ul><a href='{%url show_connection%}?user={{attendee.pk}}'>{{attendee.first_name}} {{attendee.last_name}}</a>

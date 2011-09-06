@@ -1,21 +1,15 @@
 {% extends "base.html" %}
 
-{% block mess_list %}
-    <div id="bodyc">
-        <div id="signupform">
+{% block body_block %}
+	<div id="signupform">
         <form action="{% url signup %}" method="post" class="sup" id="sign"  Signup" name="sign">
           {% csrf_token %}
    		    {{form.email.label}}{{form.email}}{{form.email.errors}}<br/>
-   		    {{form.password.label}}{{form.password}}{{form.password.errors}}<br/>
-   		    {{form.pass_confirm.label}}{{form.pass_confirm}}{{form.pass_confirm.errors}}<br/>
    		    {{form.first_name.label}}{{form.first_name}}{{form.first_name.errors}}<br/>
     		{{form.last_name.label}}{{form.last_name}}{{form.last_name.errors}}<br/>
-    		{{form.is_organizer.label}}{{form.is_organizer}}{{form.is_organizer.errors}}
-  			{{form.is_leadbuyer.label}}{{form.is_leadbuyer}}{{form.is_leadbuyer.errors}}
+    		{{form.is_organizer.label}}{{form.is_organizer}}{{form.is_organizer.errors}}<br/>
+  			{{form.is_leadbuyer.label}}{{form.is_leadbuyer}}{{form.is_leadbuyer.errors}}<br/>
           <input  type="submit" value="Create Account" class="button" /><br />
         </form>
-      </div>
-      <a href='{% url linkedin %}'><img src='/media/img/linkedin.png'/></a>
-      <a href='{% url meetup   %}'><img src='/media/img/meetup.png' /></a>
 	</div>
 {% endblock %}

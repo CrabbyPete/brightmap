@@ -7,35 +7,34 @@
 <meta name="description" content="" />
 <link href="/media/css/style.css" rel="stylesheet" type="text/css" />
 <link href="/media/css/form.css" rel="stylesheet" type="text/css" />
-<link href="/media/css/tabs.css" rel="stylesheet" type="text/css" />
 </head>
 
-<body>
-  {% load i18n %}
-  {% load smartif %}
-  {% block js %}
-  {% endblock %}
-
-<!--mainContainer start -->
-    <h1> BrightMap </h1>
-    <div id="mainContainer">
-
-      {% block page_menu %}
-      {% endblock %}
-	  {% block body_block %}
-	  {% endblock %}
-
-      {% block mess_list %}
-      {% endblock %}
-      {% block profile %}
-      {% endblock %}
+<body class="oneColFixCtr">
+  	{% load i18n %}
+  	{% load smartif %}
+  	{% block js %}
+  	{% endblock %}
+	<div id="container">
+  		<div id="mainContent">
+  		   <table width="100%" border="0" cellspacing="20" cellpadding="5">
+      		<tr>
+        		<td><a href="/"><img src="/media/img/brightmap-logo-220.jpg" alt="BrightMap" border="0"/></a></td>
+      		</tr>
+      		<tr>
+        		<td><strong>BrightMap - Connecting Business Communities</strong></td>
+      		</tr>
+    		</table>
+  			{% block menu_block %}
+  			{% endblock %}
+  			{% block body_block %}
+  			{% endblock %}
+  	  	</div> <!-- end #mainContent -->
+	</div> <!-- end #container -->
 
 	<!--footer start -->
-		<div id="footer">
-			<p>&copy; 2011 BrightMap, All Rights Reserved.</p>
-		</div>
-	<!--footer end -->
+	<div id="footer">
+		<p>&copy; 2011 BrightMap, All Rights Reserved.</p>
 	</div>
-<!--mainContaainer end -->
+	<!--footer end -->
 </body>
 </html>

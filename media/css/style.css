@@ -1,84 +1,139 @@
-/* Getting the new tags to behave */
-article, aside, audio, canvas, command, datalist, details, embed, figcaption, figure, footer, header, hgroup, keygen, meter, nav, output, progress, section, source, video{ display: block; }
-mark, rp, rt, ruby, summary, time{ display: inline }
+/* Global Styles */
 
-@font-face {
-	font-family: 'Lobster1.1Regular';
-	src: url('../fonts/Lobster_1.1_-webfont.eot');
-	src: local('☺'), url('../fonts/Lobster_1.1_-webfont.woff') format('woff'), url('../fonts/Lobster_1.1_-webfont.ttf') format('truetype'), url('../fonts/Lobster_1.1_-webfont.svg#webfont30G9S4nm') format('svg');
-	font-weight: normal;
-	font-style: normal; }
+body {
+	font: 100% Verdana, Arial, Helvetica, sans-serif;
+	background: #666666;
+	margin: 0; /* it's good practice to zero the margin and padding of the body element to account for differing browser defaults */
+	padding: 0;
+	text-align: center; /* this centers the container in IE 5* browsers. The text is then set to the left aligned default in the #container selector */
+	color: #000000;
+}
 
-@font-face {
-	font-family: 'RalewayThin';
-	src: url('../fonts/raleway_thin-webfont.eot');
-	src: local('☺'), url('../fonts/raleway_thin-webfont.woff') format('woff'), url('../fonts/raleway_thin-webfont.ttf') format('truetype'), url('../fonts/raleway_thin-webfont.svg#webfont') format('svg');
-	font-weight: normal;
-	font-style: normal; }
+td {
+	font:15px verdana;
+	color:#000000;
+	}
+	
+hr {
+	height:1px; 
+	color: #ffffff;
+	border: none;
+	}
+	
+a {
+	color: #888888;
+	text-decoration:none;
+	}
+	
+a:hover {
+	color: #000000;
+	text-decoration:none;
+	}
 
-/* Site-wide properties ======================================================== */
-body{
-    font: normal normal 12px/12px Tahoma, Arial, Helvetica, Verdana, sans-serif; }
+a:visited {
+	text-decoration:none;
+	}
 
-    /* Fibonacci based heading scale ratio */
-    h1{ font-size: 4.4em; font-weight: normal; }
-    h2{ font-size: 2.8em; font-weight: bold; }
-    h3{ font-size: 1.6em; font-weight: bold; }
-    h4{ font-size: 1.2em; font-weight: bold; }
+ul
+  {
+  margin-left: 1em;
+  padding-left: 0;
+  }
+li
+  {
+  margin: 0;
+  padding: 0;
+  }
+	
+/* ID Styles */
 
-/* Reusable classes ============================================================ */
+#navigation a {
+	font:11px verdana;
+	color: #ffffff;
+	font-weight:bold;
+	text-decoration: none;
+	letter-spacing:.1em;
+	line-height:16px;
+	display:block;
+	padding:10px;
+	border: 1pt solid rgb(20,40,95);
+	border-right-width: 0px; 
+	border-left-width: 0px; 
+	}
+	
+#navigation a:hover {
+	color:#ffffff;
+	border: 1pt dotted red;
+	border-right-width: 0px; 
+	border-left-width: 0px; 
+	}
+	
+#sidebarHeader {
+	padding: 0px 4px 14px 4px;
+	}
+	
+#dateformat a {
+	color:#ffffff;
+	font:11px verdana;
+	color: #000000;
+	letter-spacing:.2em;
+	text-decoration:none;
+	font-weight:bold;
+	}
+	
+#dateformat a:hover {
+	color: #ffffff;
+	}
 
-/* Left & Right alignment */
-.left{ float: left; }
-.right{ float: right; }
+	
+.oneColFixCtr #container {
+	width: 780px;  /* using 20px less than a full 800px width allows for browser chrome and avoids a horizontal scroll bar */
+	background: #FFFFFF;
+	margin: 0 auto; /* the auto margins (in conjunction with a width) center the page */
+	border: 1px solid #000000;
+	text-align: left; /* this overrides the text-align: center on the body element. */
+}
+.oneColFixCtr #mainContent {
+	padding: 0 20px; /* remember that padding is the space inside the div box and margin is the space outside the div box */
+}
 
-/* The inside class provides consistent padding. To be used often! */
-.inside{ padding: 20px; }
+#show_available_leads {
+	font:11px verdana;
+}
 
-/* The fraction classes are useful for column lists */
-.half, .third, .quarter, .fifth, .sixth{ width: 100%; }
-.half li, .third li, .quarter li, .fifth li, .sixth li{ float: left; }
-.half li{ padding-right: 5%; width: 45% }
-.third li{  padding-right: 5%; width: 28.3% }
-.quarter li{  padding-right: 5%; width: 20% }
-.fifth li{  padding-right: 5%; width: 15% }
 
-/* For when a <br /> just ain't enough */
-.separator{
-    clear: both;
-    float: left;
-    height: 1px;
-    width: 100%; }
 
-/* Basic Structure ============================================================= */
-#wrap{
-    margin: 0 auto;
-    position: relative;
-    width: 960px; }
+/* Footer */
 
-    /* Header */
-    header{
-        float: left;
-        width: 100%; }
+#footer {
+	width: 900px;
+	height: 50px;
+	margin: 0 auto;
+	margin-bottom: 20px;
+	font-size: 11px;
+	color: #CCCCCC;
+}
 
-    /* Content */
-    article{
-        float: left;
-        width: 66.7%; }
+#footer p {
+	margin: 0;
+	padding: 13px 20px 15px 20px;
+}
 
-    /* Sidebar */
-    aside{
-        float: left;
-        width: 33.3%; }
+#footer a {
+	color: #FFFFFF;
+}
 
-    /* Footer */
-    footer{
-        float: left;
-        width: 100%; }
+#legal {
+	float: left;
+}
 
-/* Project specifics =========================================================== */
-/* Pour some CSS below ========================================================= */
+#links {
+	float: right;
+}
 
-/* The H1 declarations - for @font-face presentational purposes only */
-h1{ font: 50px 'Lobster1.1Regular', Arial, sans-serif; }
-    h1 span{ font: 50px RalewayThin, Arial, sans-serif; letter-spacing: -4px }
+#hmenu li {
+	display: inline;
+	list-style-type: none;
+	padding-right: 20px;
+}
+

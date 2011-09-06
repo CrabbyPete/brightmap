@@ -1,6 +1,6 @@
 # Import system stuff
 import os, sys, uuid, time, re
-from datetime import datetime
+from datetime import datetime, date
 
 import cProfile
 
@@ -40,39 +40,22 @@ mailer  = Mailer ( mailer = 'amazon',
                  )
 
 """
-
-def report_interests(date = None):
+def report_interests ( date = None ):
     """
-    Report number of interests for each event
+    Interests Report
     """
-
-    # Return a dictionary of events and interests
     report = {}
-    if date == None:
-        today = datetime.today()
-    else:
-        today = date
-
-    # Get all organizers
-    organizations = Organization.objects.all()
-    for organization in organizations:
-        for chapter in organization.chapters():
-
-            # Get all the events for this organization/chapter
-            for event in chapter.events():
-
-                # Ignore old events
-                delta = event.date - today
-                # Sometimes the time is off
-                if delta.days >= -1:
-                    if delta.days == -1 and event.date.day != today.day:
-                        continue
-
-                    # Get all the interests for this event
-                    interests = event.interests( open = True )
-                    report[event] = interests
-
-    # You are done return the report
+    interests = Interest.objects.all()
+    for interest in interests:
+        report[interest] = interest.events( open = True )
+    
+    """ For testing
+    for interest, event  in report.items():
+        print interest.interest
+        
+        for ev, count in event.items():
+            print ev.describe + ':' + str(count)
+    """
     return report
 
 
@@ -88,11 +71,9 @@ def cronjob():
 
     # Get the latest report
     report = report_interests()
-    leads = Interest.objects.leads()
 
     # Create the messsage from the email template
     c = Context({ 'date'  : date,
-                  'leads' : leads,
                   'report': report
                 })
 
@@ -103,7 +84,7 @@ def cronjob():
 
 
     # TESTING TESTING TESTING TESTING
-    spam = ['pete.douma@gmail.com', 'graham@ultralightstartups.com']
+    spam = ['pete.douma@gmail.com']
     msg = EmailMultiAlternatives( subject,
                                   text,
                                   'newsletter@brightmap.com',

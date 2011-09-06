@@ -8,7 +8,7 @@
  			{% if term.buyer %}
  				Deal Organization: {{deal.chapter.name}}<br/>
  				Deal Interest:{{deal.interest.interest}}<br/>
- 				Max Number: {{deal.max_sell}}<br/>
+ 				Exclusive: {{term.exclusive}}<br/>
  				Cost: ${{ term.cost }}<br/>
  				{% if term.cancel %}
  					Term Type: Good Til Canceled<br/>
@@ -19,13 +19,16 @@
  				{% if term.count %}
  			    	Term Type: Good For {{term.count.number}} Times<br/>
  				{% endif %}
+ 				{% if term.budget %}
+ 					Term Type: Remaining Budget = {{ term.budget.remaining }}<br/>
+ 				{% endif %}
  				Term Buyer: {{term.buyer}}<br/>
  				{% if not term.canceled %}
  					<a href='{% url cancel_term %}?term={{term.pk}}'>Cancel Deal</a><br/>
  				{% else %}
  					These terms are canceled<br/>
  				{% endif %}   
- 				<a href='{% url edit_deal %}?deal={{deal.pk}}'>Edit Deal</a><br />
+ 				<a href='{% url edit_deal %}?term={{term.pk}}'>Edit Deal</a><br />
  			{% endif %}
  		{% endfor %}
  		<h3>Offers</h3>
@@ -49,7 +52,7 @@
  				{% else %}
  					This offer canceled<br/>
  				{% endif %}   
- 				<a href='{% url edit_deal %}?deal={{deal.pk}}'>Edit Offer</a><br />
+ 				<a href='{% url edit_deal %}?term={{term.pk}}'>Edit Offer</a><br />
  				<br/>
  			{% endif %}
  		{% endfor %}

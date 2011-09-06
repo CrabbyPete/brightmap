@@ -1,5 +1,5 @@
 
-import sys
+import sys, optparse
 from datetime                   import datetime
 from os.path                    import abspath, dirname, join,split
 from site                       import addsitedir
@@ -18,6 +18,8 @@ import settings
 setup_environ(settings)
 
 # From here on through its treated as a normal django module
+import logging
+
 from django.contrib.auth.models     import User
 from django.db.models               import Q
 from django.template                import loader, Context
@@ -31,7 +33,9 @@ from base.models                    import *
 from meetup                         import MeetUpAPI
 from social.models                  import MeetupProfile
 
+logger = logging.getLogger('main.py')
 
+PROMPT     = False
 AMAZON_SES = False
 if AMAZON_SES:
 
@@ -108,14 +112,14 @@ def get_latest_events(evb, organizer_id, date = None):
         events = evb.list_organizer_events(organizer_id = organizer_id)
     except:
         print log( 'Eventbrite Error: Events for ' + organizer_id )
+        logger.debug('Eventbrite Error: Events for ' + organizer_id )
         return []
 
     # Check if you get an error from Eventbrite
     if 'error' in events:
-        print log( 'Eventbrite Error: ' +             \
-                    events['error']['error_type'] +   \
-                    ' for ' + str(organizer_id)
-                  )
+        err = 'Eventbrite Error: ' + events['error']['error_type'] + ' for ' + str(organizer_id)
+        print log( err )
+        logger.debug( err )
         return []
 
     # Compare to todays date and find all events ending after today
@@ -293,6 +297,10 @@ def make_contact( survey, deal, template ):
         if not term.execute( event = survey.event ):
             continue
 
+        # Determine if you did this or not
+        if not survey.event.add_connection( survey, deal ):
+            continue
+
         # Don't spam user
         survey.mailed += 1
         survey.save()
@@ -326,22 +334,34 @@ def make_contact( survey, deal, template ):
         # Send the email
         if settings.SEND_EMAIL:
             if AMAZON_SES:
+                # Amazon require each sender to be authenticated
                 mailer.email_to( message,
                                  recipients,
                                  'newsletter@brightmap.com',
                                  subject
                                 )
             else:
+                #TESTING BELOW REMOVE LATER
+                #recipients = ['pete.douma@gmail.com']
                 msg = EmailMultiAlternatives( subject,
-                                              text,
-                                              'newsletter@brightmap.com',
-                                              spam
+                                              message,
+                                              event.chapter.organizer.email,
+                                              recipients
                                              )
                 #msg.attach_alternative(html, "text/html")
+
+                # If the prompt was set ask before sending
+                if PROMPT:
+                    ans = raw_input('Send? (y/n)')
+                    if ans != 'y':
+                        continue
+
+                # Try and send the message
                 try:
                     msg.send( fail_silently = False )
                 except:
-                    print log("Email Error")
+                    err = "Email Send Error For: " + event.chapter.organizer.email
+                    logger.error("Email Send Error:")
 
 
 def print_event(event):
@@ -415,8 +435,24 @@ def main():
                                 continue
 
                             # Connect attendees and mail contacts
-                            if event.add_connection( survey, deal ):
-                                make_contact( survey, deal, template )
+                            make_contact( survey, deal, template )
 
 if __name__ == '__main__':
+    op = optparse.OptionParser( usage="usage: %prog " +" [options]" )
+    # Add options for debugging
+    op.add_option('-d', action="store_true", help = 'Debug no emails sent')
+    op.add_option('-p', action="store_true", help = 'Prompt to send')
+
+    opts,args = op.parse_args()
+
+    # Check if options were set
+    if opts.d:
+        DEBUG = False
+    else:
+        DEBUG = True
+
+    if opts.p:
+        PROMPT = True
+    else:
+        PROMPT = False
     main()

@@ -1,14 +1,47 @@
 {% extends "base.html" %}
+{% load smartif %}
 
-{% block mess_list %}
-    <div id="bodyc">
-        {% for buyer in buyers %} 
-             {{buyer.user.first_name }} {{buyer.user.last_name}}
-             <a href='{% url show_connection %}?user={{buyer.user.pk}}'>
-                {{buyer.user.email}}
-             </a>
-             <br />
-              
-        {% endfor %}
+{% block menu_block %}
+	<div id = 'topmenu'>
+		<ul id= 'hmenu'>
+			<li><a href={% url show_available_deals %}> Available Event Deals</a></li>
+		</ul>
 	</div>
+{% endblock %}
+
+{% block body_block %}
+    <div id=show_buyer_deals>
+   		<h3>My Deals</h3>
+ 		<table>
+ 		{% for term in buyer.deals %}
+ 		<tr>
+ 			<td>{{term.deal.interest}}</td>
+ 			<td>{{term.deal.chapter.name}}</td>
+ 			{% if term.expire %}    
+ 				<td>Trial</td>
+ 			{% else %}
+ 				{% if term.exclusive %} 
+ 					<td>Exclusive</td>
+ 				{% else %}
+ 					<td>Non-Exclusive</td>
+ 				{% endif %}
+ 			{% endif %}
+ 			<td>{{term.cost}}
+ 			<td>{{term.status}}</tr>
+ 		</tr> 
+ 		{% endfor %}
+ 		</table>
+ 	</div>
+ 	<div id=show_buyer_connections>	   
+   		<h3>My Connections</h3>
+    	<table>
+    	{% for connection in buyer.connections %}
+   		<tr>
+    		<td>{{connection.survey.event}}</td>
+    		<td>{{connection.survey.attendee}}</td>
+    	</tr>
+    	{% endfor %}
+   		</table>
+   	</div>
+ 
 {% endblock %}

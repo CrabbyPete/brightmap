@@ -3,6 +3,7 @@ from django                                 import forms
 from django.utils.translation               import ugettext_lazy
 from django.contrib.localflavor.us.forms    import USPhoneNumberField
 from django.forms                           import ModelForm
+
 #from radio                                  import ChoiceWithOtherField
 from radio2                                 import ChoiceWithOtherField
 from models                                 import *
@@ -30,19 +31,6 @@ class SignUpForm(forms.Form):
                                             max_length = 60,
                                             widget= forms.TextInput(attrs={'class':'supf','size':40})
                                          )
-
-    password        = forms.CharField   ( max_length = 45,
-                                            label = 'Password:',
-                                            widget = forms.PasswordInput(attrs={'class':'supf','size':35},
-                                                                         render_value = True              )
-                                        )
-
-    pass_confirm    = forms.CharField   ( max_length = 45,
-                                            label = 'Confirm Password:',
-                                            widget = forms.PasswordInput(attrs={'class':'supf','size':35},
-                                                                         render_value = True              )
-                                        )
-
 
     first_name      = forms.RegexField  ( required = False,
                                             label = 'First Name:',
@@ -95,10 +83,21 @@ class SignUpForm(forms.Form):
                                         )
 
 class InterestForm(forms.Form):
-    interests        = forms.CharField  ( required = False,
-                                          widget = forms.Textarea(attrs={'cols':70, 'rows':10})
-                                         )
+    interests        = forms.ChoiceField( choices=(),
+                                          label = 'Interest',
+                                          widget=forms.Select(attrs={})
+                                        )
+    
+    def __init__(self, *args, **kwargs):
+        super(InterestForm, self).__init__(*args, **kwargs)   
+        self.fields['interests'].choices = [(i.interest,i.interest) for i in Interest.objects.all()] 
 
+
+TERM_CHOICES = [('Cancel','Until Cancel', forms.RadioSelect  ),
+                ('Expire','Until Date',   forms.DateInput    ),
+                ('Count' ,'Until Count',  forms.TextInput    ),
+                ('Budget','Under Budget', forms.TextInput    ),
+               ]
 
 class DealForm(forms.Form):
 
@@ -108,23 +107,10 @@ class DealForm(forms.Form):
     interest        = forms.ChoiceField( choices=(),
                                          widget=forms.Select() )
 
-    max_sell        = forms.IntegerField()
-
-    add_terms       = forms.BooleanField( required = False,
-                                          widget=forms.CheckboxInput(attrs={'class':'row'})    )
-
-
-    def __init__(self, *args, **kwargs):
-        super(DealForm, self).__init__(*args, **kwargs)
-        self.fields['interest'].choices = [(i.interest,i.interest) for i in Interest.objects.all()]
-
-
-TERM_CHOICES = [('Cancel','Until Cancel', forms.RadioSelect  ),
-                ('Expire','Until Date',   forms.DateInput    ),
-                ('Count' ,'Until Count',  forms.TextInput    )
-               ]
-
-class TermForm(forms.Form):
+    exclusive       = forms.BooleanField( required = False,
+                                          widget=forms.CheckboxInput(attrs={})
+                                        )
+    
     cost            = forms.CharField( max_length = 10 )
 
     terms           = ChoiceWithOtherField( choices = TERM_CHOICES )
@@ -135,9 +121,9 @@ class TermForm(forms.Form):
                                          widget=forms.Select(attrs={})
                                        )
 
-
     def __init__(self, *args, **kwargs):
-        super(TermForm, self).__init__(*args, **kwargs)
+        super(DealForm, self).__init__(*args, **kwargs)
+        self.fields['interest'].choices = [(i.interest,i.interest) for i in Interest.objects.all()]
         self.fields['buyers'].choices = [('', 'None')]+[(i.user.email ,i.user.first_name + ' '+ i.user.last_name )
                                            for i in Profile.objects.filter(is_leadbuyer  = True)]
 
@@ -198,6 +184,7 @@ class BuyerForm(forms.Form):
                                           widget = forms.TextInput(attrs={'class':'row','size':40})
                                         )
 
+
 class BuyersForm( forms.Form):
     buyers        = forms.ChoiceField( required = False,
                                        choices=(),
@@ -210,6 +197,19 @@ class BuyersForm( forms.Form):
                                            for i in Profile.objects.filter(is_leadbuyer  = True)]
 
 class ProfileForm( SignUpForm ):
+    
+    password        = forms.CharField   ( max_length = 45,
+                                            label = 'Password',
+                                            widget = forms.PasswordInput(attrs={'size':35}, render_value = True )
+                                        )
+
+    pass_confirm    = forms.CharField   ( max_length = 45,
+                                            label = 'Confirm Password',
+                                            widget = forms.PasswordInput(attrs={'size':35}, render_value = True )
+     
+                                        )
+
+    
     title          = forms.CharField  ( required = False,
                                             label = 'Title:',
                                             max_length =45,
@@ -233,13 +233,39 @@ class ProfileForm( SignUpForm ):
                                             required = False,
                                             widget = forms.CheckboxInput(attrs={'class':'row'})
                                          )
-"""
-class LeadForm (ModelForm):
-    class Meta:
-        model = Lead
-        exclude = ('user')
-"""
+ 
 
+DEAL_CHOICES = (('Exclusive','Exclusive ($50.00 per Introduction)'),
+                ('Nonexclusive','Nonexclusive ($20.00 per Introduction'),
+                ('Trial' ,'Trial (free for 1 month)')
+               )
+
+
+class BuyDealForm(forms.Form):
+
+    chapter          = forms.CharField  ( required = False,
+                                            label = 'Community:',
+                                            max_length =45,
+                                            widget = forms.TextInput(attrs={'size':40})
+                                        )
+    interest         = forms.CharField  ( required = False,
+                                            label = 'Interest:',
+                                            max_length =45,
+                                            widget = forms.TextInput(attrs={'size':40})
+                                        )
+    
+    deal_type        = forms.ChoiceField( required = False,
+                                            choices=DEAL_CHOICES,
+                                            label = 'Deal Type:',
+                                            widget=forms.RadioSelect(attrs={})
+                                       )
+    
+class LeadBuyerForm(ModelForm):
+    class Meta:
+        model = LeadBuyer
+        exclude = ('user','letter')
+    
+ 
 class ChapterForm(ModelForm):
     class Meta:
         model = Chapter

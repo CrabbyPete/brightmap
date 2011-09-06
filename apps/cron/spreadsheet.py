@@ -136,13 +136,23 @@ def spreadsheet( email, password ):
                 email   = sponser['Sponsor Email']
                 first   = sponser['Sponsor First Name']
                 last    = sponser['Sponsor Last Name']
-                company = sponser['Sponsor Company']
-                title   = sponser['Sponsor Title']
-                website = sponser['Sponsor Website']
-            except KeyError, e:
-                print "Key Error: " + e.message
+            except KeyError, err:
+                print "Key Error: " + err.message
                 continue
-
+            
+            if 'Sponsor Company' in sponser:
+                company = sponser['Sponsor Company']
+            else:
+                company = None
+            if 'Sponsor Title' in sponser:
+                title = sponser['Sponsor Title']
+            else:
+                title = None
+            if 'Sponsor Website' in sponser:
+                website = sponser['Sponsor Website']
+            else:
+                website = None
+ 
             # Get or create the user
             try:
                 user = User.objects.get(email = email)
@@ -198,11 +208,7 @@ def spreadsheet( email, password ):
                     interest = Interest( interest = key )
                     interest.save()
 
-                # Add the interest to the leadbuyer
-                lb.interests.add(interest)
-                lb.save()
-
-                # Get or create a deal
+                 # Get or create a deal
                 try:
                     deal = Deal.objects.get( chapter = d_chapter,
                                              interest = interest
@@ -231,22 +237,32 @@ def spreadsheet( email, password ):
                         lb.budget = number
                         lb.save()
                     
-                        term = Cancel( deal = deal,
-                                       buyer = user,
-                                       cost = cost
-                                      )
+                        if number != 0:
+                            term = Budget ( deal = deal, 
+                                            buyer = user,
+                                            cost = cost,
+                                            remaining = number,
+                                            status = 'approved'
+                                          )
+                        else:
+                            term = Cancel( deal   = deal,
+                                           buyer  = user,
+                                           cost   = cost,
+                                           status = 'approved'
+                                         )
                         
                         if 'exclusive' == term_type[0]:
-                            deal.exclusive = True
-                            deal.save()
-                            
+                            term.exclusive = True
+                        
+                        term.save()
                     # Good til exires
                     elif 'expire' == term_type[0]:
                         date = datetime.strptime(term_type[1],"%m/%d/%y")
-                        term = Expire( deal = deal,
-                                       buyer = user,
-                                       cost = 0,
-                                       date = date
+                        term = Expire( deal   = deal,
+                                       buyer  = user,
+                                       cost   = 0,
+                                       date   = date,
+                                       status = 'approved'
                                      )
 
                     # Good for x number of events

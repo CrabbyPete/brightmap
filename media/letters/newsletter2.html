@@ -35,18 +35,27 @@
         <p>BrightMap makes introductions between attendees of business networking events and business service providers, based on the stated interest of the event attendees
            The list below shows the leads available on BrightMap this week.  To buy these leads, click the "BUY LEADS" link at the bottom of any section.
         </p>
-        <h2>Interest Report</h3>
-        {% for interest, event in report.items %}
-        <h3>{{interest.interest}}</h3>
-        	{% for e,count in event.items %}
-        		<p>{{count}} {% if count > 1 %} leads {% else %} lead {% endif %} {{e.describe}}</p>
-        	{% endfor %}
+        <p>Leads by Interest</p>
+        {% for interest, number in leads.items %}
+        <p>{{number}} leads for {{interest.interest}}</p>
+        {% endfor %}
+        <p>Leads by Event</p>
+        {% for event, interests in report.items %}
+            {% if interests|length > 0 %}
+                <br/>
+                <h3>
+            	{{event.describe}} for {{event.chapter.organization}} {{event.date|date:"M d, Y"}}<br/>
+                </h3>
+                {% for interest, value in interests.items %}
+                    {{ value }} {% if value == 1 %} lead {% else %} leads {% endif %} for {{ interest }}<br/>
+                {% endfor %}
+            {% endif %}
         {% endfor %}
     </div>
     <div id="help">
         <p>Hit reply and we'll contact you or:</p>
         <p>or:
-            <a href='{% url buy_deal %}'>
+            <a href='{% url buy_leads %}'>
                 Click here if you are would like to buy any of the above leads
             </a>
         </p>
