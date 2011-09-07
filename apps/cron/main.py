@@ -1,4 +1,3 @@
-
 import sys, optparse
 from datetime                   import datetime
 from os.path                    import abspath, dirname, join,split
@@ -36,17 +35,6 @@ from social.models                  import MeetupProfile
 logger = logging.getLogger('main.py')
 
 PROMPT     = False
-AMAZON_SES = False
-if AMAZON_SES:
-
-    from mail                           import Mailer
-
-    # Open Amazon emailer
-    mailer  = Mailer ( mailer = 'amazon',
-                       access_key = settings.AMAZON['AccessKeyId'],
-                       secret_key = settings.AMAZON['SecretKey']
-                      )
-
 
 def log(message):
     """
@@ -264,7 +252,12 @@ def database_attendees( evb, event ):
             # Is this a new interest?
             if normal_interest == None:
                 print log( "New Interest: " + interest )
-                Interest( interest = interest )
+                """ If you want to automatically save interests
+                normal_interest = Interest( interest = interest )
+                normal_intest.save()
+                else:
+                """
+                continue
 
             try:
                 survey = Survey.objects.get( event = event,
@@ -286,7 +279,7 @@ def database_attendees( evb, event ):
 
     return
 
-MAX_SURVEY_SEND = 10
+
 def make_contact( survey, deal, template ):
     """
     Send an email to those attendees who answered the survey and have a
@@ -299,17 +292,18 @@ def make_contact( survey, deal, template ):
         # Determine whether to execute this deal
         if term == None or not term.execute( event = survey.event ):
             continue
+        
+        # Don't spam 
+        if survey.mails_for() >= settings.MAX_MAIL_SEND:
+            continue
 
         # Determine if you did this or not
         if not survey.event.add_connection( survey, deal ):
             continue
 
-        # Don't spam user
+        # Count email so you don't spam
         survey.mailed += 1
         survey.save()
-
-        if survey.mails_for() > MAX_SURVEY_SEND:
-            continue
 
         # Set up the email template
         sponser   = term.buyer
@@ -328,43 +322,40 @@ def make_contact( survey, deal, template ):
         message = template.render(c)
         print_connection( attendee, sponser, interest )
 
-        subject = survey.event.describe + '-' + interest.interest
-        recipients = [ attendee.email,
-                       sponser.email,
-                       event.chapter.organizer.email ]
+        subject = deal.chapter.organization.name + ' Intro: '+ interest.interest
+ 
+        recipients = [ '%s %s <%s>'% ( attendee.first_name, attendee.last_name, attendee.email ),
+                       '%s %s <%s>'% ( sponser.first_name, sponser.last_name, sponser.email )
+                     ]
+ 
 
-
+        bcc = [ 'bcc@brightmap.com',
+                #event.chapter.organizer.email
+              ]
+        
         # Send the email
         if settings.SEND_EMAIL:
-            if AMAZON_SES:
-                # Amazon require each sender to be authenticated
-                mailer.email_to( message,
-                                 recipients,
-                                 'newsletter@brightmap.com',
-                                 subject
-                                )
-            else:
-                #TESTING BELOW REMOVE LATER
-                #recipients = ['pete.douma@gmail.com']
-                msg = EmailMultiAlternatives( subject,
-                                              message,
-                                              event.chapter.organizer.email,
-                                              recipients
-                                             )
-                #msg.attach_alternative(html, "text/html")
+            #TESTING BELOW REMOVE LATER
+            recipients = ['Pete Douma <pete.douma@gmail.com>']
+            msg = EmailMultiAlternatives( subject,
+                                          message,
+                                          '%s %s <%s>' % (organizer.first_name, organizer.last_name,organizer.email),
+                                          recipients,
+                                          bcc
+                                        )
+            #msg.attach_alternative(html, "text/html")
+            # If the prompt was set ask before sending
+            if PROMPT:
+                ans = raw_input('Send? (y/n)')
+                if ans != 'y':
+                    continue
 
-                # If the prompt was set ask before sending
-                if PROMPT:
-                    ans = raw_input('Send? (y/n)')
-                    if ans != 'y':
-                        continue
-
-                # Try and send the message
-                try:
-                    msg.send( fail_silently = False )
-                except:
-                    err = "Email Send Error For: " + event.chapter.organizer.email
-                    logger.error("Email Send Error:")
+            # Try and send the message
+            try:
+                msg.send( fail_silently = False )
+            except:
+                err = "Email Send Error For: " + event.chapter.organizer.email
+                logger.error("Email Send Error:")
 
 
 def print_event(event):
@@ -436,6 +427,13 @@ def main():
                                            survey.interest.interest
                                           )
                                 continue
+                            else:
+                                if deal == None:
+                                    print log( chapter.name +        \
+                                           ' has no deal for ' + \
+                                           survey.interest.interest
+                                          )
+                                    continue
 
                             # Connect attendees and mail contacts
                             make_contact( survey, deal, template )

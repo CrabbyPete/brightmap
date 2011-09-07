@@ -3,8 +3,12 @@
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-SEND_EMAIL = False
+# Brightmap specific settings
+SEND_EMAIL    = True
+MAX_MAIL_SEND = 10
+SPREADSHEET   = 'Eventbrite Lead-Gen Addresses - UAT' 
 
+# Sys Admin
 ADMINS = (
      ('PeteD', 'pete@brightmap.com'),
 )
@@ -204,7 +208,7 @@ LOGGING = {
         'main': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler', # set the logging class to log to a file
-            'filename': './main.log'        # log file
+            'filename': 'main.log'          # log file
         }
     },
     'loggers': {

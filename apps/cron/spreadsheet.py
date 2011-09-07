@@ -26,21 +26,16 @@ from django.core.mail               import send_mail,EmailMessage, \
 # Local libraries
 from client                         import EventbriteClient
 from base.models                    import *
-
-#---
 from google                         import GoogleSpreadSheet
-
-
-SPREADSHEET = 'Eventbrite Lead-Gen Addresses - UAT'  # Spreadsheet to use
 
 def spreadsheet( email, password ):
 
    # Open Google Docs and get the spreadsheet
     spreadsheet = GoogleSpreadSheet( email, password )
-    result = spreadsheet.getSpreadSheet(SPREADSHEET)
-    if result == None or result.title.text != SPREADSHEET:
+    result = spreadsheet.getSpreadSheet(settings.SPREADSHEET)
+    if result == None or result.title.text != settings.SPREADSHEET:
         print "Google Spreadsheet Error, Found: "  + result.title.text + \
-              " Looking for: " + SPREADSHEET
+              " Looking for: " + settings.SPREADSHEET
         return None
 
     # Open the Organizers worksheet

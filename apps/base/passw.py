@@ -16,7 +16,7 @@ def generate(length):
     # these passwords! They are therefore not used by default. Modify the string
     # on the line below accordingly, and probably also the 'special' list
     # above.
-    characters = az + AZ + zero_to_9 + special
+    characters = az + AZ + zero_to_9 #+ special
     pw = ''
     for i in range(length):
         pw += chr(choice(characters))

@@ -19,7 +19,7 @@ from django.core.mail               import  send_mail, EmailMultiAlternatives
 # Local imports
 from models                         import *
 from forms                          import *
-from passw                          import generate
+from passw                          import gen
 
 def homepage( request ):
     # Homepage
@@ -108,7 +108,7 @@ def signup(request):
 
     # Get the email address and see if they are in the database
     email    = form.cleaned_data['email']
-    password = generate(6)
+    password = gen()
     
     try:
         user = User.objects.get(email = email)
