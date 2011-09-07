@@ -306,16 +306,18 @@ def make_contact( survey, deal, template ):
         survey.save()
 
         # Set up the email template
-        sponser   = term.buyer
-        attendee  = survey.attendee
-        event     = survey.event
-        interest  = deal.interest
-        organizer = survey.event.chapter.organizer
+        sponser      = term.buyer
+        attendee     = survey.attendee
+        event        = survey.event
+        interest     = deal.interest
+        organizer    = survey.event.chapter.organizer
+        organization = event.chapter.organization.name
 
-        c = Context({'interest' :interest,
-                     'attendee' :attendee,
-                     'sponser'  :sponser,
-                     'organizer':organizer
+        c = Context({'interest'    :interest,
+                     'attendee'    :attendee,
+                     'sponser'     :sponser,
+                     'organizer'   :organizer,
+                     'organization':organization
                      })
 
         # Render the message and log it
@@ -328,7 +330,6 @@ def make_contact( survey, deal, template ):
                        '%s %s <%s>'% ( sponser.first_name, sponser.last_name, sponser.email )
                      ]
  
-
         bcc = [ 'bcc@brightmap.com',
                 #event.chapter.organizer.email
               ]
@@ -343,7 +344,7 @@ def make_contact( survey, deal, template ):
                                           recipients,
                                           bcc
                                         )
-            #msg.attach_alternative(html, "text/html")
+
             # If the prompt was set ask before sending
             if PROMPT:
                 ans = raw_input('Send? (y/n)')

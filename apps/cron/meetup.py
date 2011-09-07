@@ -1,6 +1,6 @@
 import pdb
 import cgi
-import json
+import simplejson as json
 import urllib
 
 from social.models      import  MeetupProfile
