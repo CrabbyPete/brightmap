@@ -331,13 +331,13 @@ def make_contact( survey, deal, template ):
                      ]
  
         bcc = [ 'bcc@brightmap.com',
-                #event.chapter.organizer.email
+                event.chapter.organizer.email
               ]
         
         # Send the email
         if settings.SEND_EMAIL:
             #TESTING BELOW REMOVE LATER
-            recipients = ['Pete Douma <pete.douma@gmail.com>']
+            #recipients = ['Pete Douma <pete.douma@gmail.com>']
             msg = EmailMultiAlternatives( subject,
                                           message,
                                           '%s %s <%s>' % (organizer.first_name, organizer.last_name,organizer.email),
