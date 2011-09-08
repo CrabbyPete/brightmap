@@ -61,10 +61,19 @@ def spreadsheet( email, password ):
         # Get the organization or create one
         try:
             d_organization = Organization.objects.get( name = name )
-
+            state = 'Exists:'
         except Organization.DoesNotExist:
             d_organization = Organization( name = name )
             d_organization.save()
+            state = 'Create:'
+            
+        print state + \
+              name      + ' ' +\
+              chapter   + ' ' +\
+              email     + ' ' +\
+              organizer + ' ' +\
+              user_key  + ' ' +\
+              org_id  
 
         # Get the organizer or create one
         try:
