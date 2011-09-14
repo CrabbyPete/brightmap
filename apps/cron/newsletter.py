@@ -1,27 +1,9 @@
-# Import system stuff
-import os, sys, uuid, time, re
-from datetime import datetime, date
+import django_header
 
-import cProfile
+from datetime                   import datetime
 
-from os.path                    import abspath, dirname, join,split
-from site                       import addsitedir
-from email.mime.text            import MIMEText
-
-# Set up the environment to run on it own.
-APP_ROOT, tail = split(abspath(dirname(__file__)))
-PROJECT_ROOT, tail = split(APP_ROOT)
-
-sys.path.insert(0,PROJECT_ROOT)
-sys.path.insert(0,APP_ROOT)
-
-
-from django.core.management     import setup_environ
-import settings
-setup_environ(settings)
-
-from django.db.models           import Q
-from django.core.mail           import send_mail,EmailMessage,EmailMultiAlternatives
+# Import Django
+from django.core.mail           import EmailMultiAlternatives
 from django.contrib             import auth
 from django.contrib.auth.models import User
 from django.template            import loader, Context
@@ -32,14 +14,6 @@ from pycron                     import pycron
 from mail                       import Mailer
 
 
-"""
-# Open Amazon emailer
-mailer  = Mailer ( mailer = 'amazon',
-                   access_key = settings.AMAZON['AccessKeyId'],
-                   secret_key = settings.AMAZON['SecretKey']
-                 )
-
-"""
 def report_interests ( date = None ):
     """
     Interests Report
@@ -48,11 +22,11 @@ def report_interests ( date = None ):
     interests = Interest.objects.all()
     for interest in interests:
         report[interest] = interest.events( open = True )
-    
+
     """ For testing
     for interest, event  in report.items():
         print interest.interest
-        
+
         for ev, count in event.items():
             print ev.describe + ':' + str(count)
     """
@@ -64,10 +38,14 @@ def cronjob():
     print 'Mailing @' + date.strftime("%Y-%m-%d %H:%M")
 
     # Send email to every user who subscribes and is a leadbuyer
-    qry = Profile.objects.filter( newsletter = True, is_leadbuyer = True )
-    spam=[]
-    for profile in qry:
-        spam.append(profile.user.email)
+    bcc = []
+    for profile in Profile.objects.filter( newsletter   = True,
+                                           is_leadbuyer = True ):
+        to =  '%s %s <%s>'% ( profile.user.first_name,
+                              profile.user.last_name,
+                              profile.user.email
+                            )
+        bcc.append(to)
 
     # Get the latest report
     report = report_interests()
@@ -85,21 +63,15 @@ def cronjob():
 
     # TESTING TESTING TESTING TESTING
     spam = ['pete.douma@gmail.com']
+    bcc  = ['newsletter@brightmap.com']
     msg = EmailMultiAlternatives( subject,
                                   text,
                                   'newsletter@brightmap.com',
-                                  spam
+                                  spam,
+                                  bcc
                                 )
     msg.attach_alternative(html, "text/html")
     msg.send( fail_silently = False )
-
-    """ For Amazon
-    mailer.email_to( message,
-                     spam,
-                     'newsletter@brightmap.com',
-                     subject
-                    )
-    """
     return
 
 """

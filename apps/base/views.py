@@ -20,6 +20,7 @@ from django.core.mail               import  send_mail, EmailMultiAlternatives
 from models                         import *
 from forms                          import *
 from passw                          import gen
+from social.models                  import *
 
 def homepage( request ):
     # Homepage
@@ -33,18 +34,18 @@ def homepage( request ):
 def welcome( request ):
     # Check if they are a Lead Buyer, and make sure they have a valid profile
     user = request.user
- 
+
     # Get the profile, Admin may not have a profile yet
     try:
         profile = user.get_profile()
     except ObjectDoesNotExist:
         if user.is_staff or user.is_super_user:
             profile = Profile( user = user )
-            profile.save() 
+            profile.save()
 
     if profile.is_leadbuyer and not profile.is_ready:
         return edit_profile(request)
- 
+
     return render_to_response('welcome.html', {}, context_instance=RequestContext(request))
 
 
@@ -109,7 +110,7 @@ def signup(request):
     # Get the email address and see if they are in the database
     email    = form.cleaned_data['email']
     password = gen()
-    
+
     try:
         user = User.objects.get(email = email)
         profile = user.get_profile()
@@ -122,12 +123,12 @@ def signup(request):
                                         )
         user.first_name = form.cleaned_data['first_name'].capitalize()
         user.last_name  = form.cleaned_data['last_name'].capitalize()
-        
+
         user.save()
         profile = Profile( user = user)
     else:
         user.set_password(password)
- 
+
     if form.cleaned_data['is_organizer']:
         profile.is_organizer = True
 
@@ -141,18 +142,18 @@ def signup(request):
         profile.address = address
 
     profile.save()
-    
+
     # Email the new user their password
     url = settings.SITE_BASE + reverse('login')
     c = Context({'password' :password,
                  'user'     :user,
                  'url'      :url
                 })
-    
+
     # Render the letter
     template = loader.get_template('letters/signup.tmpl')
     message = template.render(c)
-    
+
     subject = "Welcome to BrightMap"
     recipients = [ user.email ]
 
@@ -229,7 +230,7 @@ def  edit_profile(request):
     profile.is_organizer = form.cleaned_data['is_organizer']
     profile.is_leadbuyer = form.cleaned_data['is_leadbuyer']
     profile.is_attendee  = form.cleaned_data['is_attendee']
- 
+
     profile.newsletter   = form.cleaned_data['newsletter']
 
     profile.address      = form.cleaned_data['address']
@@ -403,7 +404,7 @@ def edit_deal(request):
                                    context_instance=RequestContext(request) )
     #GET
     if request.method == 'GET':
-        
+
         # Edit an existing deal
         if 'term' in request.GET:
             term = Term.objects.get(pk = request.GET['term'])
@@ -557,13 +558,14 @@ def show_buyer(request):
             except LeadBuyer.DoesNotExist:
                 buyer = LeadBuyer( user = request.user)
                 buyer.save()
-                
+
             return submit_form(buyer)
-  
+
 
     if request.method == 'POST':
             return HttpResponseRedirect('/')
 
+@csrf_protect
 def edit_buyer(request):
     # Edit LeadBuyer details
 
@@ -574,11 +576,34 @@ def edit_buyer(request):
     # GET
     if request.method == 'GET':
         if 'buyer' in request.GET:
+            user = User.objects.get(pk = request.GET['buyer'])
+            buyer = user.get_profile
+        else:
+            user = request.user
+            buyer = user.get_profile()
+        
+        # Check if they have a LinkedIn profile 
+        try:
+            linkedin = LinkedInProfile.objects.get(user = user)
+        except LinkedInProfile.DoesNotExist:
+            data = {
+                    'phone':        buyer.phone,
+                    'title':        buyer.title,
+                    'company':      buyer.company,
+                    'address':      buyer.address,
+                    'website':      buyer.website
+                    }
+        else:
+            data = {
+                    'phone':        buyer.phone,
+                    'title':        linkedin.title,
+                    'company':      linkedin.company,
+                    'address':      buyer.address,
+                    'website':      buyer.website
+                    }
 
-                user = User.objects.get(pk = request.GET['buyer'])
-                buyers = [user.get_profile]
-
-        return submit_form(BuyerForm())
+        form = BuyerForm(data)
+        return submit_form(form)
 
     # POST
     form = BuyerForm(request.POST)
@@ -752,9 +777,9 @@ def show_available_deals(request):
     def submit_form( form, interest = None, report = None ):
         c = {'form':form, 'interest': interest, 'report':report  }
         return render_to_response( 'show_available_deals.html',c,
-                                    context_instance=RequestContext(request) 
+                                    context_instance=RequestContext(request)
                                  )
-   
+
     # GET
     if request.method == 'GET':
         form = InterestForm()
@@ -769,10 +794,10 @@ def show_available_deals(request):
     interest = Interest.objects.get( interest = interest )
     report = interest.events( open = True )
     return submit_form( form, interest, report )
-    
- 
+
+
 def buy_deal(request):
-    
+
     def submit_form(form):
         c = {'form':form }
         return render_to_response( 'buy_deal.html', c,
@@ -783,42 +808,42 @@ def buy_deal(request):
             event = Event.objects.get(pk = request.GET['event'])
             chapter = event.chapter
             interest = Interest.objects.get(interest = request.GET['interest'])
-            
+
         data = { 'chapter':chapter,
                  'interest':interest.interest
                }
         form = BuyDealForm(data)
         return submit_form(form)
-    
+
     # POST
     if request.method == 'POST':
         form = BuyDealForm(request.POST)
         if not form.is_valid():
             return submit_form(form)
-        
+
         chapter   = form.cleaned_data['chapter']
         interest  = form.cleaned_data['interest']
         deal_type = form.cleaned_data['deal_type']
-        
+
         # Check if there are any existing deals
         interest = Interest.objects.get(interest = interest)
         chapter  = Chapter.objects.get(name = chapter)
         try:
             deal = Deal.objects.get( chapter = chapter, interest = interest )
-        
+
         # If not create one
         except Deal.DoesNotExist:
             deal = Deal( chapter = chapter, interest = interest )
             deal.save()
-        
+
         # Check the type of deal
         if deal_type == 'Trial':
             one_month = datetime.now() + relativedelta(months=+1)
-            expire = Expire( deal = deal, 
+            expire = Expire( deal = deal,
                              date = one_month,
-                             cost = 0, 
+                             cost = 0,
                              status = 'pending',
-                             buyer = request.user 
+                             buyer = request.user
                             )
             expire.save()
         else:
@@ -828,11 +853,11 @@ def buy_deal(request):
             elif deal_type ==  'Nonexclusive':
                 cost = 20.00
                 exclusive = False
-                
-            cancel = Cancel( deal = deal, 
+
+            cancel = Cancel( deal = deal,
                              cost = cost,
                              exclusive = exclusive,
-                             buyer = request.user 
+                             buyer = request.user
                             )
-            cancel.save()  
-    return HttpResponseRedirect('/')           
+            cancel.save()
+    return HttpResponseRedirect('/')

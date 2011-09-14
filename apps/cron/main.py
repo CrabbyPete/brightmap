@@ -1,39 +1,25 @@
-import sys, optparse
-from datetime                   import datetime
-from os.path                    import abspath, dirname, join,split
-from site                       import addsitedir
-from dateutils                  import relativedelta
+import django_header
 
-# Set up the environment to run on it own.
-APP_ROOT, tail = split(abspath(dirname(__file__)))
-PROJECT_ROOT, tail = split(APP_ROOT)
+# Python libraries
+from datetime                       import datetime, date
 
-sys.path.insert(0,PROJECT_ROOT)
-sys.path.insert(0,APP_ROOT)
-
-from django.core.management     import setup_environ
-
-import settings
-setup_environ(settings)
-
-# From here on through its treated as a normal django module
-import logging
-
+# Django libraries
 from django.contrib.auth.models     import User
-from django.db.models               import Q
 from django.template                import loader, Context
 from django.core.mail               import send_mail,\
                                            EmailMessage,EmailMultiAlternatives
-
 # Local libraries
-from client                         import EventbriteClient
 from base.models                    import *
-
+from base.passw                     import gen
+from client                         import EventbriteClient
 from meetup                         import MeetUpAPI
 from social.models                  import MeetupProfile
 
+import logging
 logger = logging.getLogger('main.py')
 
+# Environment variables
+from settings                       import EVENTBRITE, MAX_MAIL_SEND, SEND_EMAIL
 PROMPT     = False
 
 def log(message):
@@ -53,7 +39,7 @@ def get_attendees( evb, event_id ):
     try:
         attendees = evb.list_event_attendees( event_id = int(event_id) )
     except:
-        print log('Eventbrite Error: No attendees for event id ' + event_id )
+        print log('Eventbrite Error: No attendees for event id ' + str(event_id) )
         return []
 
     if 'error' in attendees:
@@ -92,7 +78,7 @@ def check_survey(attendee):
     return [], leadbuyer
 
 
-def get_latest_events(evb, organizer_id, date = None):
+def get_latest_events( evb, organizer_id ):
     """
     Search for the latest events
     """
@@ -111,10 +97,7 @@ def get_latest_events(evb, organizer_id, date = None):
         return []
 
     # Compare to todays date and find all events ending after today
-    if date == None:
-        today = datetime.today()
-    elif isinstance(date, datetime):
-        today = date
+    today = datetime.today()
 
     # Look through all events and keep all future events
     event_ids = []
@@ -123,23 +106,15 @@ def get_latest_events(evb, organizer_id, date = None):
         # Make sure these are not past events
         end_date = datetime.strptime(event['event']['end_date'],
                                      "%Y-%m-%d %H:%M:%S")
+        # Only get future events
+        if end_date < today:
+            continue
 
-        delta = end_date - today
-
-        # Only get next months events
-        if delta.days >= -1:
-
-            # Sometimes they do not set the hour and it defaults to 2am
-            if delta.days == -1:
-                rdelta = relativedelta( end_date, today )
-                if rdelta.days < 0:
-                    continue
-
-            event_ids.append([ event['event']['title'],
-                               event['event']['id'],
-                               end_date
-                              ]
-                             )
+        event_ids.append([ event['event']['title'],
+                           event['event']['id'],
+                           end_date
+                          ]
+                         )
     return event_ids
 
 
@@ -150,11 +125,8 @@ def database_events(organizer, evb = None):
     if evb == None:
 
         # Open a new Eventbrite client
-        evb = EventbriteClient( app_key  = settings.EVENTBRITE['APP_KEY' ],
+        evb = EventbriteClient( app_key  = EVENTBRITE['APP_KEY' ],
                                 user_key = organizer.user_key     )
-
-    # This is for testing
-    date = datetime.strptime('2011-08-01', "%Y-%m-%d")
 
     # Get the latest from Eventbrite
     events = get_latest_events(evb, int(organizer.organizer_id) )
@@ -163,7 +135,7 @@ def database_events(organizer, evb = None):
     # Add each event and find the right organizer
     for event in events:
         try:
-            event_rec = Event.objects.get( Q(event_id = event[1]) )
+            event_rec = Event.objects.get(event_id = event[1])
         except Event.DoesNotExist:
             event_rec = Event( event_id        = event[1],
                                describe        = event[0],
@@ -191,13 +163,13 @@ def database_attendees( evb, event ):
 
         # Check if they are a user
         try:
-            user = User.objects.get( Q(email = attendee['email']) )
+            user = User.objects.get( email = attendee['email'] )
 
         # If not create a new user
         except User.DoesNotExist:
 
             # Create a temporary password and username which is 30 chars max
-            password = attendee['last_name']+'$'+attendee['first_name'],
+            password = gen()
             username = attendee['email'][0:30]
             user = User.objects.create_user(  username = username,
                                               email    = attendee['email'],
@@ -286,15 +258,15 @@ def make_contact( survey, deal, template ):
     corresponding lead buyer for an interest
     """
     if deal == None:
-        return 
-    
+        return
+
     for term in deal.terms():
         # Determine whether to execute this deal
         if term == None or not term.execute( event = survey.event ):
             continue
-        
-        # Don't spam 
-        if survey.mails_for() >= settings.MAX_MAIL_SEND:
+
+        # Don't spam
+        if survey.mails_for() >= MAX_MAIL_SEND:
             continue
 
         # Determine if you did this or not
@@ -325,17 +297,17 @@ def make_contact( survey, deal, template ):
         print_connection( attendee, sponser, interest )
 
         subject = deal.chapter.organization.name + ' Intro: '+ interest.interest
- 
+
         recipients = [ '%s %s <%s>'% ( attendee.first_name, attendee.last_name, attendee.email ),
                        '%s %s <%s>'% ( sponser.first_name, sponser.last_name, sponser.email )
                      ]
- 
+
         bcc = [ 'bcc@brightmap.com',
                 event.chapter.organizer.email
               ]
-        
+
         # Send the email
-        if settings.SEND_EMAIL:
+        if SEND_EMAIL:
             #TESTING BELOW REMOVE LATER
             #recipients = ['Pete Douma <pete.douma@gmail.com>']
             msg = EmailMultiAlternatives( subject,
@@ -387,6 +359,7 @@ def main():
     organizations = Organization.objects.all()
     for organization in organizations:
         for chapter in organization.chapter_set.all():
+
             # Check for meetups
             """
             meetup = MeetUpAPI( user = chapter.organizer )
@@ -396,7 +369,7 @@ def main():
             # Open a new Eventbrite client
             tickets = chapter.get_eventbrite()
             for ticket in tickets:
-                app_key  = settings.EVENTBRITE['APP_KEY' ]
+                app_key  = EVENTBRITE['APP_KEY' ]
                 user_key = ticket.user_key
                 evb = EventbriteClient( app_key = app_key, user_key = user_key )
 
@@ -439,6 +412,7 @@ def main():
                             # Connect attendees and mail contacts
                             make_contact( survey, deal, template )
 
+import optparse
 if __name__ == '__main__':
     op = optparse.OptionParser( usage="usage: %prog " +" [options]" )
     # Add options for debugging

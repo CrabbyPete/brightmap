@@ -1,41 +1,109 @@
-import sys
-from datetime                   import datetime
-from os.path                    import abspath, dirname, join,split
-from site                       import addsitedir
+import django_header
+# Python libraries
+from datetime                       import datetime
 
-# Set up the environment to run on it own.
-APP_ROOT, tail = split(abspath(dirname(__file__)))
-PROJECT_ROOT, tail = split(APP_ROOT)
-
-
-sys.path.insert(0,PROJECT_ROOT)
-sys.path.insert(0,APP_ROOT)
-
-from django.core.management     import setup_environ
-
-import settings
-setup_environ(settings)
-
-# From here on through its treated as a normal django module
-
+# Django libraries
 from django.contrib.auth.models     import User
-from django.db.models               import Q
 from django.template                import loader, Context
 from django.core.mail               import send_mail,EmailMessage, \
                                            EmailMultiAlternatives
 # Local libraries
-from client                         import EventbriteClient
 from base.models                    import *
+from client                         import EventbriteClient
 from google                         import GoogleSpreadSheet
+from settings                       import SPREADSHEET, EVENTBRITE
+
+
+
+valid_deals = ('cancel','sponsored','exclusive','expire')
+
+def new_term( deal, user, term_type, cost ):
+    """
+    Create a new term
+    term_type eg. 'cancel,500,20'
+    """
+
+    # Good til Canceled
+    if 'cancel'    == term_type[0] or \
+       'sponsored' == term_type[0] or \
+       'exclusive' == term_type[0]     :
+        try:
+            number = int(term_type[1])
+        except ValueError:
+            number = 0
+
+        if number != 0:
+            term = Budget ( deal      = deal,
+                            buyer     = user,
+                            cost      = cost,
+                            remaining = number,
+                            status    = 'approved'
+                           )
+        else:
+            term = Cancel( deal   = deal,
+                           buyer  = user,
+                           cost   = cost,
+                           status = 'approved'
+                          )
+
+            if 'exclusive' == term_type[0]:
+                term.exclusive = True
+
+        term.save()
+
+    # Good til exires
+    elif 'expire' == term_type[0]:
+        date = datetime.strptime(term_type[1],"%m/%d/%y")
+        term = Expire( deal   = deal,
+                       buyer  = user,
+                       cost   = cost,
+                       date   = date,
+                       status = 'approved'
+                      )
+
+    # Good for x number of events
+    elif 'count'  == term_type[0]:
+        try:
+            number = int(term_type[1])
+        except ValueError:
+            number = 0
+
+        term = Count( deal      = deal,
+                      buyer     = user,
+                      cost      = cost,
+                      number    = number,
+                      remaining = number,
+                     )
+
+    # Good for x number of connections
+    elif 'connects' == term_type[0]:
+        try:
+            number = int(term_type[1])
+        except ValueError:
+            number = 0
+
+        term = Connects( deal      = deal,
+                         buyer     = user,
+                         cost      = cost,
+                         number    = number,
+                         remaining = number
+                        )
+    else:
+        print "Error No Deal Type: ", + term_type[1]
+        return None
+
+    term.save()
+    return term
+
 
 def spreadsheet( email, password ):
 
    # Open Google Docs and get the spreadsheet
     spreadsheet = GoogleSpreadSheet( email, password )
-    result = spreadsheet.getSpreadSheet(settings.SPREADSHEET)
-    if result == None or result.title.text != settings.SPREADSHEET:
+    result = spreadsheet.getSpreadSheet(SPREADSHEET)
+    if result == None or result.title.text != SPREADSHEET:
         print "Google Spreadsheet Error, Found: "  + result.title.text + \
-              " Looking for: " + settings.SPREADSHEET
+              " Looking for: " + SPREADSHEET
         return None
 
     # Open the Organizers worksheet
@@ -58,6 +126,34 @@ def spreadsheet( email, password ):
             print "Key Error: " + e.message
             continue
 
+        # Test this to make sure user_id and organizer_id are OK
+        app_key  = EVENTBRITE['APP_KEY' ]
+        evb = EventbriteClient( app_key = app_key, user_key = user_key )
+
+        try:
+            events = evb.list_organizer_events( organizer_id = int(org_id) )
+        except:
+            print "Eventbrite ID Error:" + name +\
+                  " user_id = " + str(user_key) +\
+                  " organization_id = "+ str(org_id)
+
+            ans = raw_input('Continue anyway (y/n)')
+            if ans != 'y':
+                pass
+            else:
+                continue
+
+        else:
+            # Check if you get an error from Eventbrite
+            if 'error' in events:
+                print 'Eventbrite Error: ' + events['error']['error_type'] + ' for ' + name +' = '+ org_id
+                ans = raw_input('Continue anyway (y/n)')
+                if ans != 'y':
+                    pass
+                else:
+                    continue
+
+
         # Get the organization or create one
         try:
             d_organization = Organization.objects.get( name = name )
@@ -66,14 +162,14 @@ def spreadsheet( email, password ):
             d_organization = Organization( name = name )
             d_organization.save()
             state = 'Create:'
-            
+
         print state + \
               name      + ' ' +\
               chapter   + ' ' +\
               email     + ' ' +\
               organizer + ' ' +\
               user_key  + ' ' +\
-              org_id  
+              org_id
 
         # Get the organizer or create one
         try:
@@ -143,7 +239,7 @@ def spreadsheet( email, password ):
             except KeyError, err:
                 print "Key Error: " + err.message
                 continue
-            
+
             if 'Sponsor Company' in sponser:
                 company = sponser['Sponsor Company']
             else:
@@ -156,7 +252,7 @@ def spreadsheet( email, password ):
                 website = sponser['Sponsor Website']
             else:
                 website = None
- 
+
             # Get or create the user
             try:
                 user = User.objects.get(email = email)
@@ -190,7 +286,7 @@ def spreadsheet( email, password ):
 
             # Any key that does not start with Sponsor is an interest
             keys = sponser.keys()
-            
+
             # Default deal is good til cancel
             deal_term = "cancel: ,20"
             for key in keys:
@@ -204,7 +300,7 @@ def spreadsheet( email, password ):
                 # Get or create an interest, make sure their is an 'x' in the box
                 if sponser[key] != 'x':
                     continue
-                
+
                 try:
                     interest = Interest.objects.get(interest = key)
                 except Interest.DoesNotExist:
@@ -226,104 +322,34 @@ def spreadsheet( email, password ):
                 # Get or create a term
                 term_type, cost = deal_term.split(',')
                 term_type = term_type.split(':')
+
+                # See if this term exists
                 try:
                     term = Term.objects.get( deal = deal, buyer = user )
+
+                # If not create it
                 except Term.DoesNotExist:
-                    # Good til Canceled
-                    if 'cancel'    == term_type[0] or \
-                       'sponsored' == term_type[0] or \
-                       'exclusive' == term_type[0]     :
-                        try:
-                            number = int(term_type[1])
-                        except ValueError:
-                            number = 0
-                        
-                        lb.budget = number
-                        lb.save()
-                    
-                        if number != 0:
-                            term = Budget ( deal = deal, 
-                                            buyer = user,
-                                            cost = cost,
-                                            remaining = number,
-                                            status = 'approved'
-                                          )
-                        else:
-                            term = Cancel( deal   = deal,
-                                           buyer  = user,
-                                           cost   = cost,
-                                           status = 'approved'
-                                         )
-                        
-                        if 'exclusive' == term_type[0]:
-                            term.exclusive = True
-                        
-                        term.save()
-                    # Good til exires
-                    elif 'expire' == term_type[0]:
-                        date = datetime.strptime(term_type[1],"%m/%d/%y")
-                        term = Expire( deal   = deal,
-                                       buyer  = user,
-                                       cost   = 0,
-                                       date   = date,
-                                       status = 'approved'
-                                     )
+                    term = new_term( deal, user, term_type, cost )
 
-                    # Good for x number of events
-                    elif 'count'  == term_type[0]:
-                        try:
-                            number = int(term_type[1])
-                        except ValueError:
-                            number = 0
-                    
-                        term = Count( deal      = deal,
-                                      buyer     = user,
-                                      cost      = cost,
-                                      number    = number,
-                                      remaining = number,
-                                     )
-
-                    # Good for x number of connections
-                    elif 'connects' == term_type[0]:
-                        try:
-                            number = int(term_type[1])
-                        except ValueError:
-                            number = 0
-                        
-                        term = Connects( deal      = deal,
-                                         buyer     = user,
-                                         cost      = cost,
-                                         number    = number,
-                                         remaining = number
-                                        )
-                    else:
-                        print "Error No Deal Type: ", + term_type[1]
-
-                    term.save()
-                
-                # Update an existing deal
+                # Otherwise delete the existing deal, and create a new one
                 else:
-                    # Determine child type
-                    cterm = term.get_child()
-                    # This should never be None, unless a term bombed while save
-                    if cterm != None:
-                        cterm.cost = cost
-                        if isinstance(cterm,Expire):
-                            cterm.date = datetime.strptime( term_type[1],
-                                                            "%m/%d/%y"
-                                                          )
-                        elif isinstance(cterm,Count) or \
-                             isinstance(cterm,Connects):
-                            try:
-                                number = int(term_type[1])
-                            except ValueError:
-                                pass
-                            else:
-                                cterm.number    = int(term_type[1])
-                                cterm.remaining = int(term_type[1])
-                                cterm.save()
-                    else:
-                        print "No Terms for : "+ term
+                    term.delete()
+                    term = new_term( deal, user, term_type, cost )
+
+                # In order to get child object, you have to query the db
+                term = Term.objects.get( deal = deal, buyer = user )
+                cterm = term.get_child()
+                if isinstance(cterm, Budget):
+                    lb.budget = cterm.remaining
+                    lb.save()
+
+                print 'Deal: %-35s Buyer: %-40s %s:%s,%s'%\
+                      ( deal.interest.interest,
+                        user.email,
+                        term_type[0],
+                        term_type[1],
+                        cost )
+
 
 import cProfile
 if __name__ == '__main__':
