@@ -283,13 +283,13 @@ def make_contact( survey, deal, template ):
         event        = survey.event
         interest     = deal.interest
         organizer    = survey.event.chapter.organizer
-        organization = event.chapter.organization.name
+        chapter      = event.chapter.name
 
         c = Context({'interest'    :interest,
                      'attendee'    :attendee,
                      'sponser'     :sponser,
                      'organizer'   :organizer,
-                     'organization':organization
+                     'chapter'     :chapter
                      })
 
         # Render the message and log it

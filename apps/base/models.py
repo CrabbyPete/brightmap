@@ -1,5 +1,5 @@
 from difflib                                import SequenceMatcher
-from datetime                               import date
+from datetime                               import datetime,date
 
 from django.db                              import models
 from django.contrib.auth.models             import User
@@ -66,7 +66,7 @@ class Chapter( models.Model ):
             return self.deal_set.get( interest = interest )
         except:
             return None
-            
+
 
     def events( self ):
         # Get all the events for this chapter
@@ -120,11 +120,11 @@ class LeadBuyer( models.Model ):
 
     def deals(self):
         return Term.objects.filter(buyer = self.user)
-    
+
     def connections(self):
         return Connection.objects.for_user(self.user)
-        
-        
+
+
     def __unicode__(self):
         return user.email
 
@@ -163,32 +163,33 @@ class Interest(models.Model):
 
     def __unicode__(self):
         return self.interest
-    
+
     def events(self, day = None, open = False ):
         # Return all the events that have this interest
         report = {}
         if day == None:
-            day = date.today()
-            
-        for survey in Survey.objects.filter(interest = self):
+            day = datetime.today()
+
+        query = Survey.objects.filter(interest = self)
+        for survey in query:
             # Check is exclusive
             if open:
                 deal = survey.event.chapter.deal( self )
                 if deal and deal.exclusive():
                     continue
-            
+
             # Don't report past events
-            if date < survey.event.date:
+            if day < survey.event.date:
                 continue
-            
+
             # Count
             if survey.event in report:
                 report[survey.event] += 1
             else:
                 report[survey.event] = 1
-        
+
         return report
-                
+
 class Deal(models.Model):
     """
     Deal is a link between an Interest and a Chapter. There should only be one
@@ -211,7 +212,7 @@ class Deal(models.Model):
             if term.exclusive and term.status == 'approved':
                 return term
         return None
-            
+
     def __unicode__(self):
         return self.interest.interest
 
@@ -262,8 +263,7 @@ class Expire( Term ):
         if self.buyer == None or self.status != 'approved':
             return False
 
-        delta = self.date - date.today()
-        if delta.days >= 0:
+        if self.date >= date.today():
             return True
         return False
 
@@ -285,26 +285,26 @@ class Cancel( Term ):
         return 'cancel'
 
 class Budget( Term ):
-    
+
     remaining   = models.DecimalField( max_digits= 12,
                                        decimal_places = 2,
-                                       blank = True, 
+                                       blank = True,
                                        null = True
-                                     )   
+                                     )
     def execute(self, **kwargs):
         # Has this Term been canceled
         if self.buyer == None or self.status != 'approved':
             return False
-        
+
         # Refill on day 1
         today = date.today()
         if today.day == 1:
             remaining = buyer.budget
-        
+
         # Is money left to do this?
         if self.remaining < self.cost:
             return False
-    
+
         # Deduct the money and do it.
         self.remaining -= self.cost
         self.save()
@@ -350,11 +350,11 @@ class Connects( Term ):
 
         if self.remaining <= 0:
             return False
-        
+
         self.remaining -= 1
-        self.save()    
+        self.save()
         return True
- 
+
 
     def __unicode__(self):
         return 'connects:'+ str(self.number)
@@ -466,7 +466,7 @@ class Event(models.Model):
         for deal in deals:
             for event in deal.chapter.events():
                 deal_list.append(deal)
- 
+
         return deal_list
 
 
