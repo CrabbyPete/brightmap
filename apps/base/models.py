@@ -126,7 +126,7 @@ class LeadBuyer( models.Model ):
 
 
     def __unicode__(self):
-        return user.email
+        return self.user.email
 
 class InterestManager( models.Manager ):
     """
@@ -382,7 +382,7 @@ class Event(models.Model):
     Event description class
     """
     chapter      = models.ForeignKey( Chapter )
-    event_id     = models.IntegerField( unique = True )
+    event_id     = models.BigIntegerField( unique = True )
     describe     = models.TextField()
     date         = models.DateTimeField()
     letter       = models.ForeignKey( Letter,  blank = True, null = True )
