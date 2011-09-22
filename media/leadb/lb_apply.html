@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load smartif %}
+
+{% block menu_block %}
+    <div class="navBar">
+        <div class="navLogin">
+            <a href='{% url lb_dash %}'>Lead-Buyer Dashboard</a> |
+            <a href='{% url community %}'>Event Organizer Dashboard</a> |
+            <a href='{% url logout  %}'>Logout</a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body_block %}
+	<form action="{% url lb_apply %}" method="post" >
+    {% csrf_token %}
+      <table width="80%" border="0" cellspacing="20" cellpadding="5">
+        <tr>
+          <th scope="col" bgcolor="#FFFF00">Apply to Buy Leads from a Community</th>
+        </tr>
+
+        <tr>
+          <td>Complete this form to purchase leads from a particular community. The community
+          organizer must review and approve your application before we can send you leads. You will
+          be notified via email about the community organizer's decision.</td>
+        </tr>
+
+        <tr>
+          <td>
+            <table width="100%" border="0" cellspacing="0" cellpadding="3">
+              <tr>
+                <td><strong>Community</strong></td>
+
+                <td>{{form.chapter}}</td>
+              </tr>
+
+              <tr>
+                <td><strong>Lead Category</strong></td>
+                <td>{{form.interest}}</td>
+              </tr>
+              <tr>
+                <td>Suggest a new lead</td>
+                <td>{{form.suggest}}{{form.suggest.errors}}</td>
+              </tr>
+              <tr>
+                <td><strong>Terms</strong></td>
+                <td>
+ 				{{form.deal_type}}
+                </td>
+              </tr>
+
+              <tr>
+                <td>&nbsp;</td>
+
+                <td align="right">
+                  <input type="image" name="submit" src="/media/img/submit_application_buy_leads.gif" />
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </form>
+{% endblock %}

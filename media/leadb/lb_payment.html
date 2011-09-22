@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load smartif %}
+
+{% block menu_block %}
+    <div class="navBar">
+        <div class="navLogin">
+            <a href='{% url lb_dash %}'>Lead-Buyer Dashboard</a> |
+            <a href='{% url community %}'>Event Organizer Dashboard</a> |
+            <a href='{% url logout  %}'>Logout</a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body_block %}
+    <form action="{% url lb_payment %}" method="post" >
+      {% csrf_token %}
+      <table width="80%" border="0" cellspacing="20" cellpadding="5">
+        <tr>
+          <th scope="col" bgcolor="#FFFF00">Payment and Budget</th>
+        </tr>
+
+        <tr>
+          <td>Your budget determines the maximum dollar value of leads you will receive each
+          month.</td>
+        </tr>
+
+        <tr>
+          <td>
+            <table width="100%" border="0" cellspacing="0" cellpadding="3">
+              <tr>
+                <td><strong>Credit Card Number</strong></td>
+
+                <td>{{form.card_number}}{{form.card_number.errors}}</td>
+              </tr>
+
+              <tr>
+                <td><strong>Expiration</strong></td>
+
+                <td>{{form.expiration_date}}{{form.expiration_date.errors}}</td>
+              </tr>
+
+              <tr>
+                <td><strong>Security Code</strong></td>
+
+                <td>{{form.card_code}}{{form.card_code.errors}}</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Your budget determines the maximum dollar value of leads you will receive each
+          month.</td>
+        </tr>
+
+        <tr>
+          <td>
+            <table width="100%" border="0" cellspacing="0" cellpadding="3">
+              <tr>
+                <td><strong>Monthly Budget</strong></td>
+
+                <td>budget</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <tr>
+          <td align="right">
+            <input type="image"
+                   name="submit"
+                   src="/media/img/create_update_payment_method_budget.gif"
+                   alt="Create/Update Profile" />
+          </td>
+        </tr>
+      </table>
+    </form>
+{% endblock %}

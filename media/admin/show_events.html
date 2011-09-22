@@ -1,0 +1,14 @@
+{% extends "admin\admin.html" %}
+
+{% block body_block %}
+    <div id="bodyc">
+        {% for event in events %}
+             <a href='{% url show_event %}?event={{event.pk}}'>{{ event.describe }}</a>
+              {{event.date|date:"d M Y" }}
+              {{event.attendees|length}} -
+              {{event.connections|length}}
+             <a href='{% url show_survey %}?event={{event.pk}}'> open</a>
+              <br/>
+        {% endfor %}
+	</div>
+{% endblock %}

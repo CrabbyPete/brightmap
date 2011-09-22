@@ -63,7 +63,7 @@ class SignUpForm(forms.Form):
                                         )
 
 
-    is_organizer   = forms.BooleanField( initial = True,
+    is_organizer   = forms.BooleanField( initial = False,
                                             label = 'Im an event organizer',
                                             required = False,
                                             widget = forms.CheckboxInput(attrs={'class':'row'})
@@ -76,7 +76,7 @@ class SignUpForm(forms.Form):
                                             widget = forms.CheckboxInput(attrs={'class':'row'})
                                         )
 
-    is_leadbuyer   = forms.BooleanField( initial = False,
+    is_leadbuyer   = forms.BooleanField( initial = True,
                                             label = 'Im interested in buying leads',
                                             required = False,
                                             widget = forms.CheckboxInput(attrs={'class':'row'})
@@ -87,10 +87,10 @@ class InterestForm(forms.Form):
                                           label = 'Interest',
                                           widget=forms.Select(attrs={})
                                         )
-    
+
     def __init__(self, *args, **kwargs):
-        super(InterestForm, self).__init__(*args, **kwargs)   
-        self.fields['interests'].choices = [(i.interest,i.interest) for i in Interest.objects.all()] 
+        super(InterestForm, self).__init__(*args, **kwargs)
+        self.fields['interests'].choices = [(i.interest,i.interest) for i in Interest.objects.all()]
 
 
 TERM_CHOICES = [('Cancel','Until Cancel', forms.RadioSelect  ),
@@ -110,7 +110,7 @@ class DealForm(forms.Form):
     exclusive       = forms.BooleanField( required = False,
                                           widget=forms.CheckboxInput(attrs={})
                                         )
-    
+
     cost            = forms.CharField( max_length = 10 )
 
     terms           = ChoiceWithOtherField( choices = TERM_CHOICES )
@@ -158,6 +158,17 @@ class BuyerForm(forms.Form):
                                             widget = forms.TextInput(attrs={'class':'row','size':40})
                                         )
 
+    password        = forms.CharField   ( max_length = 45,
+                                            label = 'Password',
+                                            widget = forms.PasswordInput(attrs={'size':40}, render_value = True )
+                                        )
+
+    pass_confirm    = forms.CharField   ( max_length = 45,
+                                            label = 'Confirm Password',
+                                            widget = forms.PasswordInput(attrs={'size':40}, render_value = True )
+                                        )
+
+
     title          = forms.CharField  ( required = False,
                                             label = 'Title:',
                                             max_length =45,
@@ -184,6 +195,22 @@ class BuyerForm(forms.Form):
                                           widget = forms.TextInput(attrs={'class':'row','size':40})
                                         )
 
+    linkedin        = forms.URLField ( required = False,
+                                          max_length = 100,
+                                          label = 'LinkedIn Web Site',
+                                          widget = forms.TextInput(attrs={'class':'row','size':40})
+                                        )
+    twitter         = forms.URLField ( required = False,
+                                          max_length = 100,
+                                          label = 'Twitter Web Site',
+                                          widget = forms.TextInput(attrs={'class':'row','size':40})
+                                        )
+
+    agree           = forms.BooleanField( initial = False,
+                                          required = False,
+                                          widget = forms.CheckboxInput(attrs={'class':'supf'})
+                                         )
+
 
 class BuyersForm( forms.Form):
     buyers        = forms.ChoiceField( required = False,
@@ -197,7 +224,7 @@ class BuyersForm( forms.Form):
                                            for i in Profile.objects.filter(is_leadbuyer  = True)]
 
 class ProfileForm( SignUpForm ):
-    
+
     password        = forms.CharField   ( max_length = 45,
                                             label = 'Password',
                                             widget = forms.PasswordInput(attrs={'size':35}, render_value = True )
@@ -206,10 +233,10 @@ class ProfileForm( SignUpForm ):
     pass_confirm    = forms.CharField   ( max_length = 45,
                                             label = 'Confirm Password',
                                             widget = forms.PasswordInput(attrs={'size':35}, render_value = True )
-     
+
                                         )
 
-    
+
     title          = forms.CharField  ( required = False,
                                             label = 'Title:',
                                             max_length =45,
@@ -233,7 +260,7 @@ class ProfileForm( SignUpForm ):
                                             required = False,
                                             widget = forms.CheckboxInput(attrs={'class':'row'})
                                          )
- 
+
 
 DEAL_CHOICES = (('Exclusive','Exclusive ($50.00 per Introduction)'),
                 ('Nonexclusive','Nonexclusive ($20.00 per Introduction'),
@@ -253,19 +280,19 @@ class BuyDealForm(forms.Form):
                                             max_length =45,
                                             widget = forms.TextInput(attrs={'size':40})
                                         )
-    
+
     deal_type        = forms.ChoiceField( required = False,
                                             choices=DEAL_CHOICES,
                                             label = 'Deal Type:',
                                             widget=forms.RadioSelect(attrs={})
                                        )
-    
+
 class LeadBuyerForm(ModelForm):
     class Meta:
         model = LeadBuyer
         exclude = ('user','letter')
-    
- 
+
+
 class ChapterForm(ModelForm):
     class Meta:
         model = Chapter

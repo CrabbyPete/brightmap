@@ -1,0 +1,27 @@
+{% extends "admin\admin.html" %}
+
+{% block body_block %}
+    <div id="bodyc">
+    	{% if connections|length > 1 %}
+        	{% for connection in connections %}
+             <a href='{% url show_connection %}?connection={{connection.pk}}'>
+              {{connection}}</a><br/>
+        	{% endfor %}
+      	{% else %}
+      		{% for connection in connections %}
+      			{{connection.survey.event}} <br/>
+      			{{connection.deal.interest}} <br/>
+      			Buyer(s):
+      			{% for term in connection.deal.terms %}
+      					{% if term.buyer != None %}
+      						{{term.buyer.first_name}}
+                            {{term.buyer.last_name}}<br/>
+      					{% endif %}
+      			{% endfor %}
+      			Attendee: {{connection.survey.attendee.first_name}}
+                          {{connection.survey.attendee.last_name}}<br/>
+      			On: {{connection.date|date:"d M Y" }}
+      		{% endfor %}
+      	{% endif %}
+	</div>
+{% endblock %}

@@ -23,14 +23,30 @@ class Profile( models.Model ):
     photo      = models.URLField(                    blank = True, null = True )
 
     is_ready      = models.BooleanField( default = False )
+    is_active     = models.BooleanField( default = True  )
     is_organizer  = models.BooleanField( default = False )
     is_leadbuyer  = models.BooleanField( default = False )
     is_attendee   = models.BooleanField( default = False )
+    is_agreed     = models.BooleanField( default = False )
 
     newsletter    = models.BooleanField( default = True )
 
     def __unicode__(self):
         return self.user.email
+
+class Authorize( models.Model):
+    user        = models.ForeignKey( User )
+
+
+class Invoice( models.Model):
+    user        = models.ForeignKey( User )
+    cost        = models.DecimalField( max_digits = 10,
+                                       decimal_places = 2,
+                                       default = 0.00
+                                     )
+    issued      = models.DateTimeField( auto_now = True )
+    status      = models.CharField( max_length = 20, default ='issued' )
+
 
 class Organization( models.Model ):
     """
@@ -124,7 +140,6 @@ class LeadBuyer( models.Model ):
     def connections(self):
         return Connection.objects.for_user(self.user)
 
-
     def __unicode__(self):
         return self.user.email
 
@@ -208,13 +223,14 @@ class Deal(models.Model):
 
     def exclusive ( self ):
         # Return the excluve for this deal, None if none
+        # Make sure exclusive don't allow other terms
         for term in self.terms():
             if term.exclusive and term.status == 'approved':
                 return term
         return None
 
     def __unicode__(self):
-        return self.interest.interest
+        return self.chapter.name +':' + self.interest.interest
 
 TERM_STATUS = ((0,'canceled' ),
                (1,'pending'  ),
@@ -228,10 +244,14 @@ class Term( models.Model ):
     A Term are the terms of a Deal. There can be many Terms for each Deal
     """
     deal      = models.ForeignKey( Deal )
-    cost      = models.DecimalField( max_digits = 10, decimal_places = 2, default = 0.00 )
+    cost      = models.DecimalField( max_digits = 10,
+                                     decimal_places = 2,
+                                     default = 0.00
+                                    )
     buyer     = models.ForeignKey( User, blank = True, null = True )
     exclusive = models.BooleanField( default = False )
-    status    = models.CharField( max_length = 20, default ='pending', null = True )
+    status    = models.CharField( max_length = 20, default ='pending' )
+    modified  = models.DateTimeField( auto_now = True )
     """
     Valid Status:
         pending   - a lead buyer wants this deal, but not approved
@@ -252,6 +272,9 @@ class Term( models.Model ):
         term = self.get_child()
         return term.execute()
 
+    def __unicode__(self):
+        return self.buyer.email +'-' +\
+               self.deal.chapter.name +':' + self.deal.interest.interest
 
 class Expire( Term ):
     """
@@ -428,7 +451,7 @@ class Event(models.Model):
 
             # Just return open deals
             if open:
-                # Only exclude those connected with an exclusive deal : max_deal = 1
+                # Only exclude those connected with an exclusive deal
                 try:
                     deal = self.chapter.deal( survey.interest )
                 except Deal.DoesNotExist:
@@ -470,17 +493,19 @@ class Event(models.Model):
         return deal_list
 
 
-    def add_connection( self, survey, deal ):
+    def add_connection( self, survey, term ):
         # Add a connection to an Event and an attendee
 
         # Look for any existing deals
         try:
             connection  = Connection.objects.get( survey = survey,
-                                                  deal   = deal
+                                                  term   = term
                                                  )
             # Not found, create a new one
         except Connection.DoesNotExist:
-            connection = Connection( survey = survey, deal = deal )
+            connection = Connection( survey = survey,
+                                     term   = term
+                                   )
             connection.save()
             return True
 
@@ -533,7 +558,8 @@ class ConnectionManager(models.Manager):
         if profile.is_leadbuyer:
             terms = Term.objects.filter(buyer = user)
             for term in terms:
-                for c in self.filter(deal = term.deal):
+
+                for c in self.filter(term = term):
                     connections.append(c)
 
         if profile.is_attendee:
@@ -554,19 +580,14 @@ class Connection(models.Model):
     Describes a connection for an Event, Deal, and attendee
     """
     survey          = models.ForeignKey( Survey )
-    deal            = models.ForeignKey( Deal )
+    term            = models.ForeignKey( Term )
     date            = models.DateTimeField( auto_now = True )
 
     objects         = ConnectionManager()
 
     def buyers(self):
-        # Who was the buyer of this Deal
+        return self.term.buyer
 
-        buyers = []
-        for term in self.deal.terms:
-            if term.buyer != None:
-                buyers.append(term.buyer)
-        return buyers
 
     def is_connected(self, user ):
         #Returns whether a user is part of this connection
@@ -580,5 +601,8 @@ class Connection(models.Model):
         return False
 
     def __unicode__(self):
-        return self.survey.attendee.email + '-' + self.deal.interest.interest
+        return self.survey.attendee.email + '-' +\
+               self.term.buyer.email + ':' +\
+               self.survey.event.describe
+
 

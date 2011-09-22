@@ -1,0 +1,147 @@
+{% extends 'admin\admin.html' %}
+
+{% block body_block %}
+  <table width="80%" border="0" cellspacing="20" cellpadding="5">
+    <tr>
+      <th scope="col" bgcolor="#FFFF00">Join BrightMap</th>
+    </tr>
+
+    <tr>
+      <td bgcolor="#999999"><strong>Profile</strong></td>
+    </tr>
+
+    <tr>
+      <td>This information will be seen by event organizers, when you apply to sponsor their events
+      and by leads, when you are introduced to them via email. Starred items (*) are required.</td>
+    </tr>
+
+    <tr>
+      <td>
+        <table width="100%" border="0" cellspacing="0" cellpadding="3">
+          <tr>
+            <td><strong>Company*</strong></td>
+
+            <td><label><input type="text" name="company" id="company" /></label></td>
+          </tr>
+
+          <tr>
+            <td><strong>Contact Name*</strong></td>
+
+            <td><label><input type="text" name="contact name" id="contact name" /></label></td>
+          </tr>
+
+          <tr>
+            <td><strong>Title*</strong></td>
+
+            <td><label><input type="text" name="title" id="title" /></label></td>
+          </tr>
+
+          <tr>
+            <td><strong>Website*</strong></td>
+
+            <td><label><input type="text" name="website" id="website" /></label></td>
+          </tr>
+
+          <tr>
+            <td><strong>Phone</strong></td>
+
+            <td><label><input type="text" name="phone" id="phone" /></label></td>
+          </tr>
+
+          <tr>
+            <td><strong>LinkedIn</strong></td>
+
+            <td><label><input type="text" name="linkedin" id="linkedin" /></label></td>
+          </tr>
+
+          <tr>
+            <td><strong>Twitter</strong></td>
+
+            <td><label><input type="text" name="twitter" id="twitter" /></label></td>
+          </tr>
+
+          <tr>
+            <td><strong>Photo</strong></td>
+
+            <td align="right"><img src="../images/click_to_upload.gif" width="140" height="40" alt=
+            "Click to Upload" /></td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#999999"><strong>Payment and Budget</strong></td>
+    </tr>
+
+    <tr>
+      <td>You must provide your credit card details before receiving any leads from BrightMap. We
+      will validate your card up to your monthly budget, but you will not be charged until after
+      the leads are sent. You will not be charged for free leads (e.g. Sponsored leads or Trial
+      leads).</td>
+    </tr>
+
+    <tr>
+      <td>
+        <table width="100%" border="0" cellspacing="0" cellpadding="3">
+          <tr>
+            <td><strong>Credit Card Number</strong></td>
+
+            <td><label><input type="text" name="credit card" id="credit card" /></label></td>
+          </tr>
+
+          <tr>
+            <td><strong>Expiration</strong></td>
+
+            <td><label><input type="text" name="expiration" id="expiration" /></label></td>
+          </tr>
+
+          <tr>
+            <td><strong>Security Code</strong></td>
+
+            <td><label><input type="text" name="security code" id="security code" /></label></td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Your budget determines the maximum dollar value of leads you will receive each
+      month.</td>
+    </tr>
+
+    <tr>
+      <td>
+        <table width="100%" border="0" cellspacing="0" cellpadding="3">
+          <tr>
+            <td><strong>Monthly Budget</strong></td>
+
+            <td><label><input type="text" name="monthly budget" id="monthly budget" /></label></td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#999999"><strong>Confirm Terms and Conditions</strong></td>
+    </tr>
+
+    <tr>
+      <td>
+        <table width="100%" border="0" cellspacing="0" cellpadding="3">
+          <tr>
+            <td width="40" align="center"><label><input type="checkbox" name="consent" id=
+            "consent" /></label></td>
+
+            <td>I hereby agree to the BrightMap terms and conditions for lead buyers.</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr>
+      <td align="right"><img src="../images/create_update_profile.gif" width="200" height="40" alt=
+      "Create/Update Profile" /></td>
+    </tr>
+  </table>
+{% endblock %}

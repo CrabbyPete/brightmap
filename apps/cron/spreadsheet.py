@@ -17,12 +17,47 @@ from settings                       import SPREADSHEET, EVENTBRITE
 
 valid_deals = ('cancel','sponsored','exclusive','expire')
 
+def update_term( term, term_type, cost ):
+    """
+    Check if changes required for an existing term
+    """
+    # Determine child type
+    cterm = term.get_child()
+
+    # This should never be None, unless a term bombed while save
+    if cterm == None:
+        return None
+
+    cterm.cost = cost
+    if isinstance(cterm,Expire):
+        cterm.date = datetime.strptime( term_type[1], "%m/%d/%y" )
+
+    elif isinstance(cterm,Count) or \
+         isinstance(cterm,Connects):
+        try:
+            number = int(term_type[1])
+        except ValueError:
+            pass
+        else:
+            cterm.number    = int(term_type[1])
+            cterm.remaining = int(term_type[1])
+
+    elif isinstance(cterm,Budget):
+        try:
+            number = int(term_type[1])
+        except ValueError:
+            pass
+        else:
+            cterm.remaining = number
+    cterm.save()
+    return cterm
+
+
 def new_term( deal, user, term_type, cost ):
     """
     Create a new term
     term_type eg. 'cancel,500,20'
     """
-
     # Good til Canceled
     if 'cancel'    == term_type[0] or \
        'sponsored' == term_type[0] or \
@@ -122,8 +157,8 @@ def spreadsheet( email, password ):
             user_key  = organization['API User Key']
             org_id    = organization['Organizer ID']
 
-        except KeyError, e:
-            print "Key Error: " + e.message
+        except KeyError as error:
+            print "Key Error:" + str(error)
             continue
 
         # Test this to make sure user_id and organizer_id are OK
@@ -236,8 +271,8 @@ def spreadsheet( email, password ):
                 email   = sponser['Sponsor Email']
                 first   = sponser['Sponsor First Name']
                 last    = sponser['Sponsor Last Name']
-            except KeyError, err:
-                print "Key Error: " + err.message
+            except KeyError as error:
+                print "Key Error:" + str(error)
                 continue
 
             if 'Sponsor Company' in sponser:
@@ -333,8 +368,7 @@ def spreadsheet( email, password ):
 
                 # Otherwise delete the existing deal, and create a new one
                 else:
-                    term.delete()
-                    term = new_term( deal, user, term_type, cost )
+                    term = update_term( term, term_type, cost )
 
                 # In order to get child object, you have to query the db
                 term = Term.objects.get( deal = deal, buyer = user )

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load smartif %}
+
+{% block body_block %}
+      <table width="100%" border="0" cellspacing="20" cellpadding="5">
+        <tr>
+          <td>
+            <p>Currently, BrightMap works exclusively with <a href=
+            "http://www.eventbrite.com/r/uls">Eventbrite</a>. In order for us to find out which of
+            your community members are interested in purchasing which services, we add a survey
+            question to your Eventbrite registration form.</p>
+
+            <p>In order to generate and sell leads on BrightMap, you must grant permission to
+            Brightmap to access your Eventbrite page. This is so that we can add the survey
+            question to your registration form and read the results from the Eventbrite database.
+            To do this, follow these steps:</p>
+
+            <ol>
+              <li>Log into your Eventbrite page</li>
+
+              <li>Click on the Account tab</li>
+
+              <li>Click on Multi-User Access</li>
+
+              <li>Click "Add Email Address"</li>
+
+              <li>Enter the following settings
+
+                <ul>
+                  <li>Email: &lt;community name&gt;@brightmap.com (eg
+                  "my.community@brightmap.com")</li>
+
+                  <li>Grant access to: All events</li>
+
+                  <li>Actions to perform: Selected actions only</li>
+
+                  <li>Edit event details not including the payment options</li>
+
+                  <li>Edit survey questions</li>
+
+                  <li>View order and attendee reports (read-only)</li>
+
+                  <li>Receive copies of: No emails<br /></li>
+                </ul>
+              </li>
+
+              <li>Click Save</li>
+            </ol>
+
+            <p>
+            Once you click Save, Eventbrite will notify us that your account has been setup for
+            BrightMap. We will add survey questions and send you reports of the leads you're
+            generating, sponsors who want to buy your leads, and the cash balance accumulating in
+            your account as these leads are sold.
+            </p>
+
+          </td>
+        </tr>
+      </table>
+
+      <table width="100%" border="0" cellspacing="20" cellpadding="5">
+        <tr>
+          <td><a href="/">Home</a></td>
+        </tr>
+      </table>
+{% endblock %}
+

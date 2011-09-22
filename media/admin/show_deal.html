@@ -1,0 +1,61 @@
+{% extends 'admin\admin.html' %}
+{% load smartif %}
+
+{% block body_block %}
+ 	<div id='deal'>
+ 		<h3>Deals</h3>
+ 		{% for term in deal.term_set.all %}
+ 			{% if term.buyer %}
+ 				Deal Organization: {{deal.chapter.name}}<br/>
+ 				Deal Interest:{{deal.interest.interest}}<br/>
+ 				Exclusive: {{term.exclusive}}<br/>
+ 				Cost: ${{ term.cost }}<br/>
+ 				{% if term.cancel %}
+ 					Term Type: Good Til Canceled<br/>
+ 				{% endif %}
+ 				{% if term.expire %}
+ 					Term Type: Good Til {{term.expire.date|date:"d M Y" }}<br/>
+ 				{% endif %}
+ 				{% if term.count %}
+ 			    	Term Type: Good For {{term.count.number}} Times<br/>
+ 				{% endif %}
+ 				{% if term.budget %}
+ 					Term Type: Remaining Budget = {{ term.budget.remaining }}<br/>
+ 				{% endif %}
+ 				Term Buyer: {{term.buyer}}<br/>
+ 				{% if not term.canceled %}
+ 					<a href='{% url cancel_term %}?term={{term.pk}}'>Cancel Deal</a><br/>
+ 				{% else %}
+ 					These terms are canceled<br/>
+ 				{% endif %}
+ 				<a href='{% url edit_deal %}?term={{term.pk}}'>Edit Deal</a><br />
+ 			{% endif %}
+ 		{% endfor %}
+ 		<h3>Offers</h3>
+ 		{% for term in deal.term_set.all %}
+ 			{% if not term.buyer %}
+ 				Deal Organization: {{deal.organizer.organization}}<br/>
+ 				Deal Interest:{{deal.interest.interest}}<br/>
+ 				Max Number: {{deal.max_sell}}<br/>
+ 				Cost: ${{ term.cost }}<br/>
+ 				{% if term.cancel %}
+ 					Term Type: Good Til Canceled<br/>
+ 				{% endif %}
+ 				{% if term.expire %}
+ 					Term Type: Good Til {{term.expire.date|date:"d M Y" }}<br/>
+ 				{% endif %}
+ 				{% if term.count %}
+ 			    	Term Type: Good For {{term.count.number}} Times<br/>
+ 				{% endif %}
+ 				{% if not term.canceled %}
+ 					<a href='{% url cancel_term %}?term={{term.pk}}'>Cancel Offer</a><br/>
+ 				{% else %}
+ 					This offer canceled<br/>
+ 				{% endif %}
+ 				<a href='{% url edit_deal %}?term={{term.pk}}'>Edit Offer</a><br />
+ 				<br/>
+ 			{% endif %}
+ 		{% endfor %}
+
+ 	</div>
+{% endblock %}

@@ -1,20 +1,12 @@
-{% extends "base.html" %}
+{% extends "admin/admin.html" %}
 
 {% block body_block %}
     <div id="bodyc">
     	<div id="welcom">
     		Welcome {{user}}<br/>
-    		<ul id="tabnav">
-				<li><a href='{% url edit_profile %}'>My Profile</a></li>
-				{% if user.get_profile.is_organizer %}
-				<li><a href='{% url show_chapter %}'>My Organizer Page</a></li>
-				{% endif %}
-				{% if user.get_profile.is_leadbuyer %}
-				<li><a href='{% url show_buyer %}'>My Lead Buyer Page</a></li>
-				{% endif %}
 				{% if user.is_staff %}
-					<li><a href = '{% url show_chapter %}?organizer=all' >Edit Organizers</a></li>
-    				<li><a href = '{% url show_buyer%}?buyer=all' >Edit LeadBuyers</a></li>
+					<li><a href = '{% url show_chapter %}?organizer=all' >Show Organizers</a></li>
+    				<li><a href = '{% url show_buyer%}?buyer=all' >Show LeadBuyers</a></li>
     				<li><a href = '{% url show_connection%}?connection=all' >Show Connections</a></li>
 				{% endif %}
 				<li><a href='{% url logout %}'>Log Out</a></li>

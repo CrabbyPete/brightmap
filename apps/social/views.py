@@ -3,6 +3,7 @@ import pdb
 import settings
 import cgi
 import urllib
+import re
 
 import oauth2   as oauth
 import oauth2.clients.imap as imaplib
@@ -49,13 +50,15 @@ class OauthView(object):
 
     def register(self,request):
         # Step 1. Get a request token from Provider.
-        body = 'oauth_callback='+ self.call_back_url
-
+        body = 'oauth_callback='+self.call_back_url
         if self.scope != None:
-            body += ' scope='+self.scope
-
+            # body += self.scope.strip()
+            body +=  '&scope=%s' % re.sub( '\s', '+', 
+                                           re.sub('\s+',  ' ',self.scope.strip())
+                                         ) 
+  
         resp, content = self.client.request( self.request_token_url,
-                                             "POST", body = body     )
+                                             "POST", body = body   )
         if resp['status'] != '200':
             raise Exception("Invalid response from Provider.")
 
@@ -261,9 +264,9 @@ class OauthMeetup(OauthView):
         access_token_url  = 'https://api.meetup.com/oauth/access/'
         authenticate_url  = 'http://www.meetup.com/authenticate/'
         refresh_url       = 'https://secure.meetup.com/oauth2/access?'
-
-        rest_url           = 'http://api.meetup.com/'
-        call_back_url      = settings.SITE_BASE + '/social/meetup'
+        scope             = 'basic+messaging'
+        rest_url          = 'http://api.meetup.com/'
+        call_back_url     = settings.SITE_BASE + '/social/meetup'
 
 
         def get_info( self, user, content ):
@@ -304,7 +307,7 @@ class OauthMeetup(OauthView):
 twitter  = OauthTwitter( settings.TWITTER['API_KEY'], settings.TWITTER['APP_SECRET'] )
 linkedin = OauthLinkedIn( settings.LINKEDIN['API_KEY'], settings.LINKEDIN['APP_SECRET'] )
 google   = OauthGoogle( settings.GOOGLE['API_KEY'], settings.GOOGLE['APP_SECRET'],scope='https://mail.google.com/' )
-meetup   = OauthMeetup( settings.MEETUP['API_KEY'], settings.MEETUP['APP_SECRET'] )
+meetup   = OauthMeetup( settings.MEETUP['API_KEY'], settings.MEETUP['APP_SECRET']  )
 
 def gmail(request):
     try:

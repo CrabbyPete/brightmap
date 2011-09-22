@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load smartif %}
+
+{% block menu_block %}
+    <div class="navBar">
+        <div class="navLogin">
+            <a href='{% url lb_dash %}'>Lead-Buyer Dashboard</a> |
+            <a href='{% url community %}'>Event Organizer Dashboard</a> |
+            <a href='{% url logout  %}'>Logout</a>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block body_block %}
+  <form action="{% url lb_profile %}" method="post" >
+  {% csrf_token %}
+  <table width="80%" border="0" cellspacing="20" cellpadding="5">
+    <tr>
+      <th scope="col" bgcolor="#FFFF00">BrightMap - Lead-Buyer Profile</th>
+    </tr>
+    <tr>
+      <td>This information will be seen by event organizers, when you apply to sponsor their events
+      and by leads, when you are introduced to them via email. Starred items (*) are required.
+	  </td>
+    </tr>
+    <tr>
+      <td>
+        <table width="100%" border="0" cellspacing="0" cellpadding="3">
+          <tr>
+            <td><strong>First Name*</strong></td>
+
+            <td>{{form.first_name}}</td>
+          </tr>
+
+          <tr>
+            <td><strong>Last Name*</strong></td>
+
+            <td>{{form.last_name}}{{form.last_name.errors}}</td>
+          </tr>
+
+          <tr>
+            <td><strong>Email*</strong></td>
+
+            <td>{{form.email}}{{form.email.errors}}</td>
+          </tr>
+
+          <tr>
+            <td><strong>Password*</strong></td>
+
+            <td><label>{{form.password}}{{form.password.errors}}</label></td>
+          </tr>
+          <tr>
+            <td><strong>Confirm Password*</strong></td>
+
+            <td><label>{{form.pass_confirm}}{{form.pass_confirm.errors}}</label></td>
+          </tr>
+
+          <tr>
+            <td><strong>Company*</strong></td>
+
+            <td>{{form.company}}{{form.company.errors}}</td>
+          </tr>
+
+          <tr>
+            <td><strong>Title*</strong></td>
+
+            <td>{{form.title}}{{form.title.errors}}</td>
+          </tr>
+
+          <tr>
+            <td><strong>Website*</strong></td>
+
+            <td>{{form.website}}{{form.website.errors}}</td>
+          </tr>
+
+          <tr>
+            <td><strong>Phone</strong></td>
+
+            <td>{{form.phone}}{{form.phone.errors}}</td>
+          </tr>
+
+          <tr>
+            <td><strong>LinkedIn</strong></td>
+
+            <td>{{form.linkedin}}{{form.linkedin.errors}}</td>
+          </tr>
+
+          <tr>
+            <td><strong>Twitter</strong></td>
+
+            <td>{{form.twitter}}{{form.twitter.errors}}</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#999999"><strong>Confirm Terms and Conditions</strong></td>
+    </tr>
+    <tr>
+      <td>
+        <table width="100%" border="0" cellspacing="0" cellpadding="3">
+          <tr>
+            <td>{{form.agree}}{{form.agree.errors}}</td>
+
+            <td>I hereby agree to the BrightMap terms and conditions for lead buyers.</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td align="right">
+        <input type="image" name="submit" src="/media/img/create_update_profile.gif" width="200" height="40" alt="Create/Update Profile" />
+      </td>
+    </tr>
+
+  </table>
+  </form>
+{% endblock %}

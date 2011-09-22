@@ -1,0 +1,14 @@
+{% extends 'admin/admin.html' %}
+
+{% block body_block %}
+ 	<div id='deal'>
+ 	   <form action="{% url edit_deal %}" method="post" >
+       {% csrf_token %}
+       	<fieldset>
+ 			{{form}}
+        	{{terms}}
+        	<input type="image" name="submit" src=/media/img/btn-submit.gif />
+    	</fieldset>
+    </form>
+ 	</div>
+{% endblock %}

@@ -1,5 +1,7 @@
 # Python imports
 import settings
+import logging
+
 from datetime                       import datetime
 from dateutils                      import relativedelta
 
@@ -43,8 +45,11 @@ def welcome( request ):
             profile = Profile( user = user )
             profile.save()
 
-    if profile.is_leadbuyer and not profile.is_ready:
-        return edit_profile(request)
+    if profile.is_leadbuyer:
+        if not profile.is_ready:
+            return HttpResponseRedirect( reverse('lb_profile') )
+        else:
+            return HttpResponseRedirect( reverse('lb_dash') )
 
     return render_to_response('welcome.html', {}, context_instance=RequestContext(request))
 
@@ -157,18 +162,42 @@ def signup(request):
     subject = "Welcome to BrightMap"
     recipients = [ user.email ]
 
-    msg = EmailMultiAlternatives( subject, message,'welcome@brightmap.com', recipients )
-    msg.send( fail_silently = False )
-    return render_to_response('thanks.html', c, context_instance=RequestContext(request))
+    msg = EmailMultiAlternatives( subject,
+                                  message,
+                                  'welcome@brightmap.com',
+                                  recipients
+                                )
+    try:
+        msg.send( fail_silently = False )
+    except:
+        err = "Email Send Error For: " + event.chapter.organizer.email
+        logger.error("Email Send Error:")
 
+    return render_to_response('thanks.html', {},
+                               context_instance=RequestContext(request))
 
+def community(request):
+    return render_to_response('community.html', {},
+                               context_instance=RequestContext(request))
+
+@csrf_protect
+def logout(request):
+    # Log out a user
+    auth.logout(request)
+    return HttpResponseRedirect('/')
+
+"""
+    All Admin functions are here
+"""
 @csrf_protect
 def  edit_profile(request):
     # Edit a users profile
 
     def submit_form(form, lead = None):
-        c = {'form':form, 'lead':lead }
-        return render_to_response('edit_profile.html', c, context_instance=RequestContext(request))
+        return render_to_response( 'admin\edit_profile.html',
+                                   {'form':form, 'lead':lead } ,
+                                   context_instance=RequestContext(request)
+                                 )
 
    # Need to know what user this is
     user    = request.user
@@ -232,7 +261,6 @@ def  edit_profile(request):
     profile.is_attendee  = form.cleaned_data['is_attendee']
 
     profile.newsletter   = form.cleaned_data['newsletter']
-
     profile.address      = form.cleaned_data['address']
     """
     elif address != '':
@@ -252,20 +280,17 @@ def  edit_profile(request):
     return HttpResponseRedirect('/')
 
 
-@csrf_protect
-def logout(request):
-    # Log out a user
-    auth.logout(request)
-    return HttpResponseRedirect('/')
 
 @csrf_protect
 def show_chapter(request):
     # Show Chapter details
 
     def submit_form(organizations):
-        c = {'organizations':organizations}
-        return render_to_response( 'show_chapter.html', c,
-                                   context_instance=RequestContext(request) )
+        return render_to_response( 'admin\show_chapter.html',
+                                   {'organizations':organizations},
+                                   context_instance=RequestContext(request)
+                                 )
+
     # GET: All organizations
     if 'organizer' in request.GET:
         return submit_form(Organization.objects.all())
@@ -281,9 +306,10 @@ def edit_chapter( request ):
     # Edit Chapter details
 
     def submit_form(form):
-        c = {'form':form}
-        return render_to_response( 'edit_chapter.html', c,
-                                   context_instance=RequestContext(request) )
+        return render_to_response( 'admin\edit_chapter.html',
+                                   {'form':form},
+                                   context_instance=RequestContext(request)
+                                 )
 
     # GET: Edit a chapter or create a new one
     if request.method == 'GET':
@@ -327,9 +353,10 @@ def edit_interest( request ):
     # Edit Interest
 
     def submit_form(form):
-        c = {'form':form }
-        return render_to_response( 'edit_interest.html', c,
-                                   context_instance=RequestContext(request) )
+        return render_to_response( 'admin\edit_interest.html',
+                                   {'form':form },
+                                   context_instance=RequestContext(request)
+                                 )
     # GET: All the current interests
     if request.method == 'GET':
         interests = Interest.objects.all()
@@ -360,11 +387,8 @@ def edit_interest( request ):
 def show_event(request):
     # Show details of a single event
     def submit_form(event, attendees ):
-        c = { 'event'      :event,
-              'attendees'  :attendees,
-            }
-
-        return render_to_response( 'show_event.html', c,
+        return render_to_response( 'admin\show_event.html',
+                                   { 'event':event, 'attendees':attendees },
                                    context_instance=RequestContext(request) )
 
    # GET: All the attendees for a given event
@@ -373,13 +397,11 @@ def show_event(request):
         attendees   = event.attendees()
         return submit_form(event, attendees )
 
-
-
 def show_events(request):
     # List the users current events
     def submit_form(events):
-        c = {'events':events }
-        return render_to_response( 'show_events.html', c,
+        return render_to_response( 'admin\show_events.html',
+                                   {'events':events },
                                    context_instance=RequestContext(request) )
 
     # GET: All events or events for a specific chapter
@@ -399,8 +421,8 @@ def edit_deal(request):
     # Create or edit a Deal
 
     def submit_form( form ):
-        c = {'form': form }
-        return render_to_response( 'edit_deal.html', c,
+        return render_to_response( 'admin\edit_deal.html',
+                                   {'form': form },
                                    context_instance=RequestContext(request) )
     #GET
     if request.method == 'GET':
@@ -420,11 +442,12 @@ def edit_deal(request):
         # Create a new deal
         elif'organizer' in request.GET:
             form = DealForm( initial={'organizer':request.GET['organizer']} )
-            terms = TermForm()
-            return submit_form(form, terms)
+            return submit_form(form)
+
+        # Apply to a new deal
         else:
-            #Log an error
-            pass
+            form = DealForm()
+            return submit_form(form)
 
     # POST:
     form = DealForm(request.POST)
@@ -501,9 +524,10 @@ def show_deals(request):
     # Show a list of Deals
 
     def submit_form(deals):
-        c = { 'deals':deals }
-        return render_to_response( 'show_deals.html', c,
-                                   context_instance=RequestContext(request) )
+        return render_to_response( 'admin\show_deals.html',
+                                   { 'deals':deals },
+                                   context_instance=RequestContext(request)
+                                 )
 
     if request.method == 'GET':
         if 'open' in request.GET:
@@ -521,8 +545,8 @@ def show_deal(request):
     # Show specific details for a Deal
 
     def submit_form( deal ):
-        c = {'deal':deal }
-        return render_to_response( 'show_deal.html', c,
+        return render_to_response( 'admin\show_deal.html',
+                                   {'deal':deal },
                                    context_instance=RequestContext(request) )
 
     if request.method == 'GET' and 'deal' in request.GET:
@@ -538,28 +562,42 @@ def cancel_term(request):
         term.save()
         return HttpResponseRedirect(reverse('show_deals'))
 
+def show_buyers(request):
+    pass
 
 def show_buyer(request):
     # Show LeadBuyer details
 
     def submit_form( buyer ):
-        c = {'buyer':buyer }
-        return render_to_response( 'show_buyer.html', c,
+        return render_to_response( 'admin\show_buyer.html',
+                                   {'buyer':buyer },
                                    context_instance=RequestContext(request) )
 
     if request.method == 'GET':
         if 'buyer' in request.GET:
             if request.GET['buyer'] == 'all':
                 buyers = Profile.objects.filter(is_leadbuyer = True)
-                return submit_form( buyers )
+                return render_to_response( 'admin\show_buyers.html',
+                                           {'buyers':buyers},
+                                     context_instance=RequestContext(request) )
+
+
+            else:
+                profile = Profile.objects.get(pk = request.GET['buyer'])
+                try:
+                    buyer  = LeadBuyer.objects.get(user = profile.user)
+                except LeadBuyer.DoesNotExist:
+                    buyer = LeadBuyer( user = request.user)
+                    buyer.save()
         else:
             try:
                 buyer  = LeadBuyer.objects.get(user = request.user)
+
             except LeadBuyer.DoesNotExist:
                 buyer = LeadBuyer( user = request.user)
                 buyer.save()
 
-            return submit_form(buyer)
+        return submit_form(buyer)
 
 
     if request.method == 'POST':
@@ -570,8 +608,8 @@ def edit_buyer(request):
     # Edit LeadBuyer details
 
     def submit_form(form):
-        c = {'form':form }
-        return render_to_response( 'edit_buyer.html', c,
+        return render_to_response( 'admin\edit_buyer.html',
+                                   {'form':form },
                                    context_instance=RequestContext(request) )
     # GET
     if request.method == 'GET':
@@ -581,8 +619,8 @@ def edit_buyer(request):
         else:
             user = request.user
             buyer = user.get_profile()
-        
-        # Check if they have a LinkedIn profile 
+
+        # Check if they have a LinkedIn profile
         try:
             linkedin = LinkedInProfile.objects.get(user = user)
         except LinkedInProfile.DoesNotExist:
@@ -647,8 +685,8 @@ def add_buyer(request):
     # Add a LeadBuyer
 
     def submit_form( form ):
-        c = {'form':form }
-        return render_to_response( 'add_buyer.html', c,
+        return render_to_response( 'admin\add_buyer.html',
+                                   {'form':form },
                                    context_instance=RequestContext(request) )
 
     if request.method == 'GET':
@@ -673,7 +711,7 @@ def show_survey(request):
     # Show what surveys were answered
 
     def submit_form( surveys ):
-        return render_to_response( 'show_survey.html',
+        return render_to_response( 'admin\show_survey.html',
                                    {'surveys':surveys },
                                     context_instance=RequestContext(request) )
     if 'event' in request.GET:
@@ -701,9 +739,10 @@ def show_connection(request):
     # Show details of a Connections
 
     def submit_form( connections ):
-        c = {'connections':connections }
-        return render_to_response( 'show_connection.html', c,
+        return render_to_response( 'admin\show_connection.html',
+                                   {'connections':connections },
                                     context_instance=RequestContext(request) )
+
     if request.method == 'GET':
         if 'connection' in request.GET:
             # All or specific organizers?
@@ -735,8 +774,8 @@ def edit_letter(request):
     # Edit the current Chapter Letter
 
     def submit_form(form):
-        c = {'form':form }
-        return render_to_response( 'edit_letter.html', c,
+        return render_to_response( 'admin\edit_letter.html',
+                                   {'form':form },
                                    context_instance=RequestContext(request) )
     if request.method == 'GET':
         if 'organizer' in request.GET:
@@ -775,8 +814,11 @@ def show_available_deals(request):
     Report number of interests for each event
     """
     def submit_form( form, interest = None, report = None ):
-        c = {'form':form, 'interest': interest, 'report':report  }
-        return render_to_response( 'show_available_deals.html',c,
+        return render_to_response( 'admin\show_available_deals.html',
+                                    { 'form':form,
+                                      'interest': interest,
+                                      'report':report
+                                    },
                                     context_instance=RequestContext(request)
                                  )
 
@@ -799,8 +841,8 @@ def show_available_deals(request):
 def buy_deal(request):
 
     def submit_form(form):
-        c = {'form':form }
-        return render_to_response( 'buy_deal.html', c,
+        return render_to_response( 'admin\buy_deal.html',
+                                   {'form':form },
                                    context_instance=RequestContext(request) )
     # GET
     if request.method == 'GET':

@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load smartif %}
+
+{% block menu_block %}
+    <div class="navBar">
+        <div class="navLogin">
+            <a href='{% url lb_dash %}'>Lead-Buyer Dashboard</a> |
+            <a href='{% url community %}'>Event Organizer Dashboard</a> |
+            <a href='{% url logout  %}'>Logout</a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body_block %}
+     <table width="80%" border="0" cellspacing="20" cellpadding="5">
+        <tr>
+          <th scope="col" bgcolor="#FFFF00">Join BrightMap</th>
+        </tr>
+
+        <tr>
+          <td bgcolor="#999999"><strong>Leads Received</strong></td>
+        </tr>
+
+        <tr>
+          <td>
+            <table width="100%" border="1" cellspacing="0" cellpadding="0">
+              <tr>
+                <th scope="col">Interest</th>
+                <th scope="col">Organization</th>
+                <th scope="col">Start Date</th>
+                <th scope="col">Terms</th>
+                <th scope="col">Leads Sent</th>
+                <th scope="col">Lead Price</th>
+                <th scope="col">Total</th>
+                <th scope="col">Action</th>
+              </tr>
+
+              {% for connection in connections %}
+              <tr>
+                <td>{{connection.term.deal.interest.interest}}</td>
+                <td>{{connection.term.deal.chapter.name}}</td>
+                <td>{{connection.survey.event.date}}</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+			 {% endfor %}
+            </table>
+            <a href="{% url lb_apply %}">Apply to buy leads from a new community</a>
+          </td>
+        </tr>
+
+        <tr>
+          <td bgcolor="#999999"><strong>Budget</strong></td>
+        </tr>
+
+        <tr>
+          <td>
+            <table width="100%" border="0" cellspacing="0" cellpadding="3">
+              <tr>
+                <td><strong>Monthly Budget*</strong></td>
+
+                <td><label><input type="text" name="company" id="company" /></label></td>
+              </tr>
+
+              <tr>
+                <td>&nbsp;</td>
+
+                <td><img src="/media/img/update_monthly_budget.gif" width="220" height="40" alt=
+                "Update Monthly Budget" longdesc="2-3_lead-buyer-dashboard.html" /></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <tr>
+          <td bgcolor="#999999"><strong>Lead-Buyer Profile</strong></td>
+        </tr>
+
+        <tr>
+          <td><a href="{% url lb_profile %}">Update my profile</a></td>
+        </tr>
+
+        <tr>
+          <td bgcolor="#999999"><strong>Past Invoices</strong></td>
+        </tr>
+
+        <tr>
+          <td>
+            <table width="100%" border="0" cellspacing="0" cellpadding="3">
+              <tr>
+                <td>
+
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+{% endblock %}

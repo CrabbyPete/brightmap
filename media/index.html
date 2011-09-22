@@ -1,6 +1,4 @@
-
 {% extends 'base.html' %}
-{% load smartif %}
 
 {% block body_block %}
 	{% if profile.user.is_authenticated %}
@@ -16,8 +14,11 @@
 					<input type="image" src="/media/img/btn-submit.gif" name="signup" title="submit" class="signup" id="button" />
 
 				</form>
-				or
+                <br/>
+                or
 				<a href={% url signup %}><img src='/media/img/btn-signup.gif'/></a>
 		</div>
+        <br/>
+        <br/>
 	{% endif %}
 {% endblock %}

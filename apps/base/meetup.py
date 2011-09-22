@@ -57,6 +57,19 @@ class MeetupHTTPErrorProcessor(HTTPErrorProcessor):
             else:
                 raise ClientException(error_json)
 
+what_types = ('groups'
+'2/groups'
+'events'
+'cities'
+'topics'
+'photos'
+'members'
+'rsvps'
+'rsvp'
+'comments'
+'photo'
+'2/member_photo'
+)
 
 class MeetUpAPI(object):
     def __init__(self, access_token):
@@ -72,18 +85,6 @@ class MeetUpAPI(object):
         response = json.loads(data)
         return
 
-'groups'
-'2/groups'
-'events'
-'cities'
-'topics'
-'photos'
-'members'
-'rsvps'
-'rsvp'
-'comments'
-'photo'
-'2/member_photo'
 
 class API_Item(object):
     """Base class for an item in a result set returned by the API."""

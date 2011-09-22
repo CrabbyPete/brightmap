@@ -3,18 +3,24 @@ import cgi
 import simplejson as json
 import urllib
 
+import django_header
+
+
 from social.models      import  MeetupProfile
+from base.models        import *
+
 
 # Meetup JSON Encoding format
 JSON_ENCODING = 'ISO-8859-1'
 
 import settings
+PROMPT = False
 
 class MeetUpAPI(object):
         def __init__(self, user):
             try:
                 self.meetup = MeetupProfile.objects.get(user = user)
-            except MeetUpProfile.DoesNotExist:
+            except MeetupProfile.DoesNotExist:
                 return None
 
 
@@ -73,4 +79,34 @@ class MeetUpAPI(object):
                         print member['name'] + ':' + str(member['member_id'])
                     """
             return
+        
+def main():
+    # Get all organizers
+    organizations = Organization.objects.all()
+    for organization in organizations:
+        for chapter in organization.chapter_set.all():
+            # Check for meetups
+            meetup = MeetUpAPI( user = chapter.organizer )
+            if meetup:
+                meetup.get_groups()
+            
+import optparse
+if __name__ == '__main__':
+    op = optparse.OptionParser( usage="usage: %prog " +" [options]" )
+    # Add options for debugging
+    op.add_option('-d', action="store_true", help = 'Debug no emails sent')
+    op.add_option('-p', action="store_true", help = 'Prompt to send')
 
+    opts,args = op.parse_args()
+
+    # Check if options were set
+    if opts.d:
+        DEBUG = False
+    else:
+        DEBUG = True
+
+    if opts.p:
+        PROMPT = True
+    else:
+        PROMPT = False
+    main()

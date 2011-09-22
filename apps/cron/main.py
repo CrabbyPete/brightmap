@@ -270,7 +270,7 @@ def make_contact( survey, deal, template ):
             continue
 
         # Determine if you did this or not
-        if not survey.event.add_connection( survey, deal ):
+        if not survey.event.add_connection( survey, term ):
             continue
 
         # Count email so you don't spam
@@ -306,24 +306,27 @@ def make_contact( survey, deal, template ):
                 event.chapter.organizer.email
               ]
 
+        #TESTING BELOW REMOVE LATER
+        #recipients = ['Pete Douma <pete.douma@gmail.com>']
+
         # Send the email
+        msg = EmailMultiAlternatives( subject,
+                                      message,
+                                      '%s %s <%s>' % ( organizer.first_name,
+                                                       organizer.last_name,
+                                                       organizer.email       ),
+                                      recipients,
+                                      bcc
+                                     )
+
+        # If the prompt was set ask before sending
+        if PROMPT:
+            ans = raw_input('Send? (y/n)')
+            if ans != 'y':
+                continue
+
+        # Try and send the message
         if SEND_EMAIL:
-            #TESTING BELOW REMOVE LATER
-            #recipients = ['Pete Douma <pete.douma@gmail.com>']
-            msg = EmailMultiAlternatives( subject,
-                                          message,
-                                          '%s %s <%s>' % (organizer.first_name, organizer.last_name,organizer.email),
-                                          recipients,
-                                          bcc
-                                        )
-
-            # If the prompt was set ask before sending
-            if PROMPT:
-                ans = raw_input('Send? (y/n)')
-                if ans != 'y':
-                    continue
-
-            # Try and send the message
             try:
                 msg.send( fail_silently = False )
             except:

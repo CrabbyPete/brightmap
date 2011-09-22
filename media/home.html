@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
-{% load smartif %}
+
+{% block menu_block %}
+   <a href = '{% url login %}'>Log In</a>
+{% endblock %}
 
 {% block body_block %}
-    <a href = '{% url login %}'>Log In</a>
     <table width="100%" border="0" cellspacing="20" cellpadding="5">
 
       <tr>
@@ -48,7 +50,7 @@
         </ul>        </td>
       </tr>
       <tr>
-        <td align="center" bgcolor="#faa71d" style="border:solid 2px #000"><p><a href='{% url signup %}'><strong>Join BrightMap<br>Community/Event Organizer</strong></a></p></td>
+        <td align="center" bgcolor="#faa71d" style="border:solid 2px #000"><p><a href='{% url community %}'><strong>Join BrightMap<br>Community/Event Organizer</strong></a></p></td>
         <td align="center" bgcolor="#faa71d" style="border:solid 2px #000"><p><a href='{% url signup %}'><strong>Join BrightMap<br>Professional Service Provider</strong></a></p></td>
       </tr>
     </table>
