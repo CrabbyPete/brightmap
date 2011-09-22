@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "admin/admin.html" %}
 
 {% block body_block %}
 	<div id='show_available_leads'>
@@ -9,11 +9,11 @@
 		</form>
 		{% for event, count in report.items %}
 			<p>
-			{{event.describe}} has {{count}} 
+			{{event.describe}} has {{count}}
 			{% if count > 1 %} leads {% else %} lead {% endif %}
 			<a href="{% url buy_deal %}?event={{event.pk}}&interest={{interest}}"> apply to buy leads </a>
 			</p>
 		{% endfor %}
-		
+
 	</div>
 {% endblock %}

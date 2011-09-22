@@ -194,7 +194,7 @@ def  edit_profile(request):
     # Edit a users profile
 
     def submit_form(form, lead = None):
-        return render_to_response( 'admin\edit_profile.html',
+        return render_to_response( 'admin/edit_profile.html',
                                    {'form':form, 'lead':lead } ,
                                    context_instance=RequestContext(request)
                                  )
@@ -286,7 +286,7 @@ def show_chapter(request):
     # Show Chapter details
 
     def submit_form(organizations):
-        return render_to_response( 'admin\show_chapter.html',
+        return render_to_response( 'admin/show_chapter.html',
                                    {'organizations':organizations},
                                    context_instance=RequestContext(request)
                                  )
@@ -306,7 +306,7 @@ def edit_chapter( request ):
     # Edit Chapter details
 
     def submit_form(form):
-        return render_to_response( 'admin\edit_chapter.html',
+        return render_to_response( 'admin/edit_chapter.html',
                                    {'form':form},
                                    context_instance=RequestContext(request)
                                  )
@@ -353,7 +353,7 @@ def edit_interest( request ):
     # Edit Interest
 
     def submit_form(form):
-        return render_to_response( 'admin\edit_interest.html',
+        return render_to_response( 'admin/edit_interest.html',
                                    {'form':form },
                                    context_instance=RequestContext(request)
                                  )
@@ -387,7 +387,7 @@ def edit_interest( request ):
 def show_event(request):
     # Show details of a single event
     def submit_form(event, attendees ):
-        return render_to_response( 'admin\show_event.html',
+        return render_to_response( 'admin/show_event.html',
                                    { 'event':event, 'attendees':attendees },
                                    context_instance=RequestContext(request) )
 
@@ -400,7 +400,7 @@ def show_event(request):
 def show_events(request):
     # List the users current events
     def submit_form(events):
-        return render_to_response( 'admin\show_events.html',
+        return render_to_response( 'admin/show_events.html',
                                    {'events':events },
                                    context_instance=RequestContext(request) )
 
@@ -421,7 +421,7 @@ def edit_deal(request):
     # Create or edit a Deal
 
     def submit_form( form ):
-        return render_to_response( 'admin\edit_deal.html',
+        return render_to_response( 'admin/edit_deal.html',
                                    {'form': form },
                                    context_instance=RequestContext(request) )
     #GET
@@ -524,7 +524,7 @@ def show_deals(request):
     # Show a list of Deals
 
     def submit_form(deals):
-        return render_to_response( 'admin\show_deals.html',
+        return render_to_response( 'admin/show_deals.html',
                                    { 'deals':deals },
                                    context_instance=RequestContext(request)
                                  )
@@ -545,7 +545,7 @@ def show_deal(request):
     # Show specific details for a Deal
 
     def submit_form( deal ):
-        return render_to_response( 'admin\show_deal.html',
+        return render_to_response( 'admin/show_deal.html',
                                    {'deal':deal },
                                    context_instance=RequestContext(request) )
 
@@ -569,7 +569,7 @@ def show_buyer(request):
     # Show LeadBuyer details
 
     def submit_form( buyer ):
-        return render_to_response( 'admin\show_buyer.html',
+        return render_to_response( 'admin/show_buyer.html',
                                    {'buyer':buyer },
                                    context_instance=RequestContext(request) )
 
@@ -577,7 +577,7 @@ def show_buyer(request):
         if 'buyer' in request.GET:
             if request.GET['buyer'] == 'all':
                 buyers = Profile.objects.filter(is_leadbuyer = True)
-                return render_to_response( 'admin\show_buyers.html',
+                return render_to_response( 'admin/show_buyers.html',
                                            {'buyers':buyers},
                                      context_instance=RequestContext(request) )
 
@@ -608,7 +608,7 @@ def edit_buyer(request):
     # Edit LeadBuyer details
 
     def submit_form(form):
-        return render_to_response( 'admin\edit_buyer.html',
+        return render_to_response( 'admin/edit_buyer.html',
                                    {'form':form },
                                    context_instance=RequestContext(request) )
     # GET
@@ -685,7 +685,7 @@ def add_buyer(request):
     # Add a LeadBuyer
 
     def submit_form( form ):
-        return render_to_response( 'admin\add_buyer.html',
+        return render_to_response( 'admin/add_buyer.html',
                                    {'form':form },
                                    context_instance=RequestContext(request) )
 
@@ -711,7 +711,7 @@ def show_survey(request):
     # Show what surveys were answered
 
     def submit_form( surveys ):
-        return render_to_response( 'admin\show_survey.html',
+        return render_to_response( 'admin/show_survey.html',
                                    {'surveys':surveys },
                                     context_instance=RequestContext(request) )
     if 'event' in request.GET:
@@ -739,7 +739,7 @@ def show_connection(request):
     # Show details of a Connections
 
     def submit_form( connections ):
-        return render_to_response( 'admin\show_connection.html',
+        return render_to_response( 'admin/show_connection.html',
                                    {'connections':connections },
                                     context_instance=RequestContext(request) )
 
@@ -774,7 +774,7 @@ def edit_letter(request):
     # Edit the current Chapter Letter
 
     def submit_form(form):
-        return render_to_response( 'admin\edit_letter.html',
+        return render_to_response( 'admin/edit_letter.html',
                                    {'form':form },
                                    context_instance=RequestContext(request) )
     if request.method == 'GET':
@@ -814,7 +814,7 @@ def show_available_deals(request):
     Report number of interests for each event
     """
     def submit_form( form, interest = None, report = None ):
-        return render_to_response( 'admin\show_available_deals.html',
+        return render_to_response( 'admin/show_available_deals.html',
                                     { 'form':form,
                                       'interest': interest,
                                       'report':report
@@ -841,7 +841,7 @@ def show_available_deals(request):
 def buy_deal(request):
 
     def submit_form(form):
-        return render_to_response( 'admin\buy_deal.html',
+        return render_to_response( 'admin/buy_deal.html',
                                    {'form':form },
                                    context_instance=RequestContext(request) )
     # GET

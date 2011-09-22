@@ -1,4 +1,4 @@
-{% extends "admin\admin.html" %}
+{% extends "admin/admin.html" %}
 
 {% block body_block %}
     <div id="bodyc">
@@ -10,9 +10,9 @@
       	{% else %}
       		{% for connection in connections %}
       			{{connection.survey.event}} <br/>
-      			{{connection.deal.interest}} <br/>
+      			{{connection.term.deal.interest}} <br/>
       			Buyer(s):
-      			{% for term in connection.deal.terms %}
+      			{% for term in connection.term.deal.terms %}
       					{% if term.buyer != None %}
       						{{term.buyer.first_name}}
                             {{term.buyer.last_name}}<br/>
