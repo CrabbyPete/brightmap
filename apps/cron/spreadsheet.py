@@ -157,7 +157,7 @@ def spreadsheet( email, password ):
             user_key  = organization['API User Key']
             org_id    = organization['Organizer ID']
 
-        except KeyError as error:
+        except KeyError, error:
             print "Key Error:" + str(error)
             continue
 
@@ -271,7 +271,7 @@ def spreadsheet( email, password ):
                 email   = sponser['Sponsor Email']
                 first   = sponser['Sponsor First Name']
                 last    = sponser['Sponsor Last Name']
-            except KeyError as error:
+            except KeyError, error:
                 print "Key Error:" + str(error)
                 continue
 
