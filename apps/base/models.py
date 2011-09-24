@@ -83,7 +83,6 @@ class Chapter( models.Model ):
         except:
             return None
 
-
     def events( self ):
         # Get all the events for this chapter
         return self.event_set.all()
@@ -92,6 +91,24 @@ class Chapter( models.Model ):
         # Get the Eventbrite ticket for this chapter
         tickets = Eventbrite.objects.filter( chapter = self )
         return tickets
+
+
+    def buyers( self ):
+        # Get all the buyers for this chapters events
+        buyers = []
+        deals = self.deals()
+        for deal in deals:
+            for term in deal.terms():
+                if term.status == 'approved':
+                    buyers.append(term.buyer)
+        return buyers
+
+
+    def terms( self, user = None ):
+        deals = self.deals()
+        terms = Term.objects.filter()
+
+
 
     def __unicode__(self):
         return self.name
@@ -185,17 +202,14 @@ class Interest(models.Model):
         if day == None:
             day = datetime.today()
 
-        query = Survey.objects.filter(interest = self)
+        query = Survey.objects.filter( interest = self,
+                                       event__date__gte = day )
         for survey in query:
-            # Check is exclusive
+            # Check is exclusive, if there is a deal and its exclusive, ignore
             if open:
                 deal = survey.event.chapter.deal( self )
                 if deal and deal.exclusive():
                     continue
-
-            # Don't report past events
-            if day < survey.event.date:
-                continue
 
             # Count
             if survey.event in report:
@@ -397,8 +411,13 @@ class EventManager(models.Manager):
     """
     Event class object manager
     """
-    pass
-
+    def planned(self):
+        """
+        Return future events
+        """
+        today = datetime.today()
+        events = self.filter( date__gte = today )
+        return events
 
 class Event(models.Model):
     """
@@ -478,8 +497,10 @@ class Event(models.Model):
 
 
     def deals( self, interest ):
-        # Get deals for a normalized interest for this event
-        # If exclusive return only exclusive deals
+        """
+        Get deals for a normalized interest for this event
+        If exclusive return only exclusive deals
+        """
 
         deal_list = []
         normal_interest = Interest.objects.close_to( interest )
@@ -531,6 +552,9 @@ class Survey(models.Model):
         return self.connection_set.all()
 
     def mails_for(self):
+        """
+        Emails sent for an attendee, per event
+        """
         total_mails = 0
         mails = Survey.objects.filter( event    = self.event,
                                        attendee = self.attendee )
@@ -549,7 +573,7 @@ class ConnectionManager(models.Manager):
     """
     Model Manager for Connection class
     """
-    def for_user(self, user ):
+    def for_user(self, user, date_range = None ):
         # Get Connections for a particular user
 
         profile = user.get_profile()
@@ -560,7 +584,12 @@ class ConnectionManager(models.Manager):
             for term in terms:
 
                 for c in self.filter(term = term):
-                    connections.append(c)
+                    if date_range == None:
+                        connections.append(c)
+                    else:
+                        if c.date >= date_range[0] and\
+                           c.date <  date_range[1]     :
+                            connections.append(c)
 
         if profile.is_attendee:
             surveys = Survey.objects.filter( attendee = user )
@@ -579,11 +608,12 @@ class Connection(models.Model):
     """
     Describes a connection for an Event, Deal, and attendee
     """
-    survey          = models.ForeignKey( Survey )
-    term            = models.ForeignKey( Term )
-    date            = models.DateTimeField( auto_now = True )
+    survey      = models.ForeignKey( Survey )
+    term        = models.ForeignKey( Term )
+    date        = models.DateTimeField( auto_now = True )
+    status      = models.CharField( max_length = 20, default ='sent' )
 
-    objects         = ConnectionManager()
+    objects     = ConnectionManager()
 
     def buyers(self):
         return self.term.buyer

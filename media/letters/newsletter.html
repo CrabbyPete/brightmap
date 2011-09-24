@@ -39,7 +39,7 @@
         {% for interest, event in report.items %}
         <h3>{{interest.interest}}</h3>
         	{% for e,count in event.items %}
-        		<p>{{count}} {% if count > 1 %} leads {% else %} lead {% endif %} {{e.describe}}</p>
+        		<p>{{count}} {% if count > 1 %} leads {% else %} lead {% endif %} {{e.describe}}-{{e.date}}</p>
         	{% endfor %}
         {% endfor %}
     </div>
