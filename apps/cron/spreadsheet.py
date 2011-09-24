@@ -240,6 +240,8 @@ def spreadsheet( email, password ):
                                )
         d_chapter.save()
 
+        # Get a list of the current sponsors
+        buyer_list = d_chapter.buyers()
 
         # Get the eventbrite access
         try:
@@ -366,9 +368,13 @@ def spreadsheet( email, password ):
                 except Term.DoesNotExist:
                     term = new_term( deal, user, term_type, cost )
 
-                # Otherwise delete the existing deal, and create a new one
+                # Otherwise update the existing term
                 else:
                     term = update_term( term, term_type, cost )
+
+                    # Take them out of the buyer list
+                    if user in buyer_list:
+                        buyer_list.remove(user)
 
                 # In order to get child object, you have to query the db
                 term = Term.objects.get( deal = deal, buyer = user )
@@ -385,7 +391,23 @@ def spreadsheet( email, password ):
                         cost )
 
 
-import cProfile
+        #Check if anything left in the sponsor list
+        for buyer in buyer_list:
+            print "%s %s %s is no longer on the list"%(buyer.first_name,
+                                                       buyer.last_name,
+                                                       buyer.email      )
+            ans = raw_input('Do you want to cancel his deal? (y/n)')
+            if ans == 'y':
+                terms =Term.objects.filter(buyer = buyer)
+                for term in terms:
+                    if term.status == 'approved' and\
+                       term.deal.chapter == d_chapter:
+                        term.status = 'canceled'
+                        term.save()
+
+
+
+
 if __name__ == '__main__':
 
     import optparse

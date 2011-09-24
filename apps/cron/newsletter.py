@@ -23,12 +23,14 @@ def report_interests ( date = None ):
     for interest in interests:
         report[interest] = interest.events( open = True )
 
-    """ For testing
+    """ For testing the template
     for interest, event  in report.items():
         print interest.interest
 
         for ev, count in event.items():
             print ev.describe + ':' + str(count)
+            if ev.chapter.website:
+                print ev.chapter.website
     """
     return report
 

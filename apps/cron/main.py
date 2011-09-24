@@ -18,6 +18,7 @@ from social.models                  import MeetupProfile
 import logging
 logger = logging.getLogger('main.py')
 
+
 # Environment variables
 from settings                       import EVENTBRITE, MAX_MAIL_SEND, SEND_EMAIL
 PROMPT     = False
@@ -26,7 +27,7 @@ def log(message):
     """
     Time stamp all messages
     """
-    return datetime.today().strftime("%Y-%m-%d %H:%M")+ ' ' + message
+    return datetime.today().strftime("%Y-%m-%d %H:%M")+ ',' + message
 
 
 def get_attendees( evb, event_id ):
@@ -93,7 +94,7 @@ def get_latest_events( evb, organizer_id ):
     if 'error' in events:
         err = 'Eventbrite Error: ' + events['error']['error_type'] + ' for ' + str(organizer_id)
         print log( err )
-        logger.debug( err )
+        #logger.debug( err )
         return []
 
     # Compare to todays date and find all events ending after today
@@ -265,8 +266,8 @@ def make_contact( survey, deal, template ):
         if term == None or not term.execute( event = survey.event ):
             continue
 
-        # Don't spam
-        if survey.mails_for() >= MAX_MAIL_SEND:
+        # Don't spam, limit the number of emails per event
+        if survey.mails_for() > MAX_MAIL_SEND:
             continue
 
         # Determine if you did this or not
@@ -326,12 +327,20 @@ def make_contact( survey, deal, template ):
                 continue
 
         # Try and send the message
+        log_mess = "%s,%s,%s,%s"%( attendee.email,
+                                   sponser.email,
+                                   chapter,
+                                   interest
+                                 )
+
+        logger.info(log(log_mess))
         if SEND_EMAIL:
             try:
                 msg.send( fail_silently = False )
             except:
-                err = "Email Send Error For: " + event.chapter.organizer.email
-                logger.error("Email Send Error:")
+                err = "Email Send Error For:"+log_mess
+                print log(err)
+                #logger.error(log(err))
 
 
 def print_event(event):
