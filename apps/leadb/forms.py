@@ -117,6 +117,9 @@ class ApplyForm(forms.Form):
         self.fields['chapter'].choices = [(i.name,i.name) for i in Chapter.objects.all()]
 
 
+class BudgetForm(forms.Form):
+    budget          = forms.DecimalField( label = 'Maximum Monthly Budget')
+
 
 from fields import CreditCardField, \
                     CreditCardExpiryField, \

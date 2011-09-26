@@ -27,7 +27,7 @@
               <tr>
                 <th scope="col">Interest</th>
                 <th scope="col">Organization</th>
-                <th scope="col">Start Date</th>
+                <th scope="col">Status</th>
                 <th scope="col">Terms</th>
                 <th scope="col">Leads Sent</th>
                 <th scope="col">Lead Price</th>
@@ -35,16 +35,25 @@
                 <th scope="col">Action</th>
               </tr>
 
-              {% for connection in connections %}
+              {% for term in terms %}
               <tr>
-                <td>{{connection.term.deal.interest.interest}}</td>
-                <td>{{connection.term.deal.chapter.name}}</td>
-                <td>{{connection.survey.event.date}}</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td>{{term.deal.interest.interest}}</td>
+                <td>{{term.deal.chapter.name}}</td>
+                <td>{{term.status}}</td>
+                {% if term.cancel %}
+                    {% if term.exclusive %}
+                        <td>Exclusive</td>
+                    {% else %}
+                        <td>Non Exclusive</td>
+                    {% endif %}
+                {% else %}
+                    <td>Trial</td>
+                {% endif %}
+
+                <td>{{term.connections|length}}</td>
+                <td>{{term.cost}}</td>
+                <td>{{term.total}}</td>
+                <td><a href=#>Details</a></td>
               </tr>
 			 {% endfor %}
             </table>
@@ -55,22 +64,27 @@
         <tr>
           <td bgcolor="#999999"><strong>Budget</strong></td>
         </tr>
-
         <tr>
           <td>
             <table width="100%" border="0" cellspacing="0" cellpadding="3">
-              <tr>
-                <td><strong>Monthly Budget*</strong></td>
-
-                <td><label><input type="text" name="company" id="company" /></label></td>
+                <form action="{% url lb_dash %}" method="post" >
+                {% csrf_token %}
+                <tr>
+                    <td>
+                        {{form}}
+                    </td>
               </tr>
 
               <tr>
                 <td>&nbsp;</td>
-
-                <td><img src="/media/img/update_monthly_budget.gif" width="220" height="40" alt=
-                "Update Monthly Budget" longdesc="2-3_lead-buyer-dashboard.html" /></td>
+                <td>
+                      <input type="image"
+                               name="submit"
+                               src="/media/img/update_monthly_budget.gif"
+                               alt="Create/Update Profile" />
+                </td>
               </tr>
+              </form>
             </table>
           </td>
         </tr>

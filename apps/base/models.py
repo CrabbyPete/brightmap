@@ -290,6 +290,16 @@ class Term( models.Model ):
         return self.buyer.email +'-' +\
                self.deal.chapter.name +':' + self.deal.interest.interest
 
+    def connections(self):
+        connections = Connection.objects.filter(term = self)
+        return connections
+
+    def total(self):
+        cost = 0
+        for connection in self.connections():
+            cost += self.cost
+        return cost
+
 class Expire( Term ):
     """
     Subclass of Term that is good until an expiration date

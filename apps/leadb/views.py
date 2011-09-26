@@ -124,6 +124,12 @@ def lb_profile(request):
     profile.is_ready = True
     profile.save()
 
+    try:
+        leadbuyer = LeadBuyer( user = user)
+    except LeadBuyer.DoesNotExist:
+        leadbuyer = LeadBuyer(user = user)
+        leadbuyer.save()
+
     return HttpResponseRedirect(reverse('lb_dash'))
 
 @csrf_protect
@@ -193,22 +199,36 @@ def lb_apply(request):
 
     return HttpResponseRedirect(reverse('lb_profile'))
 
-
+@csrf_protect
 def lb_dash(request):
     """
     Show the buyers dash board
     """
-    def submit_form(connections):
-        c = {'connections':connections }
+    def submit_form(form, terms, connections ):
+        c = { 'form':form, 'terms':terms,'connections':connections }
         return render_to_response( 'leadb/lb_dash.html', c,
                                    context_instance=RequestContext(request) )
 
     if request.method == 'GET':
+        terms = Term.objects.filter(buyer = request.user)
         connections = Connection.objects.for_user(request.user)
-        return submit_form(connections)
+        lb = LeadBuyer.objects.get(user = request.user)
+
+        form = BudgetForm(initial = {'budget':lb.budget})
+        return submit_form(form, terms, connections)
 
     if request.method == 'POST':
-            return HttpResponseRedirect('/')
+        form = BudgetForm(request.POST)
+        if not form.is_valid():
+            return submit_form(form)
+
+        budget = form.cleaned_data['budget']
+        lb = LeadBuyer.objects.get(user = request.user)
+        lb.budget = budget
+        lb.save()
+
+        return HttpResponseRedirect(reverse('lb_dash'))
+
 
 from authorize import cim
 @csrf_protect
