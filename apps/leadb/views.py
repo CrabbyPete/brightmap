@@ -125,7 +125,7 @@ def lb_profile(request):
     profile.save()
 
     try:
-        leadbuyer = LeadBuyer( user = user)
+        leadbuyer = LeadBuyer.objects.get( user = user)
     except LeadBuyer.DoesNotExist:
         leadbuyer = LeadBuyer(user = user)
         leadbuyer.save()
