@@ -1,0 +1,394 @@
+@import "uni-form-generic.css";
+/* Your styles below */
+/* Keep in mind that wherever you see "Required property" it means that the property must exist, adjust it's value to your liking */
+
+
+
+/* Overriding default #content padding*/
+.uniForm  {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	position: relative;
+	background: transparent;
+}
+
+.uniForm fieldset {
+	margin: 0;
+	/*padding: 20px 10px 4px 20px;
+	border: 1px #c7ba9c solid;*/
+	border: 0;
+}
+
+.uniForm fieldset legend {
+	color:#000; /* Reset IE */
+	color: #982f4b;
+	font-size: 18px;
+	font-weight: normal;
+	display: none;
+	padding-top: 10px;
+}
+
+.uniForm .ctrlHolder{ /* This is the main unit that contains our form elements */
+	padding:4px 0;
+	background: none;
+	position: relative;
+}
+.uniForm .buttonHolder{
+	text-align: left; /* Recommended */
+	margin: 3px 0 0 116px;
+}
+.uniForm .buttonHolder-block{
+	text-align: left; /* Recommended */
+	margin: 17px 0 0 42px;
+}
+
+.uniForm .blockLabels .buttonHolder{
+	text-align: left; /* Recommended */
+	margin: 17px 0 0 0px;
+}
+.uniForm .focused{
+	background: #FAFAFA;
+	/*_background: none;*/
+	/*background: url(/media/img/bg_focus_input.png) left top;*/
+	/*border: 1px solid #d1d1d1;*/
+}
+
+/* .inlineLabels */
+.uniForm .inlineLabels  label,
+.uniForm .inlineLabels  .label{
+	width:100px; /* Required property */
+	text-align: left;
+	/*height: 16px;*/
+	position: relative;
+	color: #000000;
+	padding: 4px 3px 3px 3px;
+	
+}
+.uniForm label em,
+.uniForm .label em{
+	position:absolute;
+	right: 0;
+	top: 0;
+}
+.uniForm .inlineLabels .textInput,
+.uniForm .inlineLabels .fileUpload{
+	background: #FFFFFF;
+	border: 1px solid #A5A5A5;
+	padding: 3px 2px 2px 5px;
+	height: 22px;
+	/*width:45%;*/ /* Required property */
+	width: 240px;
+	text-align: left;
+	display: block;
+	
+	/*height: 16px;*/
+}
+
+.uniForm .inlineLabels .selectInput{
+	/*width:45%;*/ /* Required property */
+	background: #FFFFFF;
+	border: 1px solid #A5A5A5;
+	padding: 3px 2px 2px 2px;
+	height: 16px;
+	width: 182px;
+	position: relative;
+}
+
+.uniForm .inlineLabels .textarea{
+	background: #FFFFFF;
+	border: 1px solid #A5A5A5;
+	padding: 3px 2px 2px 2px;
+	
+	width:240px; /* Required property */
+}
+
+.uniForm .inlineLabels .checkbox-wrapper .checkbox{
+	float: left;
+	margin-right: 10px;
+	margin-top: 2px;
+	display: inline;
+	width: 15px;
+}
+.uniForm .inlineLabels .checkbox-wrapper .checkbox-label{
+	float: left;
+	display: inline;
+	width: 400px;
+}
+
+/*.uniForm .inlineLabels .textInput:focus,
+.uniForm .inlineLabels .fileUpload:focus,
+.uniForm .inlineLabels .selectInput:focus,
+.uniForm .inlineLabels .textarea:focus{*/
+.uniForm .inlineLabels input:focus,
+.uniForm .inlineLabels select:focus,
+.uniForm .inlineLabels textarea:focus{
+	background: #FFFFFF;
+	border: 1px solid #000000;
+}
+
+.uniForm .inlineLabels .formHint{
+	margin-top:0;
+	margin-left:114px; 
+}
+
+/* .blockLabels */
+.uniForm .blockLabels .textInput,
+.uniForm .blockLabels .fileUpload{
+	width: 170px; /* Required property */
+}
+
+.uniForm .blockLabels .selectInput{
+	display:block;
+	width: 182px; /* Required property */
+}
+.uniForm .blockLabels textarea{
+	width:300px; /* Required property */
+}
+.uniForm .blockLabels .formHint{
+	width:45%; /* Required property */
+}
+.uniForm .blockLabels label{
+	margin-left: 0px;
+}
+
+/* Columns */
+.uniForm .col{
+	width:47.9%; /* Required property */
+	margin:0 2% 0 0; 
+}
+.uniForm .columnLeft{
+	width:15%; /* Required property */
+	text-align: right;
+}
+.uniForm .columnRight{
+	width:35%; /* Required property */
+	text-align: left;
+	float: left;
+	padding-left: 15px;
+}
+
+
+
+/*****************************************************************/
+/*                        FORM HEADINGS                          */
+/*****************************************************************/
+.form-heading {
+	background: #d9c5a7;
+	padding: 8px 12px;
+	margin-bottom: 1em;
+	margin-top: 20px;
+	position: relative;
+}
+	.form-heading h2 {
+		color: White;
+		text-transform: uppercase;
+	}
+	.form-heading span {
+		position: absolute;
+		right: 12px;
+		top: 18px;
+		color: #f5efe7;
+		font-size: 10px;
+	}
+
+
+
+/****************** >     ERRORS      < ******************/
+/* List of errors above the form */
+.errorMsg {
+	color: #e3001b;
+	font-weight: bold;
+	font-size: 12px;
+	padding: 0px;
+	margin-top: 10px;
+	margin-bottom: 5px;
+	position: relative;
+}
+	.errorMsg strong {
+		color: #e3001b;
+	}
+	.errorMsg a:link, .successMsg a:visited {
+		font-weight: bold;
+		color: #ffffff;
+	}
+	
+	.errorMsg ol {
+		list-style-type: none;
+		/*margin-left: 20px;
+		margin-bottom: 20px;
+		padding: 0;
+	*/}
+		/*.errorMsg ol li {
+			margin: 0;
+			list-style-position: inside;
+			border-bottom:1px dotted #f8b3a0;
+			position: relative;
+			color: #e3001b;
+			padding: 0;
+			line-height: 16px;
+			font-size: 11px;
+		}
+	
+	
+.errorMsg {
+	color: #CC0900;
+	font-weight: bold;
+	font-size: 14px;
+	padding: 0px;
+	margin-top: 12px;
+	margin-bottom: 5px;
+	position: relative;
+}
+	.errorMsg div h3 {
+		font-family: Arial, Helvetica, sans-serif;
+		font-size: 14px;
+		font-weight: bold;
+		color: #ffffff;
+		text-transform: uppercase;
+	}
+	.errorMsg div a:link, .errorMsg div a:visited {
+		color: #ffffff;
+		text-decoration: underline;
+	}
+	.errorMsg div a:hover {
+		color: #ffffff;
+		text-decoration: none;
+	}
+
+
+
+
+ errors for input elements displayed INLINE (same line as input, after it) 
+*/.errorMsg-inline {
+	float: left;
+	margin-left: 10px;
+
+	display: block;
+	padding: 0 7px 0 0;
+	background: url(/media/img/required-forms/error-label-right.gif) right 50% no-repeat;
+	text-decoration: none;
+}
+.errorMsg-inline strong {
+	font-size: 10px;
+	font-weight: bold;
+	color: White;
+
+	position: relative;
+	display: block;
+	height: 20px;
+	white-space: nowrap;
+	padding: 0 0 0 28px;
+	line-height: 20px;
+	background: url(/media/img/required-forms/error-label-left.gif) left 50% no-repeat;
+}
+
+* html .errorMsg-inline {
+	width: 1%;
+}
+* html .errorMsg-inline strong {
+}
+
+
+.uniForm .error .textInput,
+.uniForm .error .selectInput,
+.uniForm .error textarea,
+.uniForm .error checkbox,
+.uniForm .error .checkbox-holder
+{
+	background: #fff2f2;
+	border: 1px solid #e9a4a4;	
+}
+
+
+
+
+/****************** >     SUCCESS      < ******************/
+.successMsg {
+	color: #379d04;
+	font-weight: bold;
+	font-size: 12px;
+	padding: 0px;
+	margin-top: 10px;
+	margin-bottom: 5px;
+	position: relative;
+}
+	.successMsg strong {
+		color: #379d04;
+	}
+	.successMsg a:link, .successMsg a:visited {
+		font-weight: bold;
+		color: #ffffff;
+	}
+
+
+
+
+
+/***********************************************************/
+/*                        WARNING                          */
+/***********************************************************/
+.warningMsg {
+	background: url(/media/img/required-forms/ico-warning.gif) no-repeat 8px 7px white;
+	border: 1px #999 dashed;
+	font-weight: normal;
+	width: 90%;
+	display: block;
+	color: #3b3b3b;
+	padding: 8px 8px 8px 35px;
+	margin-top: 10px;
+	margin-bottom: 5px;
+	position: relative;
+}
+	.warningMsg h3 {
+		font-family: Arial, Helvetica, sans-serif;
+		font-size: 14px;
+		font-weight: bold;
+		color: #3b3b3b;
+		text-transform: uppercase;
+	}
+
+
+
+/***********************************************************/
+/*                        CAPTCHA                          */
+/***********************************************************/
+	#captcha-block {
+		float: left;
+	}
+		#captcha-block img {
+			float: left;
+			clear: both;
+			padding: 0.5em 0;
+			display: block;
+		}
+		#captcha-block #reload {
+			font-size: 9px;
+			color: #1b3f93;
+			float: left;
+			display: block;
+			margin: 35px 0 0 10px;
+		}
+
+
+
+/* for checking spam */
+.email_2 {
+	display: none;
+}
+.uniForm span.inactive {
+	display: block;
+	padding-top: 4px;
+	text-indent: 3px;
+	font-weight: bold;
+}
+
+.errorMsg-after {
+	display: block;
+	height: 20px;
+	line-height: 20px;
+	text-decoration: none;
+	color: #dd0000;
+	text-align: left;
+	padding-left: 4px;
+}

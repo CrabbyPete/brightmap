@@ -1,0 +1,45 @@
+/* 
+Title:		screen styles & ie fixes
+Author:		Andrei Pfeiffer (andrei@upsidedown.ro)
+Copyright:	RealNet. www.realnet.com.ro
+*/
+
+
+/* RESET STYLES
+__________________________________________________*/
+/*@import url(reset.css);*/
+
+
+/* TEMPLATE STYLES (common styling for all pages, excluding content)
+__________________________________________________*/
+@import url(/media/css/site-template.css);
+
+
+/* CONTENT STYLES (specific styling for the pages content ONLY)
+__________________________________________________*/
+@import url(/media/css/site-styling.css);
+
+
+
+
+/* AUXILIAR Styles
+__________________________________________________*/
+
+/* IMAGES POPUP STYLE */
+@import url(/media/css/facebox.css);
+
+/* CLEARFIX STYLE */
+@import url(/media/css/clearfix.css);
+	
+/* BUTTONS STYLES (sliding doors buttons & links) */
+@import url(/media/css/site-buttons.css);
+
+/* sIFR */
+@import url(/media/css/sifr.css);
+
+/* FORMS STYLES (using UniForm) */
+@import url(/media/css/uni-form-generic.css);
+@import url(/media/css/uni-form.css);
+
+/* jQuery Countdown: */
+@import url(/media/css/jquery.countdown.css);

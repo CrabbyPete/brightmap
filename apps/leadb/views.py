@@ -19,6 +19,31 @@ from base.models                    import *
 from social.models                  import *
 from forms                          import *
 
+def mail_organizer( user, deal, term ):
+    # Render the letter
+    c = Context({'user' : user,
+                 'deal' : deal,
+                 'term' : term
+                })
+    template = loader.get_template('letters/request.tmpl')
+    message = template.render(c)
+
+    subject = "BrightMap LeadBuyer Request"
+    recipients = [ user.email, chapter.organizer.email ]
+
+    msg = EmailMultiAlternatives( subject,
+                                  message,
+                                  'requests@brightmap.com',
+                                  recipients,
+                                  'requests@brightmap.com'
+                                )
+    try:
+        msg.send( fail_silently = False )
+    except:
+        err = "Email Send Error For: " + event.chapter.organizer.email
+        logger.error("Email Send Error:")
+
+
 @csrf_protect
 def lb_profile(request):
     """
@@ -177,12 +202,18 @@ def lb_apply(request):
                              status = 'pending'
                             )
             expire.save()
+            mail_organizer( user, deal, expire )
         else:
             if deal_type == 'Exclusive':
                 cost = 50
                 exclusive = True
+
             elif deal_type ==  'Nonexclusive':
                 cost = 20
+                exclusive = False
+
+            elif deal_type == 'Sponsor':
+                cost = 0
                 exclusive = False
 
             cancel = Cancel( deal = deal,
@@ -192,10 +223,12 @@ def lb_apply(request):
                              status = 'pending'
                             )
             cancel.save()
-    try:
-        payment = Payment.objects.get(user = user)
-    except:
-        return HttpResponseRedirect(reverse('lb_payment'))
+            mail_organizer( user, deal, cancel )
+
+        try:
+            payment = Payment.objects.get(user = user)
+        except:
+            return HttpResponseRedirect(reverse('lb_payment'))
 
     return HttpResponseRedirect(reverse('lb_profile'))
 
@@ -212,7 +245,11 @@ def lb_dash(request):
     if request.method == 'GET':
         terms = Term.objects.filter(buyer = request.user)
         connections = Connection.objects.for_user(request.user)
-        lb = LeadBuyer.objects.get(user = request.user)
+        try:
+            lb = LeadBuyer.objects.get(user = request.user)
+        except LeadBuyer.DoesNotExist:
+            lb = LeadBuyer(user = request.user)
+            lb.save()
 
         form = BudgetForm(initial = {'budget':lb.budget})
         return submit_form(form, terms, connections)

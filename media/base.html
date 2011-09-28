@@ -1,40 +1,114 @@
-<!DOCTYPE html >
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html class="cufon-active cufon-ready" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<title>BrightMap.com</title>
-<meta name="keywords" content="" />
-<meta name="description" content="" />
-<link href="/media/css/brightmap.css" rel="stylesheet" type="text/css" />
-<link href="/media/css/form.css" rel="stylesheet" type="text/css" />
+  <meta name="generator" content=
+  "HTML Tidy for Linux/x86 (vers 11 February 2007), see www.w3.org" />
+  <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+
+  <title>Bright Map</title>
+  <link href="/media/css/screen.css" rel="stylesheet" type="text/css" media="screen" />
+  <meta name="description" content="" lang="en" />
+  <meta name="keywords" content="" lang="en" />
+  <meta name="language" content="en_US" />
+  <meta name="distribution" content="Global" />
+  <meta name="revisit" content="30 days" />
+  <meta name="rating" content="General" />
+  <meta name="robots" content="INDEX,FOLLOW" />
+  <script src="/media/js/site.js" type="text/javascript"></script>
+  
+  <!-- Cufon -->
+  <script src="/media/js/cufon-yui.js" type="text/javascript"></script>
+  <style type="text/css">
+/*<![CDATA[*/
+  cufon{text-indent:0!important;}@media screen,projection{cufon{display:inline!important;display:inline-block!important;position:relative!important;vertical-align:middle!important;font-size:1px!important;line-height:1px!important;}cufon cufontext{display:-moz-inline-box!important;display:inline-block!important;width:0!important;height:0!important;overflow:hidden!important;text-indent:-10000in!important;}cufon canvas{position:relative!important;}}@media print{cufon{padding:0!important;}cufon canvas{display:none!important;}}
+  /*]]>*/
+  </style>
+  <script src="/media/js/Futura_Md_BT_400.js" type="text/javascript">
+</script>
 </head>
 
-<body class="oneColFixCtr">
+<body id="index">
   	{% load i18n %}
   	{% load smartif %}
   	{% block js %}
   	{% endblock %}
-	<div id="container">
-  		<div id="mainContent">
-  		   <table width="100%" border="0" cellspacing="20" cellpadding="5">
-      		<tr>
-        		<td><a href="/"><img src="/media/img/brightmap-logo-220.jpg" alt="BrightMap" border="0"/></a></td>
-      		</tr>
-      		<tr>
-        		<td><strong>BrightMap - Connecting Business Communities</strong></td>
-      		</tr>
-    		</table>
-  			{% block menu_block %}
-  			{% endblock %}
-  			{% block body_block %}
-  			{% endblock %}
-  	  	</div> <!-- end #mainContent -->
-	</div> <!-- end #container -->
+  <div id="wrapper" class="clearfix">
+    <!-- Content -->
 
-	<!--footer start -->
-	<div id="footer">
-		<p>&copy; 2011 BrightMap, All Rights Reserved.</p>
-	</div>
-	<!--footer end -->
+    <div id="content" class="clearfix">
+      <div class="big-box">
+        <div class="top">
+          &nbsp;
+        </div>
+		{% block body_block %}
+		{% endblock %}
+        <div class="bottom">
+          &nbsp;
+        </div>
+      </div>
+    </div>
+
+    <div id="header">
+      <div class="clearfix left">
+        <a href="{% url homepage %}">
+        	<img src="/media/img/logo.jpg" alt="Bright Map" id="logo" class="fixPNG" />
+        </a>
+
+        <ul id="main-menu" class="clearfix">
+          <li>
+          	<a id="home" class="active button menu"  href="{% url show_buyer %}">
+          	  <span>Lead-Buyer Dashboard</span>
+          	</a>
+          </li>
+
+          <li>
+            <a id="home" class="button menu" href="{% url community %}">
+              <span>Event Organizer Dashboard</span>
+            </a>
+          </li>
+        </ul>
+          <a href="{% url logout %}" id="logout" class="arrow">Logout</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer" class="clearfix">
+    <div id="footer-content">
+      <p id="copyright">Copyright 2011 BrightMap LLC</p>
+    </div>
+  </div>
+
+  <div id="fancybox-tmp"></div>
+
+  <div id="fancybox-loading"></div>
+
+  <div id="fancybox-overlay"></div>
+
+  <div id="fancybox-wrap">
+    <div id="fancybox-outer">
+      <div class="fancybox-bg" id="fancybox-bg-n"></div>
+
+      <div class="fancybox-bg" id="fancybox-bg-ne"></div>
+
+      <div class="fancybox-bg" id="fancybox-bg-e"></div>
+
+      <div class="fancybox-bg" id="fancybox-bg-se"></div>
+
+      <div class="fancybox-bg" id="fancybox-bg-s"></div>
+
+      <div class="fancybox-bg" id="fancybox-bg-sw"></div>
+
+      <div class="fancybox-bg" id="fancybox-bg-w"></div>
+
+      <div class="fancybox-bg" id="fancybox-bg-nw"></div>
+
+      <div id="fancybox-content"></div><a id="fancybox-close"></a>
+
+      <div id="fancybox-title"></div>
+      <a href="javascript:;" id="fancybox-left"><span class="fancy-ico" id="fancybox-left-ico"></span></a>
+      <a href="javascript:;" id="fancybox-right"><span class="fancy-ico" id="fancybox-right-ico"></span></a>
+    </div>
+  </div>
 </body>
 </html>

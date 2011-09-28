@@ -105,10 +105,10 @@ def signup(request):
 
     #GET
     if request.method == 'GET':
-        return submit_form(SignUpForm())
+        return submit_form(BuyerForm())
 
     # POST
-    form = SignUpForm(request.POST)
+    form = BuyerForm(request.POST)
     if not form.is_valid():
         return submit_form(form)
 
@@ -147,6 +147,11 @@ def signup(request):
         profile.address = address
 
     profile.save()
+
+    if profile.is_leadbuyer:
+        leadb = LeadBuyer(user = user)
+        leadb.save()
+
 
     # Email the new user their password
     url = settings.SITE_BASE + reverse('login')
