@@ -37,7 +37,7 @@ body {
 	width: 100%;
 	color: #3a3b3d;
 	font-size: 12px;
-	background: url(./common/bg-html.jpg) no-repeat center top #fafafa;
+	background: url(/media/img/common/bg-html.jpg) no-repeat center top #fafafa;
 }
 	
 #wrapper, #footer {

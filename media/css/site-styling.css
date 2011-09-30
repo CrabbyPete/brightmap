@@ -57,7 +57,7 @@ form fieldset {
 form .personal, form .social, form .section {
 	display: block;
 	margin-top: 13px;
-	padding: 9px 9px 10px 22px;
+	padding: 1px 9px 1px 22px;
 	background: #f5f6f6;
 	border-radius: 3px;
 }

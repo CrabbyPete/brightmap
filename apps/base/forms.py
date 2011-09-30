@@ -133,13 +133,19 @@ class BuyerForm(forms.Form):
     email           = forms.EmailField  ( required = True,
                                             label = 'Email Address:',
                                             max_length = 60,
-                                            widget= forms.TextInput(attrs={'class':'row','size':40})
+                                            widget= forms.TextInput(attrs={'size':40})
                                          )
 
 
+    email_verify    = forms.EmailField  ( required = True,
+                                            label = 'Verify Email Address:',
+                                            max_length = 60,
+                                            widget= forms.TextInput(attrs={'size':40})
+                                         )
+    
     phone           = USPhoneNumberField( required = False,
                                             label = 'Phone:',
-                                            widget = forms.TextInput(attrs={'class':'row','size':16})
+                                            widget = forms.TextInput(attrs={})
                                          )
 
 
@@ -147,7 +153,7 @@ class BuyerForm(forms.Form):
                                             label = 'First Name:',
                                             max_length =45, regex=r'^[a-zA-Z]+$',
                                             error_message = ugettext_lazy("Only letters are allowed; 3 letters at least"),
-                                            widget = forms.TextInput(attrs={'class':'row','size':40})
+                                            widget = forms.TextInput(attrs={})
                                         )
 
     last_name       = forms.RegexField  ( required = False,
@@ -155,7 +161,7 @@ class BuyerForm(forms.Form):
                                             label = 'Last Name:',
                                             regex=r'^[a-zA-Z]+$',
                                             error_message = ugettext_lazy("Only letters are allowed"),
-                                            widget = forms.TextInput(attrs={'class':'row','size':40})
+                                            widget = forms.TextInput(attrs={})
                                         )
 
     password        = forms.CharField   ( max_length = 45,
@@ -172,13 +178,13 @@ class BuyerForm(forms.Form):
     title          = forms.CharField  ( required = False,
                                             label = 'Title:',
                                             max_length =45,
-                                            widget = forms.TextInput(attrs={'class':'row','size':40})
+                                            widget = forms.TextInput(attrs={'size':40})
                                         )
 
     company         = forms.CharField  ( required = False,
                                             label = 'Company:',
                                             max_length =45,
-                                            widget = forms.TextInput(attrs={'class':'row','size':40})
+                                            widget = forms.TextInput(attrs={'size':40})
                                         )
 
 
@@ -187,23 +193,23 @@ class BuyerForm(forms.Form):
                                             label = 'Address:',
                                             regex=r"^[a-zA-Z0-9,' ']+$",
                                             error_message = ugettext_lazy("Only letters numbers and commas"),
-                                            widget = forms.TextInput(attrs={'class':'row','size':40})
+                                            widget = forms.TextInput(attrs={'size':40})
                                         )
     website         = forms.URLField     ( required = False,
                                           max_length = 100,
                                           label = 'Company Web Site:',
-                                          widget = forms.TextInput(attrs={'class':'row','size':40})
+                                          widget = forms.TextInput(attrs={'size':40})
                                         )
 
     linkedin        = forms.URLField ( required = False,
                                           max_length = 100,
                                           label = 'LinkedIn Web Site',
-                                          widget = forms.TextInput(attrs={'class':'row','size':40})
+                                          widget = forms.TextInput(attrs={'size':40})
                                         )
     twitter         = forms.URLField ( required = False,
                                           max_length = 100,
                                           label = 'Twitter Web Site',
-                                          widget = forms.TextInput(attrs={'class':'row','size':40})
+                                          widget = forms.TextInput(attrs={'size':40})
                                         )
 
     agree           = forms.BooleanField( initial = False,

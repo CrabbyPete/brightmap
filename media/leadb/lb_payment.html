@@ -1,78 +1,50 @@
+
 {% extends 'base.html' %}
-{% load smartif %}
 
-{% block menu_block %}
-    <div class="navBar">
-        <div class="navLogin">
-            <a href='{% url lb_dash %}'>Lead-Buyer Dashboard</a> |
-            <a href='{% url community %}'>Event Organizer Dashboard</a> |
-            <a href='{% url logout  %}'>Logout</a>
+	{% block body_block %}
+		<div class="content clearfix">
+          <ul class="steps clearfix">
+            <li><div href="#" class="last "><span>STEP 3 of 3</span></div></li>
+
+            <li><div href="#" class=" "><span>STEP 2 of 3</span></div></li>
+
+            <li><div href="#" class="first active "><span>STEP 1 of 3</span></div></li>
+          </ul>
+
+          <form class="clearfix" action={% url lb_payment %} method="post">
+           {% csrf_token %}
+            <fieldset>
+              <div class="clearfix">
+                <span class="orange-circle left">1</span>
+
+                <h1 class="left">Lead-Buyer Profile</h1>
+              </div>
+
+              <div class="personal">
+                <div class="ctrlHolder clearfix">
+                  <label for="card_number">Credit Card Number <em>*</em></label> 
+  				 {{form.card_number}}
+  				 {{form.card_number.errors}}
+                </div>
+
+                <div class="ctrlHolder clearfix">
+                  <label for="expiration_date">Expiration Date <em>*</em></label> 
+                  {{form.expiration_date}}
+                  {{form.expiration_date.errors}}
+                </div>
+
+                <div class="ctrlHolder clearfix">
+                  <label for="card_code">Security Code <em>*</em></label>
+                  {{form.card_code}}
+                  {{form.card_code.errors}}
+                </div>
+
+              <div class="section">
+              	<button type="submit" class="button orange form-submitter right">
+              		<span><strong>&nbsp;</strong>Submit Card Info</span>
+              	</button>
+              </div>
+            </fieldset>
+          </form>
         </div>
-    </div>
-{% endblock %}
-
-{% block body_block %}
-    <form action="{% url lb_payment %}" method="post" >
-      {% csrf_token %}
-      <table width="80%" border="0" cellspacing="20" cellpadding="5">
-        <tr>
-          <th scope="col" bgcolor="#FFFF00">Payment and Budget</th>
-        </tr>
-
-        <tr>
-          <td>Your budget determines the maximum dollar value of leads you will receive each
-          month.</td>
-        </tr>
-
-        <tr>
-          <td>
-            <table width="100%" border="0" cellspacing="0" cellpadding="3">
-              <tr>
-                <td><strong>Credit Card Number</strong></td>
-
-                <td>{{form.card_number}}{{form.card_number.errors}}</td>
-              </tr>
-
-              <tr>
-                <td><strong>Expiration</strong></td>
-
-                <td>{{form.expiration_date}}{{form.expiration_date.errors}}</td>
-              </tr>
-
-              <tr>
-                <td><strong>Security Code</strong></td>
-
-                <td>{{form.card_code}}{{form.card_code.errors}}</td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-
-        <tr>
-          <td>Your budget determines the maximum dollar value of leads you will receive each
-          month.</td>
-        </tr>
-
-        <tr>
-          <td>
-            <table width="100%" border="0" cellspacing="0" cellpadding="3">
-              <tr>
-                <td><strong>Monthly Budget</strong></td>
-
-                <td>budget</td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-
-        <tr>
-          <td align="right">
-            <input type="image"
-                   name="submit"
-                   src="/media/img/create_update_payment_method_budget.gif"
-                   alt="Create/Update Profile" />
-          </td>
-        </tr>
-      </table>
-    </form>
-{% endblock %}
+	{% endblock %}

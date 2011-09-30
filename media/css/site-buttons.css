@@ -32,7 +32,7 @@ button span, a.large span, a.medium span, a.small span {
 	text-align: left;
 	padding-right: 4px;
 	margin-right: 4px;
-	background: url(./slidingDoors/btn-menu-right.png) bottom right no-repeat;	
+	background: url(/media/img/slidingDoors/btn-menu-right.png) bottom right no-repeat;	
 }
 .button.menu:hover, .button.menu.active {
 	background-position: top right;
@@ -82,7 +82,7 @@ button span, a.large span, a.medium span, a.small span {
 			display: block;
 			width: 9px;
 			height: 12px;
-			background: url(./index/ico-arrow-brown.gif) center left no-repeat;
+			background: url(/media/img/index/ico-arrow-brown.gif) center left no-repeat;
 		}
 		
 
@@ -94,7 +94,7 @@ button span, a.large span, a.medium span, a.small span {
 	.big-box .top {
 		display: block;
 		width: 519px;
-		height: 5px;
+		height: 3px;
 		background: url(/media/img/slidingDoors/big-box-top.png) no-repeat top left;
 	}
 	.big-box .content {

@@ -12,12 +12,12 @@ __________________________________________________*/
 
 /* TEMPLATE STYLES (common styling for all pages, excluding content)
 __________________________________________________*/
-@import url(/media/css/site-template.css);
+@import url(site-template.css);
 
 
 /* CONTENT STYLES (specific styling for the pages content ONLY)
 __________________________________________________*/
-@import url(/media/css/site-styling.css);
+@import url(site-styling.css);
 
 
 
@@ -25,21 +25,14 @@ __________________________________________________*/
 /* AUXILIAR Styles
 __________________________________________________*/
 
-/* IMAGES POPUP STYLE */
-@import url(/media/css/facebox.css);
 
 /* CLEARFIX STYLE */
-@import url(/media/css/clearfix.css);
+@import url(clearfix.css);
 	
 /* BUTTONS STYLES (sliding doors buttons & links) */
-@import url(/media/css/site-buttons.css);
-
-/* sIFR */
-@import url(/media/css/sifr.css);
+@import url(site-buttons.css);
 
 /* FORMS STYLES (using UniForm) */
-@import url(/media/css/uni-form-generic.css);
-@import url(/media/css/uni-form.css);
+@import url(uni-form-generic.css);
+@import url(uni-form.css);
 
-/* jQuery Countdown: */
-@import url(/media/css/jquery.countdown.css);

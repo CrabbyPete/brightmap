@@ -1,13 +1,14 @@
+
 {% extends 'base.html' %}
 
 	{% block body_block %}
 		<div class="content clearfix">
           <ul class="steps clearfix">
-            <li><a href="#" class="last"><span>STEP 3 of 3</span></a></li>
+            <li><div href="#" class="last "><span>STEP 3 of 3</span></div></li>
 
-            <li><a href="#" class=""><span>STEP 2 of 3</span></a></li>
+            <li><div href="#" class=" "><span>STEP 2 of 3</span></div></li>
 
-            <li><a href="#" class="first active"><span>STEP 1 of 3</span></a></li>
+            <li><div href="#" class="first active "><span>STEP 1 of 3</span></div></li>
           </ul>
 
           <form class="clearfix" action={% url signup %} method="post">
@@ -40,7 +41,8 @@
 
                 <div class="ctrlHolder clearfix">
                   <label for="verify_email">Verify Email <em>*</em></label> 
-                  <input name="verify_email" id="verify_email" type="text" />
+                  {{form.email_verify}}
+                  {{form.email_verify.errors}}
                 </div>
 
                 <div class="ctrlHolder clearfix">

@@ -301,6 +301,8 @@ def lb_payment(request):
                                    expiration_date = expiration,
                                    customer_id = request.user.email
                                  )
+
+    
     profile_id = tree.customer_profile_id.text_
     tree = cim_api.get_profile( customer_profile_id = profile_id )
     ret = cim_api.delete_profile( customer_profile_id = profile_id )

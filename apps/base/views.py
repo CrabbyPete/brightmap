@@ -47,7 +47,7 @@ def welcome( request ):
 
     if profile.is_leadbuyer:
         if not profile.is_ready:
-            return HttpResponseRedirect( reverse('lb_profile') )
+            return HttpResponseRedirect( reverse('lb_payment') )
         else:
             return HttpResponseRedirect( reverse('lb_dash') )
 
@@ -113,9 +113,24 @@ def signup(request):
         return submit_form(form)
 
     # Get the email address and see if they are in the database
-    email    = form.cleaned_data['email']
-    password = gen()
+    email          = form.cleaned_data['email']
+    email_verify   = form.cleaned_data['email_verify']
+    if email != email_verify:
+        form._errors['email'] = ErrorList(["The emails do not match"])
+        return submit_form(form)
+    
+    # Check the passwords match
+    password     = form.cleaned_data['password']
+    pass_confirm = form.cleaned_data['pass_confirm']
+    if password != pass_confirm:
+        form._errors['password'] = ErrorList(["The passwords do not match"])
+        return submit_form(form)
 
+    # Make sure they agree
+    if not form.cleaned_data['agree']:
+        form._errors['agree'] = ErrorList(["Please check agreement"])
+        return submit_form(form)
+    
     try:
         user = User.objects.get(email = email)
         profile = user.get_profile()
@@ -125,35 +140,58 @@ def signup(request):
         user  = User.objects.create_user( username = username,
                                           email = email,
                                           password = password
-                                        )
+                                         )
+        
         user.first_name = form.cleaned_data['first_name'].capitalize()
         user.last_name  = form.cleaned_data['last_name'].capitalize()
 
         user.save()
         profile = Profile( user = user)
     else:
-        user.set_password(password)
-
-    if form.cleaned_data['is_organizer']:
-        profile.is_organizer = True
-
-    if form.cleaned_data['is_leadbuyer']:
-        profile.is_leadbuyer = True
-
+        if not user.check_password(password):
+            form._errors['password'] = ErrorList(["User exist with a different password"])
+            return submit_form(form)
+            
+    profile.is_leadbuyer = True
+    profile.is_agreed    = True
+      
     if 'phone' in form.cleaned_data:
         profile.phone = form.cleaned_data['phone']
 
-    if 'address' in form.cleaned_data['address']:
-        profile.address = address
-
+    if 'address' in form.cleaned_data:
+        profile.address = form.cleaned_data['address']
+    
+    if 'company' in form.cleaned_data:
+        profile.company = form.cleaned_data['company']
+        
+    if 'website' in form.cleaned_data:
+        profile.website = form.cleaned_data['website']
+    
+    if 'twitter' in form.cleaned_data:
+        profile.twitter = form.cleaned_data['twitter']
+    
+    if 'linkedin' in form.cleaned_data:
+        profile.linkedin = form.cleaned_data['linkedin']
+    
     profile.save()
-
+    
+    # Check if there is a leadbuyer record for this user
     if profile.is_leadbuyer:
-        leadb = LeadBuyer(user = user)
-        leadb.save()
+        try:
+             leadb = LeadBuyer.objects.get(user = user)
+        except LeadBuyer.DoesNotExist:
+            leadb = LeadBuyer(user = user)
+            leadb.save()
 
+    # Login the new user
+    user = auth.authenticate(username=user.username, password=password)
+    if user is not None and user.is_active:
+        auth.login(request, user)
+
+    return HttpResponseRedirect(reverse('lb_payment'))
 
     # Email the new user their password
+    """
     url = settings.SITE_BASE + reverse('login')
     c = Context({'password' :password,
                  'user'     :user,
@@ -180,6 +218,7 @@ def signup(request):
 
     return render_to_response('thanks.html', {},
                                context_instance=RequestContext(request))
+    """
 
 def community(request):
     return render_to_response('community.html', {},
