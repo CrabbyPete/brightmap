@@ -8,33 +8,34 @@
 	.steps li {
 		float: right;
 	}
-		.steps li a {
+		.steps li div {
 			display: block;
 			padding-right: 15px;
 			margin-left: -15px;
-			background: url(/media/img/index/bg-step-right.png) no-repeat top right;
+			background: url(media/img/index/bg-step-right.png) no-repeat top right;
 		}
-		.steps li a.first {
+		.steps li div.first {
 			margin-left: 0;
 		}
-		.steps li a.last {
+		.steps li div.last {
 			padding-right: 0;
 			background: none;
 		}
-			.steps li a span {	
+			.steps li div span {	
 				display: block;
 				color: black;
 				text-align: center;
+				font-weight: bold;
 				width: 169px;
 				height: 44px;
 				line-height: 44px;
 				background: #efeff0;
 			}
-		.steps li a:hover, .steps li a.active {
+		.steps li div.active {
 			text-decoration: none;
-			background: url(/media/img/index/bg-step-right.png) no-repeat bottom right;
+			background: url(media/img/index/bg-step-right.png) no-repeat bottom right;
 		}
-			.steps li a:hover span, .steps li a.active span {			
+			.steps li div.active span {			
 				color: white;
 				background: #fab33d;
 			}
@@ -49,7 +50,7 @@
 	font-size: 12px;
 	font-weight: bold;
 	margin-right: 10px;
-	background: url(/media/img/index/ico-orange-circle.png) no-repeat top left;
+	background: url(media/img/index/ico-orange-circle.png) no-repeat top left;
 }
 
 form fieldset {
