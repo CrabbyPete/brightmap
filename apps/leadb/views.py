@@ -14,6 +14,10 @@ from django.core.urlresolvers       import  reverse
 from django.core.exceptions         import  ObjectDoesNotExist
 from django.core.mail               import  send_mail, EmailMultiAlternatives
 
+#Authorize imports
+
+from authorize.gen_xml              import VALIDATION_TEST
+
 #Local imports
 from base.models                    import *
 from social.models                  import *
@@ -101,17 +105,19 @@ def lb_profile(request):
         return submit_form(form)
 
     # POST
-    user = request.user
+    user    = request.user
+    profile = user.get_profile()
+ 
     form = BuyerForm(request.POST)
     if not form.is_valid():
         return submit_form(form)
 
-
-    # If they don't agree this is a waste
-    if not form.cleaned_data['agree']:
+    # Make sure they agreed to terms at least once
+    if not profile.is_agreed and not form.cleaned_data['agree']:
         form._errors['agree'] = ErrorList(["Please check agreement"])
         return submit_form(form)
-
+    profile.is_agreed = True
+    
     # Get the email and see if they want to change it
     email = form.cleaned_data['email']
     if email != user.email:
@@ -136,17 +142,22 @@ def lb_profile(request):
             user.set_password(password)
 
     user.save()
-
+   
     # Edit profile
-    profile = user.get_profile()
-    profile.is_agreed = True
     profile.is_leadbuyer = True
-
+    
+    # If they don't agree this is a waste
+    if not profile.is_agreed and not form.cleaned_data['agree']:
+        form._errors['agree'] = ErrorList(["Please check agreement"])
+        return submit_form(form)
+    profile.is_agreed = True
+    
     profile.phone   = form.cleaned_data['phone']
     profile.address = form.cleaned_data['address']
     profile.company = form.cleaned_data['company']
     profile.website = form.cleaned_data['website']
-    profile.is_ready = True
+    profile.title   = form.cleaned_data['title']
+
     profile.save()
 
     try:
@@ -202,7 +213,7 @@ def lb_apply(request):
                              status = 'pending'
                             )
             expire.save()
-            mail_organizer( user, deal, expire )
+            mail_organizer( request.user, deal, expire )
         else:
             if deal_type == 'Exclusive':
                 cost = 50
@@ -223,7 +234,7 @@ def lb_apply(request):
                              status = 'pending'
                             )
             cancel.save()
-            mail_organizer( user, deal, cancel )
+            mail_organizer( request.user, deal, cancel )
 
         try:
             payment = Payment.objects.get(user = user)
@@ -266,7 +277,23 @@ def lb_dash(request):
 
         return HttpResponseRedirect(reverse('lb_dash'))
 
+def lb_details(request):
+    
+    def submit_form(connections):
+        c = {'connections':connections }
+        return render_to_response( 'leadb/lb_details.html', c,
+                                   context_instance=RequestContext(request) )
 
+    #GET
+    if request.method == 'GET':
+        if 'term' in request.GET:
+            term = Term.objects.get(pk=request.GET['term'])
+            connections = Connection.objects.filter(term = term)
+        else:
+            connections = Connection.objects.for_user(request.user)
+        return submit_form(connections)
+
+ 
 from authorize import cim
 @csrf_protect
 def lb_payment(request):
@@ -286,52 +313,47 @@ def lb_payment(request):
     if not form.is_valid():
         return submit_form(form)
 
-    cim_api = cim.Api( unicode(settings.AUTHORIZE['API_LOG_IN_ID']),
-                       unicode(settings.AUTHORIZE['TRANSACTION_ID']) ,
-                       is_test=True
-                      )
+    try:
+        authorize = Authorize.objects.get(user = request.user)
 
+    except Authorize.DoesNotExist:
+        authorize = Authorize( user = request.user )
+        authorize.customer_profile_id = unicode(1000 + request.user.pk)
+        authorize.save()
+        
+
+    # Initialize the API class
+    cim_api = cim.Api( unicode(settings.AUTHORIZE['API_LOG_IN_ID']),
+                       unicode(settings.AUTHORIZE['TRANSACTION_ID']) 
+                      )
+    
+    # Get the card and expiration date
     card_number     = form.cleaned_data['card_number']
     expiration      = form.cleaned_data['expiration_date']
     expiration      = unicode( expiration.strftime(u"%Y-%m") )
 
-    csc             = form.cleaned_data['card_code']
 
-    tree = cim_api.create_profile( card_number = card_number,
-                                   expiration_date = expiration,
-                                   customer_id = request.user.email
-                                 )
+    # Create a Authorize.net CIM profile
+    response = cim_api.create_profile( card_number = card_number,
+                                       expiration_date = expiration,
+                                       email = request.user.email,
+                                       customer_id = authorize.customer_id
+                                     )
 
-    
-    profile_id = tree.customer_profile_id.text_
-    tree = cim_api.get_profile( customer_profile_id = profile_id )
-    ret = cim_api.delete_profile( customer_profile_id = profile_id )
+    # Check to see it if its OK
+    result = response.messages.result_code.text_.upper()
+    if result == 'OK':
+        authorize.profile_id = response.customer_profile_id.text_
+        authorize.save()
+        
+        profile = request.user.get_profile()
+        profile.is_ready = True
+        profile.save()
+        
+        profile = cim_api.get_profile( customer_profile_id = authorize.profile_id )
+    else:
+        # Log an error
+        pass
+ 
+    return HttpResponseRedirect(reverse('lb_dash'))
 
-    return HttpResponseRedirect('/')
-
-"""
- We create a profile for one of our users.
-tree = cim_api.create_profile(
-    card_number=u"4111111111111111",
-    expiration_date=u"2008-07",
-    customer_id=u"test_account")
-
-# Store the profile id somewhere so that we can later retrieve it.
-# CIM doesn't have a listing or search functionality so you'll
-# have to keep this somewhere safe and associated with the user.
-profile_id = tree.customer_profile_id.text_
-
-# Retrieve again the profile we just created using the profile_id
-tree = cim_api.get_profile(customer_profile_id=profile_id)
-pprint(tree)
-
-# And let's now try to create a transaction on that profile.
-resp = cim_api.create_profile_transaction(
-    customer_profile_id=profile_id,
-    amount=50.0
-)
-pprint(resp)
-
-# We did what we needed, we can remove the profile for this example.
-pprint(cim_api.delete_profile(customer_profile_id=profile_id))
-"""

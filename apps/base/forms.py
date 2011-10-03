@@ -29,14 +29,14 @@ class SignUpForm(forms.Form):
     email           = forms.EmailField  ( required = True,
                                             label = 'Email Address:',
                                             max_length = 60,
-                                            widget= forms.TextInput(attrs={'class':'supf','size':40})
+                                            widget= forms.TextInput(attrs={'size':40})
                                          )
 
     first_name      = forms.RegexField  ( required = False,
                                             label = 'First Name:',
                                             max_length =45, regex=r'^[a-zA-Z]+$',
                                             error_message = ugettext_lazy("Only letters are allowed; 3 letters at least"),
-                                            widget = forms.TextInput(attrs={'class':'row','size':40})
+                                            widget = forms.TextInput(attrs={'size':40})
                                         )
 
     last_name       = forms.RegexField  ( required = False,
@@ -44,13 +44,13 @@ class SignUpForm(forms.Form):
                                             label = 'Last Name:',
                                             regex=r'^[a-zA-Z]+$',
                                             error_message = ugettext_lazy("Only letters are allowed"),
-                                            widget = forms.TextInput(attrs={'class':'row','size':40})
+                                            widget = forms.TextInput(attrs={'size':40})
                                         )
 
 
     phone           = USPhoneNumberField( required = False,
                                             label = 'Phone:',
-                                            widget = forms.TextInput(attrs={'class':'supf','size':16})
+                                            widget = forms.TextInput(attrs={'size':16})
                                          )
 
 
@@ -59,27 +59,27 @@ class SignUpForm(forms.Form):
                                             label = 'Address:',
                                             regex=r"^[a-zA-Z0-9,' ']+$",
                                             error_message = ugettext_lazy("Only letters numbers and commas"),
-                                            widget = forms.TextInput(attrs={'class':'row','size':40})
+                                            widget = forms.TextInput(attrs={'size':40})
                                         )
 
 
     is_organizer   = forms.BooleanField( initial = False,
                                             label = 'Im an event organizer',
                                             required = False,
-                                            widget = forms.CheckboxInput(attrs={'class':'row'})
+                                            widget = forms.CheckboxInput(attrs={})
                                         )
 
 
     is_attendee    = forms.BooleanField( initial = False,
                                             label = 'Im interested in sponsoring events',
                                             required = False,
-                                            widget = forms.CheckboxInput(attrs={'class':'row'})
+                                            widget = forms.CheckboxInput(attrs={})
                                         )
 
     is_leadbuyer   = forms.BooleanField( initial = True,
                                             label = 'Im interested in buying leads',
                                             required = False,
-                                            widget = forms.CheckboxInput(attrs={'class':'row'})
+                                            widget = forms.CheckboxInput(attrs={})
                                         )
 
 class InterestForm(forms.Form):
@@ -149,14 +149,14 @@ class BuyerForm(forms.Form):
                                          )
 
 
-    first_name      = forms.RegexField  ( required = False,
+    first_name      = forms.RegexField  ( required = True,
                                             label = 'First Name:',
                                             max_length =45, regex=r'^[a-zA-Z]+$',
                                             error_message = ugettext_lazy("Only letters are allowed; 3 letters at least"),
                                             widget = forms.TextInput(attrs={})
                                         )
 
-    last_name       = forms.RegexField  ( required = False,
+    last_name       = forms.RegexField  ( required = True,
                                             max_length = 45,
                                             label = 'Last Name:',
                                             regex=r'^[a-zA-Z]+$',
@@ -164,7 +164,8 @@ class BuyerForm(forms.Form):
                                             widget = forms.TextInput(attrs={})
                                         )
 
-    password        = forms.CharField   ( max_length = 45,
+    password        = forms.CharField   ( required = True,
+                                            max_length = 45,
                                             label = 'Password',
                                             widget = forms.PasswordInput(attrs={'size':40}, render_value = True )
                                         )

@@ -1,112 +1,64 @@
 {% extends "base.html" %}
 {% load smartif %}
 
-{% block menu_block %}
-    <div class="navBar">
-        <div class="navLogin">
-            <a href='{% url lb_dash %}'>Lead-Buyer Dashboard</a> |
-            <a href='{% url community %}'>Event Organizer Dashboard</a> |
-            <a href='{% url logout  %}'>Logout</a>
-        </div>
-    </div>
-{% endblock %}
-
 {% block body_block %}
-     <table width="80%" border="0" cellspacing="20" cellpadding="5">
-        <tr>
-          <td bgcolor="#999999"><strong>Leads Received</strong></td>
+ 
+	<table width="100%" border="1" cellspacing="0" cellpadding="0">
+    	<tr>
+        	<th scope="col">Interest</th>
+            <th scope="col">Organization</th>
+            <th scope="col">Status</th>
+            <th scope="col">Terms</th>
+            <th scope="col">Leads Sent</th>
+            <th scope="col">Lead Price</th>
+            <th scope="col">Total</th>
+            <th scope="col">Action</th>
         </tr>
-
+        {% for term in terms %}
         <tr>
-          <td>
-            <table width="100%" border="1" cellspacing="0" cellpadding="0">
-              <tr>
-                <th scope="col">Interest</th>
-                <th scope="col">Organization</th>
-                <th scope="col">Status</th>
-                <th scope="col">Terms</th>
-                <th scope="col">Leads Sent</th>
-                <th scope="col">Lead Price</th>
-                <th scope="col">Total</th>
-                <th scope="col">Action</th>
-              </tr>
-
-              {% for term in terms %}
-              <tr>
-                <td>{{term.deal.interest.interest}}</td>
-                <td>{{term.deal.chapter.name}}</td>
-                <td>{{term.status}}</td>
-                {% if term.cancel %}
-                    {% if term.exclusive %}
-                        <td>Exclusive</td>
-                    {% else %}
-                        <td>Non Exclusive</td>
-                    {% endif %}
+        	<td>{{term.deal.interest.interest}}</td>
+            <td>{{term.deal.chapter.name}}</td>
+            <td>{{term.status}}</td>
+            {% if term.cancel %}
+            	{% if term.exclusive %}
+                	<td>Exclusive</td>
                 {% else %}
-                    <td>Trial</td>
+                	<td>Non Exclusive</td>
                 {% endif %}
+            {% else %}
+            	<td>Trial</td>
+            {% endif %}
 
-                <td>{{term.connections|length}}</td>
-                <td>{{term.cost}}</td>
-                <td>{{term.total}}</td>
-                <td><a href=#>Details</a></td>
-              </tr>
-			 {% endfor %}
-            </table>
-            <a href="{% url lb_apply %}">Apply to buy leads from a new community</a>
-          </td>
-        </tr>
-
-        <tr>
-          <td bgcolor="#999999"><strong>Budget</strong></td>
-        </tr>
-        <tr>
-          <td>
-            <table width="100%" border="0" cellspacing="0" cellpadding="3">
-                <form action="{% url lb_dash %}" method="post" >
-                {% csrf_token %}
-                <tr>
-                    <td>
-                        {{form}}
-                    </td>
-              </tr>
-
-              <tr>
-                <td>&nbsp;</td>
-                <td>
-                      <input type="image"
-                               name="submit"
-                               src="/media/img/update_monthly_budget.gif"
-                               alt="Create/Update Profile" />
-                </td>
-              </tr>
-              </form>
-            </table>
-          </td>
-        </tr>
-
-        <tr>
-          <td bgcolor="#999999"><strong>Lead-Buyer Profile</strong></td>
-        </tr>
-
-        <tr>
-          <td><a href="{% url lb_profile %}">Update my profile</a></td>
-        </tr>
-
-        <tr>
-          <td bgcolor="#999999"><strong>Past Invoices</strong></td>
-        </tr>
-
-        <tr>
-          <td>
-            <table width="100%" border="0" cellspacing="0" cellpadding="3">
-              <tr>
-                <td>
-
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-      </table>
+            <td>{{term.connections|length}}</td>
+            <td>{{term.cost}}</td>
+            <td>{{term.total}}</td>
+            <td><a href='{% url lb_details %}?term={{term.pk}}'>Details</a></td>
+         </tr>
+		{% endfor %}
+	</table>
+    <a href="{% url lb_apply %}">Apply to buy leads from a new community</a>
+ 	<br />
+ 	<br />
+	<form class="clearfix" action="{% url lb_dash %}" method="post">
+    {% csrf_token %}
+    	<fieldset>
+       		<div class="clearfix">
+           		<span class="orange-circle left">1</span>
+                <h1 class="left">Monthly Budget</h1>
+            </div>
+            <div class="personal">
+            	<div class="ctrlHolder clearfix">
+            		{{form}}
+ 				  	{{form.errors}}
+           		</div>
+           		<div class="section">
+              	<button type="submit" class="button orange form-submitter right">
+              		<span><strong>&nbsp;</strong>Update Budget</span>
+              	</button>
+              </div>
+           	</div>
+         </fieldset>
+	</form>
+	<br />
+	<a href="{% url lb_profile %}">Update Your Profile</a>
 {% endblock %}

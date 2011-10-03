@@ -35,7 +35,9 @@ class Profile( models.Model ):
         return self.user.email
 
 class Authorize( models.Model):
-    user        = models.ForeignKey( User )
+    user            = models.ForeignKey( User )
+    customer_id     = models.CharField( max_length = 255 )
+    profile_id      = models.CharField( max_length = 255 )
 
 
 class Invoice( models.Model):

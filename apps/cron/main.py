@@ -35,12 +35,12 @@ def get_attendees( evb, event_id ):
     Get all the attendees for an event from Eventbrite
     """
     attendee_list = []
-
+ 
     # Get all the attendees of each event (New York, Boston, Toronto ..)
     try:
-        attendees = evb.list_event_attendees( event_id = int(event_id) )
-    except:
-        print log('Eventbrite Error: No attendees for event id ' + str(event_id) )
+        attendees = evb.event_list_attendees( {'id': event_id} )
+    except Exception, e:
+        print log('Eventbrite Error: '+ e.__unicode__() +" for event id:" + str(event_id) )
         return []
 
     if 'error' in attendees:
@@ -84,8 +84,8 @@ def get_latest_events( evb, organizer_id ):
     Search for the latest events
     """
     try:
-        events = evb.list_organizer_events(organizer_id = organizer_id)
-    except:
+        events = evb.organizer_list_events({'id':organizer_id})
+    except Exception, error:
         print log( 'Eventbrite Error: Events for ' + organizer_id )
         logger.debug('Eventbrite Error: Events for ' + organizer_id )
         return []
@@ -103,6 +103,8 @@ def get_latest_events( evb, organizer_id ):
     # Look through all events and keep all future events
     event_ids = []
     for event in events['events']:
+        if event['event']['status'] != 'Live':
+            continue
 
         # Make sure these are not past events
         end_date = datetime.strptime(event['event']['end_date'],
@@ -383,8 +385,8 @@ def main():
             for ticket in tickets:
                 app_key  = EVENTBRITE['APP_KEY' ]
                 user_key = ticket.user_key
-                evb = EventbriteClient( app_key = app_key, user_key = user_key )
-
+                evb = EventbriteClient( tokens = app_key, user_key = user_key )
+        
                 #Get the email template for this organization
                 letter = chapter.letter
                 if letter != None:

@@ -45,7 +45,7 @@
 
 
 /****************** >     LABELS      < ******************/
-.uniForm .ctrlHolder label, 
+.uniForm .ctrlHolder label,
 .uniForm .label {
 	width: 142px; /* Required property */
 	text-align: right;
@@ -57,7 +57,7 @@
 	font-size: 12px;
 	/*font-weight: normal;*/
 }
-.uniForm .blockLabels .ctrlHolder label, 
+.uniForm .blockLabels .ctrlHolder label,
 .uniForm .blockLabels .label {
 	width: auto; /* Required property */
 	text-align: left;
@@ -73,11 +73,31 @@
 		top: 0;
 	}
 
+/*** PJD ****/
+.ctrlHolder ul {
+}
+
+.ctrlHolder li {
+}
+
+.ctrlHolder ul li label {
+    width: 230px;
+    height: 20px;
+}
+
+
+.ctrlHolder ul li label input[type=radio] {
+    display: block;
+    width:10px;
+    float:left;
+    text-align: right;
+    background:inherit;
+}
 
 
 /****************** >     INPUT, SELECT, TEXTAREA FIELDS      < ******************/
-.uniForm .textarea, 
-.uniForm .selectInput, 
+.uniForm .textarea,
+.uniForm .selectInput,
 .uniForm .textInput,
 .uniForm .fileUpload {
 	background: #ffffff;

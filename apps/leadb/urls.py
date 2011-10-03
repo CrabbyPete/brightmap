@@ -5,5 +5,6 @@ urlpatterns = patterns('leadb.views',
     url(r'^lb_payment/$',            'lb_payment',            name='lb_payment'            ),
     url(r'^lb_apply/$',              'lb_apply',              name='lb_apply'              ),
     url(r'^lb_dash/$',               'lb_dash',               name='lb_dash'               ),
+    url(r'^lb_details/$',            'lb_details',            name='lb_details'            ),
 )
 

@@ -4,11 +4,11 @@
 	{% block body_block %}
 		<div class="content clearfix">
           <ul class="steps clearfix">
-            <li><div href="#" class="last "><span>STEP 3 of 3</span></div></li>
+            <li><div class="last "><span>STEP 3 of 3</span></div></li>
 
-            <li><div href="#" class=" "><span>STEP 2 of 3</span></div></li>
+            <li><div class="first active  "><span>STEP 2 of 3</span></div></li>
 
-            <li><div href="#" class="first active "><span>STEP 1 of 3</span></div></li>
+            <li><div class=" "><span>STEP 1 of 3</span></div></li>
           </ul>
 
           <form class="clearfix" action={% url lb_payment %} method="post">
@@ -31,12 +31,6 @@
                   <label for="expiration_date">Expiration Date <em>*</em></label> 
                   {{form.expiration_date}}
                   {{form.expiration_date.errors}}
-                </div>
-
-                <div class="ctrlHolder clearfix">
-                  <label for="card_code">Security Code <em>*</em></label>
-                  {{form.card_code}}
-                  {{form.card_code.errors}}
                 </div>
 
               <div class="section">

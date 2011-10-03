@@ -1,120 +1,103 @@
 {% extends "base.html" %}
 {% load smartif %}
 
-{% block menu_block %}
-    <div class="navBar">
-        <div class="navLogin">
-            <a href='{% url lb_dash %}'>Lead-Buyer Dashboard</a> |
-            <a href='{% url community %}'>Event Organizer Dashboard</a> |
-            <a href='{% url logout  %}'>Logout</a>
-        </div>
-    </div>
-{% endblock %}
-
-
 {% block body_block %}
-  <form action="{% url lb_profile %}" method="post" >
-  {% csrf_token %}
-  <table width="80%" border="0" cellspacing="20" cellpadding="5">
-    <tr>
-      <th scope="col" bgcolor="#FFFF00">BrightMap - Lead-Buyer Profile</th>
-    </tr>
-    <tr>
-      <td>This information will be seen by event organizers, when you apply to sponsor their events
-      and by leads, when you are introduced to them via email. Starred items (*) are required.
-	  </td>
-    </tr>
-    <tr>
-      <td>
-        <table width="100%" border="0" cellspacing="0" cellpadding="3">
-          <tr>
-            <td><strong>First Name*</strong></td>
+		<div class="content clearfix">
+          <form class="clearfix" action="{% url lb_profile %}" method="post">
+           {% csrf_token %}
+            <fieldset>
+              <div class="clearfix">
+                <span class="orange-circle left">1</span>
 
-            <td>{{form.first_name}}</td>
-          </tr>
+                <h1 class="left">Lead-Buyer Profile</h1>
+              </div>
 
-          <tr>
-            <td><strong>Last Name*</strong></td>
+              <div class="personal">
+                <div class="ctrlHolder clearfix">
+                  <label for="first_name">First Name <em>*</em></label> 
+                  {{form.first_name}}
+ 				  {{form.first_name.errors}}
+                </div>
 
-            <td>{{form.last_name}}{{form.last_name.errors}}</td>
-          </tr>
+                <div class="ctrlHolder clearfix">
+                  <label for="last_name">Last Name <em>*</em></label> 
+                  {{form.last_name}}
+                  {{form.last_name.errors}}
+                </div>
 
-          <tr>
-            <td><strong>Email*</strong></td>
+                <div class="ctrlHolder clearfix">
+                  <label for="lead_buyer_email">Lead-Buyer Email <em>*</em></label>
+                  {{form.email}}
+                  {{form.email.errors}}
+                </div>
 
-            <td>{{form.email}}{{form.email.errors}}</td>
-          </tr>
+                <div class="ctrlHolder clearfix">
+                  <label for="verify_email">Verify Email <em>*</em></label> 
+                  {{form.email_verify}}
+                  {{form.email_verify.errors}}
+                </div>
 
-          <tr>
-            <td><strong>Password*</strong></td>
+                <div class="ctrlHolder clearfix">
+                  <label for="password">Password <em>*</em></label> 
+                  {{form.password}}
+                  {{form.password.errors}}
+                </div>
 
-            <td><label>{{form.password}}{{form.password.errors}}</label></td>
-          </tr>
-          <tr>
-            <td><strong>Confirm Password*</strong></td>
+                <div class="ctrlHolder clearfix">
+                  <label for="verify_password">Verify Password <em>*</em></label>
+                  {{form.pass_confirm}}
+                  {{form.pass_confirm.errors}}
+                </div>
 
-            <td><label>{{form.pass_confirm}}{{form.pass_confirm.errors}}</label></td>
-          </tr>
+                <div class="ctrlHolder clearfix">
+                  <label for="company">Company <em>*</em></label> 
+                  {{form.company}}
+                  {{form.company.errors}}
+                </div>
 
-          <tr>
-            <td><strong>Company*</strong></td>
+                <div class="ctrlHolder clearfix">
+                  <label for="title">Title <em>*</em></label> 
+                  {{form.title}}
+                  {{form.title.errors}}
+                </div>
 
-            <td>{{form.company}}{{form.company.errors}}</td>
-          </tr>
+                <div class="ctrlHolder clearfix">
+                  <label for="website">Website <em>*</em></label> 
+                  {{form.website}}
+                  {{form.website.errors}}
+                </div>
 
-          <tr>
-            <td><strong>Title*</strong></td>
+                <div class="ctrlHolder clearfix">
+                  <label for="phone">Phone</label> 
+                  {{form.phone}}
+                  {{form.phone.errors}}
+                </div>
+              </div>
 
-            <td>{{form.title}}{{form.title.errors}}</td>
-          </tr>
+              <div class="social">
+                <div class="ctrlHolder clearfix">
+                  <label for="linkedin">LinkedIn</label> 
+                  {{form.linkedin}}
+                  {{form.linkedin.errors}}
+                </div>
 
-          <tr>
-            <td><strong>Website*</strong></td>
+                <div class="ctrlHolder clearfix">
+                  <label for="twitter">Twitter</label> 
+                  {{form.twitter}}
+                  {{form.twitter.errors}}
+                </div>
+              </div>
 
-            <td>{{form.website}}{{form.website.errors}}</td>
-          </tr>
+              <div class="clearfix section" style="margin-top: 0">
+                Fields marked with <em>*</em> are mandatory
+              </div>
 
-          <tr>
-            <td><strong>Phone</strong></td>
-
-            <td>{{form.phone}}{{form.phone.errors}}</td>
-          </tr>
-
-          <tr>
-            <td><strong>LinkedIn</strong></td>
-
-            <td>{{form.linkedin}}{{form.linkedin.errors}}</td>
-          </tr>
-
-          <tr>
-            <td><strong>Twitter</strong></td>
-
-            <td>{{form.twitter}}{{form.twitter.errors}}</td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-
-    <tr>
-      <td bgcolor="#999999"><strong>Confirm Terms and Conditions</strong></td>
-    </tr>
-    <tr>
-      <td>
-        <table width="100%" border="0" cellspacing="0" cellpadding="3">
-          <tr>
-            <td>{{form.agree}}{{form.agree.errors}}</td>
-
-            <td>I hereby agree to the BrightMap terms and conditions for lead buyers.</td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-    <tr>
-      <td align="right">
-        <input type="image" name="submit" src="/media/img/create_update_profile.gif" width="200" height="40" alt="Create/Update Profile" />
-      </td>
-    </tr>
-
-  </table>
-  </form>
+              <div class="section">
+              	<button type="submit" class="button orange form-submitter right">
+              		<span><strong>&nbsp;</strong>Create / Update Profile</span>
+              	</button>
+              </div>
+            </fieldset>
+          </form>
+        </div>
 {% endblock %}

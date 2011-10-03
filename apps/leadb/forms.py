@@ -102,7 +102,6 @@ class ApplyForm(forms.Form):
 
     deal_type        = forms.ChoiceField( required = False,
                                             choices=DEAL_CHOICES,
-                                            label = 'Deal Type:',
                                             widget=forms.RadioSelect(attrs={})
                                        )
     suggest          = forms.CharField  ( required = False,
@@ -118,7 +117,7 @@ class ApplyForm(forms.Form):
 
 
 class BudgetForm(forms.Form):
-    budget          = forms.DecimalField( label = 'Maximum Monthly Budget')
+    budget          = forms.DecimalField( label = 'Monthly Budget')
 
 
 from fields import CreditCardField, \
@@ -128,5 +127,8 @@ from fields import CreditCardField, \
 
 class CIMPaymentForm(forms.Form):
     card_number     = CreditCardField(label="Credit Card Number")
+    
     expiration_date = CreditCardExpiryField(label="Expiration Date")
-    card_code       = CreditCardCVV2Field(label="Card Security Code")
+    
+    card_code       = CreditCardCVV2Field( required = False,
+                                           label="Card Security Code")

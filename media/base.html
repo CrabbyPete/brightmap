@@ -16,6 +16,7 @@
   <meta name="revisit" content="30 days" />
   <meta name="rating" content="General" />
   <meta name="robots" content="INDEX,FOLLOW" />
+  <script src="/media/js/jquery.js" type="text/javascript"></script>
   <script src="/media/js/site.js" type="text/javascript"></script>
   
   <!-- Cufon -->
@@ -53,7 +54,7 @@
        {% if user.is_authenticated %}
         <ul id="main-menu" class="clearfix">
           <li>
-          	<a id="home" class="active button menu"  href="{% url show_buyer %}">
+          	<a id="home" class="active button menu"  href="{% url lb_dash %}">
           	  <span>Lead-Buyer Dashboard</span>
           	</a>
           </li>

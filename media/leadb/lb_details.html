@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load smartif %}
+
+{% block body_block %}
+ 
+	<table width="100%" border="1" cellspacing="0" cellpadding="0">
+    	<tr>
+        	<th scope="col">Date</th>
+            <th scope="col">Chapter</th>
+            <th scope="col">First</th>
+            <th scope="col">Last</th>
+            <th scope="col">Email</th>
+            <th scope="col">Company</th>
+            <th scope="col">Status</th>
+        </tr>
+        {% for connection in connections %}
+        <tr>
+        	<td>{{connection.date}}</td>
+            <td>{{connection.survey.event.chapter}}</td>
+            <td>{{connection.survey.attendee.first_name}}</td>
+            <td>{{connection.survey.attendee.last_name}}</td>
+            <td>{{connection.survey.attendee.email}}</td>
+            <td>{{connection.survey.attendee.get_profile.company}}</td>
+            <td>{{connection.status}}</td>
+         </tr>
+		{% endfor %}
+	</table>
+  
+{% endblock %}

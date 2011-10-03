@@ -12,7 +12,7 @@
 			display: block;
 			padding-right: 15px;
 			margin-left: -15px;
-			background: url(media/img/index/bg-step-right.png) no-repeat top right;
+			background: url(/media/img/index/bg-step-right.png) no-repeat top right;
 		}
 		.steps li div.first {
 			margin-left: 0;
@@ -33,7 +33,7 @@
 			}
 		.steps li div.active {
 			text-decoration: none;
-			background: url(media/img/index/bg-step-right.png) no-repeat bottom right;
+			background: url(/media/img/index/bg-step-right.png) no-repeat bottom right;
 		}
 			.steps li div.active span {			
 				color: white;
@@ -50,7 +50,7 @@
 	font-size: 12px;
 	font-weight: bold;
 	margin-right: 10px;
-	background: url(media/img/index/ico-orange-circle.png) no-repeat top left;
+	background: url(/media/img/index/ico-orange-circle.png) no-repeat top left;
 }
 
 form fieldset {
