@@ -249,7 +249,7 @@ def lb_apply(request):
             mail_organizer( request.user, deal, cancel, deal_type )
 
 
-    return HttpResponseRedirect(reverse('lb_profile'))
+    return HttpResponseRedirect(reverse('lb_dash'))
 
 @csrf_protect
 def lb_dash(request):
