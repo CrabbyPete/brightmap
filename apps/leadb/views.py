@@ -363,7 +363,7 @@ def lb_payment(request):
         profile.is_ready = True
         profile.save()
         
-        profile = cim_api.get_profile( customer_profile_id = authorize.profile_id )
+        #profile = cim_api.get_profile( customer_profile_id = authorize.profile_id )
     else:
         # Log an error
         pass
