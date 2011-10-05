@@ -163,10 +163,10 @@ def spreadsheet( email, password ):
 
         # Test this to make sure user_id and organizer_id are OK
         app_key  = EVENTBRITE['APP_KEY' ]
-        evb = EventbriteClient( app_key = app_key, user_key = user_key )
+        evb = EventbriteClient( tokens = app_key, user_key = user_key )
 
         try:
-            events = evb.list_organizer_events( organizer_id = int(org_id) )
+            events = evb.organizer_list_events( {'id':org_id} )
         except:
             print "Eventbrite ID Error:" + name +\
                   " user_id = " + str(user_key) +\
