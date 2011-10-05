@@ -15,7 +15,7 @@ from django.core.exceptions         import  ObjectDoesNotExist
 from django.core.mail               import  send_mail, EmailMultiAlternatives
 
 #Authorize imports
-
+from authorize                      import cim
 from authorize.gen_xml              import VALIDATION_TEST
 
 #Local imports
@@ -23,29 +23,33 @@ from base.models                    import *
 from social.models                  import *
 from forms                          import *
 
-def mail_organizer( user, deal, term ):
+def mail_organizer( user, deal, term, deal_type ):
     # Render the letter
+    organizer = deal.chapter.organizer
+    
     c = Context({'user' : user,
                  'deal' : deal,
-                 'term' : term
+                 'term' : term,
+                 'type' : deal_type
                 })
+    
     template = loader.get_template('letters/request.tmpl')
     message = template.render(c)
 
-    subject = "BrightMap LeadBuyer Request"
-    recipients = [ user.email, chapter.organizer.email ]
+    subject = "New BrightMap LeadBuyer Request: %s"%(deal.interest)
+    recipients = [ organizer.email ]
 
     msg = EmailMultiAlternatives( subject,
                                   message,
                                   'requests@brightmap.com',
                                   recipients,
-                                  'requests@brightmap.com'
+                                  ['requests@brightmap.com']
                                 )
     try:
         msg.send( fail_silently = False )
     except:
-        err = "Email Send Error For: " + event.chapter.organizer.email
-        logger.error("Email Send Error:")
+        err = "Email Send Error For: " + organizer.email
+        logger.error(err)
 
 
 @csrf_protect
@@ -168,6 +172,9 @@ def lb_profile(request):
 
     return HttpResponseRedirect(reverse('lb_dash'))
 
+# Initialize the TYPE List form form.DEAL_CHOICES
+DEAL_TYPES = [c[0] for c in DEAL_CHOICES]
+
 @csrf_protect
 def lb_apply(request):
     """
@@ -191,6 +198,11 @@ def lb_apply(request):
         chapter   = form.cleaned_data['chapter']
         interest  = form.cleaned_data['interest']
         deal_type = form.cleaned_data['deal_type']
+        
+        # Make sure a deal type was chosen
+        if not deal_type in DEAL_TYPES:
+            form._errors['deal_type'] = ErrorList(["Please choose one"])
+            return submit_form(form)
 
         # Check if there are any existing deals
         interest = Interest.objects.get(interest = interest)
@@ -213,7 +225,7 @@ def lb_apply(request):
                              status = 'pending'
                             )
             expire.save()
-            mail_organizer( request.user, deal, expire )
+            mail_organizer( request.user, deal, expire, deal_type )
         else:
             if deal_type == 'Exclusive':
                 cost = 50
@@ -223,9 +235,9 @@ def lb_apply(request):
                 cost = 20
                 exclusive = False
 
-            elif deal_type == 'Sponsor':
+            elif deal_type == 'Sponsored':
                 cost = 0
-                exclusive = False
+                exclusive = True
 
             cancel = Cancel( deal = deal,
                              cost = cost,
@@ -234,12 +246,8 @@ def lb_apply(request):
                              status = 'pending'
                             )
             cancel.save()
-            mail_organizer( request.user, deal, cancel )
+            mail_organizer( request.user, deal, cancel, deal_type )
 
-        try:
-            payment = Payment.objects.get(user = user)
-        except:
-            return HttpResponseRedirect(reverse('lb_payment'))
 
     return HttpResponseRedirect(reverse('lb_profile'))
 
@@ -294,7 +302,7 @@ def lb_details(request):
         return submit_form(connections)
 
  
-from authorize import cim
+
 @csrf_protect
 def lb_payment(request):
 
@@ -328,20 +336,25 @@ def lb_payment(request):
                       )
     
     # Get the card and expiration date
-    card_number     = form.cleaned_data['card_number']
-    expiration      = form.cleaned_data['expiration_date']
-    expiration      = unicode( expiration.strftime(u"%Y-%m") )
+    card_number     = form.cleaned_data[u'card_number']
+    expiration      = form.cleaned_data[u'expiration_date']
+    expiration      = unicode( expiration.strftime(u'%Y-%m') )
 
 
     # Create a Authorize.net CIM profile
-    response = cim_api.create_profile( card_number = card_number,
-                                       expiration_date = expiration,
-                                       email = request.user.email,
-                                       customer_id = authorize.customer_id
-                                     )
-
-    # Check to see it if its OK
-    result = response.messages.result_code.text_.upper()
+    try:
+        response = cim_api.create_profile( card_number = card_number,
+                                           expiration_date = expiration,
+                                           email = request.user.email,
+                                           customer_id = authorize.customer_id
+                                          )
+    except Exception, e:
+        result = 'NG'
+    else:
+        # Check to see it if its OK
+        result = response.messages.result_code.text_.upper()
+    
+    # Check the reply
     if result == 'OK':
         authorize.profile_id = response.customer_profile_id.text_
         authorize.save()

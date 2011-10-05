@@ -182,6 +182,11 @@ def database_attendees( evb, event ):
             user.last_name  = attendee['last_name'].capitalize()
             user.save()
             profile = Profile( user = user )
+        
+        except KeyError,e:
+            print log("No email address for:%s %s"%(attendee['first_name'],attendee['last_name']))
+            continue
+        
         else:
             profile = user.get_profile()
 

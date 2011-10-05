@@ -16,14 +16,17 @@
         <div class="personal">
         	<div class="ctrlHolder clearfix">
         	{{form.chapter}}
+        	{{form.chapter.errors}}
         	</div>
         	
         	<div class="ctrlHolder clearfix">
             {{form.interest}}
+            {{form.interest.errors}}
            	</div>
   
         	<div class="ctrlHolder">
             {{form.deal_type}}
+            {{form.deal_type.errors}}
            	</div>
       		<br />
       		<br />
@@ -32,7 +35,7 @@
       		<br />
         	<div class="section">
         		<button type="submit" class="button orange form-submitter right">
-        			<span><strong>&nbsp;</strong>Update Budget</span>
+        			<span><strong>&nbsp;</strong>Apply For Leads</span>
         		</button>
         	</div>
          </div>

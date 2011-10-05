@@ -132,3 +132,15 @@ class CIMPaymentForm(forms.Form):
     
     card_code       = CreditCardCVV2Field( required = False,
                                            label="Card Security Code")
+    billing_addr    = forms.CharField   ( max_length = 255,
+                                          widget = forms.TextInput(attrs={
+                                          'value':"eg. 200 Varick St, New York, NY 010013",
+                                          'onfocus':"if(this.value == '')this.value = ''",
+                                          'onblur' :"if(this.value == '') this.value = 'eg. 200 Varick St, New York, NY 010013'"
+                                          })
+                                         )
+    
+    budget          = forms.CharField   ( max_length = 40,
+                                          widget = forms.TextInput(attrs={})
+                                         )
+ 
