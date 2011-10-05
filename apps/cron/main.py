@@ -40,7 +40,7 @@ def get_attendees( evb, event_id ):
     try:
         attendees = evb.event_list_attendees( {'id': event_id} )
     except Exception, e:
-        print log('Eventbrite Error: '+ e.__unicode__() +" for event id:" + str(event_id) )
+        print log('Eventbrite Error: '+ str(e) +" for event id:" + str(event_id) )
         return []
 
     if 'error' in attendees:
