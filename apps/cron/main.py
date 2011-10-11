@@ -297,7 +297,8 @@ def make_contact( survey, deal, template ):
                      'attendee'    :attendee,
                      'sponser'     :sponser,
                      'organizer'   :organizer,
-                     'chapter'     :chapter
+                     'chapter'     :chapter,
+                     'event'       :event
                      })
 
         # Render the message and log it
