@@ -316,7 +316,7 @@ def make_contact( survey, deal, template ):
               ]
 
         #TESTING BELOW REMOVE LATER
-        recipients = ['Pete Douma <pete.douma@gmail.com>']
+        #recipients = ['Pete Douma <pete.douma@gmail.com>']
 
         # Send the email
         msg = EmailMessage ( subject,
