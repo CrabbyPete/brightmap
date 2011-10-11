@@ -316,18 +316,18 @@ def make_contact( survey, deal, template ):
               ]
 
         #TESTING BELOW REMOVE LATER
-        #recipients = ['Pete Douma <pete.douma@gmail.com>']
+        recipients = ['Pete Douma <pete.douma@gmail.com>']
 
         # Send the email
-        msg = EmailMultiAlternatives( subject,
-                                      message,
-                                      '%s %s <%s>' % ( organizer.first_name,
-                                                       organizer.last_name,
-                                                       organizer.email       ),
-                                      recipients,
-                                      bcc
-                                     )
-
+        msg = EmailMessage ( subject,
+                             message,
+                            '%s %s <%s>' % ( organizer.first_name,
+                                             organizer.last_name,
+                                             organizer.email       ),
+                            recipients,
+                            bcc
+                          )
+        msg.content_subtype = "text"
         # If the prompt was set ask before sending
         if PROMPT:
             ans = raw_input('Send? (y/n)')
