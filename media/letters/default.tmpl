@@ -1,6 +1,7 @@
-{{attendee.first_name}},
 {% autoescape off %}
-  My records show that when you registered for our upcoming {{chapter.name}} event that you indicated you'd like an introduction to our preferred {{interest}} provider.  I've copied {{sponser.first_name}} {{sponser.last_name}}, {{sponser.get_profile.title}} at {{sponser.get_profile.company}}, our preferred provider for this service.  You should see {{sponser.first_name}} at the event, but feel free to get in touch beforehand over phone or email as well.
+{{attendee.first_name}},
+
+My records show that when you registered for our upcoming {{chapter.name}} event that you indicated you'd like an introduction to our preferred {{interest}} provider.  I've copied {{sponser.first_name}} {{sponser.last_name}}, {{sponser.get_profile.title}} at {{sponser.get_profile.company}}, our preferred provider for this service.  You should see {{sponser.first_name}} at the event, but feel free to get in touch beforehand over phone or email as well.
 {% if sponser.get_profile.website %}
 {{sponser.get_profile.website}}
 {% endif %}
@@ -10,14 +11,12 @@
 {% if sponser.get_profile.email %}
 {{sponser.get_profile.email}}
 {% endif %}
-
 {{sponser.first_name}},
-  {{attendee.first_name}} {{attendee.last_name}}{% if attendee.get_profile.company %} of {{attendee.get_profile.company}}{% endif %} will be joining us for {{event.describe}} on {{event.date|date:"M d, Y"}}.  Can you let {{attendee.first_name}} know the best way to find you there and/or if you're available to talk beforehand?
-
+{{attendee.first_name}} {{attendee.last_name}}{% if attendee.get_profile.company %} of {{attendee.get_profile.company}}{% endif %} will be joining us for {{event.describe}} on {{event.date|date:"M d, Y"}}.  Can you let {{attendee.first_name}} know the best way to find you there and/or if you're available to talk beforehand?
 Please let me know if I can be of further assistance.  Otherwise, I look forward to seeing you both at the event!
 
 Best regards,
-
 {{organizer.first_name}} {{organizer.last_name}}
-{{organization.name}}
+
+{{chapter.organization.name}}
 {% endautoescape %}

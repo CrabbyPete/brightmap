@@ -291,7 +291,7 @@ def make_contact( survey, deal, template ):
         event        = survey.event
         interest     = deal.interest
         organizer    = survey.event.chapter.organizer
-        chapter      = event.chapter.name
+        chapter      = event.chapter
 
         c = Context({'interest'    :interest,
                      'attendee'    :attendee,
@@ -327,7 +327,7 @@ def make_contact( survey, deal, template ):
                             recipients,
                             bcc
                           )
-        msg.content_subtype = "text"
+ 
         # If the prompt was set ask before sending
         if PROMPT:
             ans = raw_input('Send? (y/n)')
