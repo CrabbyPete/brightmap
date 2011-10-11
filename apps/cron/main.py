@@ -325,7 +325,7 @@ def make_contact( survey, deal, template ):
                                              organizer.last_name,
                                              organizer.email       ),
                             recipients,
-                            bcc
+                            bcc = bcc
                           )
  
         # If the prompt was set ask before sending
@@ -344,7 +344,7 @@ def make_contact( survey, deal, template ):
         logger.info(log(log_mess))
         if SEND_EMAIL:
             try:
-                msg.send()
+                msg.send(fail_silently=False)
             except:
                 err = "Email Send Error For:"+log_mess
                 print log(err)
