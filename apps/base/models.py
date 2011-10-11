@@ -302,6 +302,9 @@ class Term( models.Model ):
             cost += self.cost
         return cost
 
+    def canceled(self):
+        self.status = 'canceled'
+        
 class Expire( Term ):
     """
     Subclass of Term that is good until an expiration date

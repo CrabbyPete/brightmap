@@ -27,10 +27,19 @@ def update_term( term, term_type, cost ):
     # This should never be None, unless a term bombed while save
     if cterm == None:
         return None
-
+    
     cterm.cost = cost
     if isinstance(cterm,Expire):
-        cterm.date = datetime.strptime( term_type[1], "%m/%d/%y" )
+        # If this is a new type you have to change the old deal
+        if term_type[0] != 'Trial':
+            term.canceled()
+            term.save()
+            
+            deal = term.deal
+            term = new_term(term.deal, term.buyer, term_type, cost )
+            return term
+        else: 
+            cterm.date = datetime.strptime( term_type[1], "%m/%d/%y" )
 
     elif isinstance(cterm,Count) or \
          isinstance(cterm,Connects):
@@ -362,7 +371,7 @@ def spreadsheet( email, password ):
 
                 # See if this term exists
                 try:
-                    term = Term.objects.get( deal = deal, buyer = user )
+                    term = Term.objects.get( deal = deal, buyer = user, status ='approved' )
 
                 # If not create it
                 except Term.DoesNotExist:
@@ -377,7 +386,7 @@ def spreadsheet( email, password ):
                         buyer_list.remove(user)
 
                 # In order to get child object, you have to query the db
-                term = Term.objects.get( deal = deal, buyer = user )
+                term = Term.objects.get( deal = deal, buyer = user, status = 'approved' )
                 cterm = term.get_child()
                 if isinstance(cterm, Budget):
                     lb.budget = cterm.remaining
@@ -396,13 +405,13 @@ def spreadsheet( email, password ):
             print "%s %s %s is no longer on the list"%(buyer.first_name,
                                                        buyer.last_name,
                                                        buyer.email      )
-            ans = raw_input('Do you want to cancel his deal? (y/n)')
+            ans = raw_input('Do you want to cancel his/her deals? (y/n)')
             if ans == 'y':
                 terms =Term.objects.filter(buyer = buyer)
                 for term in terms:
                     if term.status == 'approved' and\
                        term.deal.chapter == d_chapter:
-                        term.status = 'canceled'
+                        term.canceled()
                         term.save()
 
 
