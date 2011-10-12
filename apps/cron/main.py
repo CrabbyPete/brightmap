@@ -319,15 +319,15 @@ def make_contact( survey, deal, template ):
         #recipients = ['Pete Douma <pete.douma@gmail.com>']
 
         # Send the email
-        msg = EmailMessage ( subject,
-                             message,
-                            '%s %s <%s>' % ( organizer.first_name,
-                                             organizer.last_name,
-                                             organizer.email       ),
-                            recipients,
-                            bcc = bcc
-                          )
- 
+        msg = EmailMultiAlternatives( subject    = subject,
+                                      body       = message,
+                                      from_email = '%s %s <%s>' % ( organizer.first_name,
+                                                                    organizer.last_name,
+                                                                    organizer.email       ),
+                                      to         = recipients,
+                                      bcc        = bcc
+                                     )
+
         # If the prompt was set ask before sending
         if PROMPT:
             ans = raw_input('Send? (y/n)')
@@ -344,7 +344,7 @@ def make_contact( survey, deal, template ):
         logger.info(log(log_mess))
         if SEND_EMAIL:
             try:
-                msg.send(fail_silently=False)
+                msg.send( fail_silently = False )
             except:
                 err = "Email Send Error For:"+log_mess
                 print log(err)
