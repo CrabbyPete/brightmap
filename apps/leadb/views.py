@@ -17,6 +17,7 @@ from django.core.mail               import  send_mail, EmailMultiAlternatives
 #Authorize imports
 from authorize                      import cim
 from authorize.gen_xml              import VALIDATION_TEST
+from authorize.responses            import AuthorizeError, _cim_response_codes
 
 #Local imports
 from base.models                    import *
@@ -326,7 +327,8 @@ def lb_payment(request):
 
     except Authorize.DoesNotExist:
         authorize = Authorize( user = request.user )
-        authorize.customer_profile_id = unicode(1000 + request.user.pk)
+        customer_id = 1000 + request.user.pk
+        authorize.customer_id = str( customer_id )
         authorize.save()
         
 
@@ -346,10 +348,11 @@ def lb_payment(request):
         response = cim_api.create_profile( card_number = card_number,
                                            expiration_date = expiration,
                                            email = request.user.email,
-                                           customer_id = authorize.customer_id
+                                           customer_id = unicode( authorize.customer_id )
                                           )
-    except Exception, e:
-        result = 'NG'
+    except AuthorizeError, e:
+        form._errors['card_number'] = ErrorList([e])
+        return submit_form(form)
     else:
         # Check to see it if its OK
         result = response.messages.result_code.text_.upper()
@@ -365,8 +368,8 @@ def lb_payment(request):
         
         #profile = cim_api.get_profile( customer_profile_id = authorize.profile_id )
     else:
-        # Log an error
-        pass
- 
+        form._errors['card_number'] = ErrorList( [response.messages.message.code.text_] )
+        return submit_form(form)
+
     return HttpResponseRedirect(reverse('lb_dash'))
 
