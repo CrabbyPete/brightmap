@@ -12,7 +12,7 @@ from django.core.mail               import send_mail,\
 from base.models                    import *
 from base.passw                     import gen
 from client                         import EventbriteClient
-from meetup                         import MeetUpAPI
+#from meetup                         import MeetUpAPI
 from social.models                  import MeetupProfile
 
 import logging

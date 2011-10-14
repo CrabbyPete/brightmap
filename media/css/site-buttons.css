@@ -44,19 +44,20 @@ button span, a.large span, a.medium span, a.small span {
 		line-height: 30px; 
 		color: black;
 		padding-left: 13px;
-		padding-right: 9px;
-		background: url(/media/img/slidingDoors/btn-menu-left.png) bottom left no-repeat;
+     	padding-right: 8px;    
+		background: url(/media/img/slidingDoors/btn-menu-left.png) left no-repeat;
 	}
 	.button.menu:hover span, .button.menu.active span {
 		color: white;
-		background-position: top left;
+		background-position: left;
 	}
 
 .button.orange {
+	width: 161px;
 	cursor: pointer;
 	text-align: left;
-	padding-right: 5px;
-	background: url(/media/img/slidingDoors/btn-orange-right.png) top right no-repeat;	
+	padding-right: 0px;
+	background: url(/media/img/slidingDoors/btn-orange-right.png) right no-repeat;	
 }
 .button.orange:hover, .button.orange.active {
 	
