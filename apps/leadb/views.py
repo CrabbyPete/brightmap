@@ -371,5 +371,5 @@ def lb_payment(request):
         form._errors['card_number'] = ErrorList( [response.messages.message.code.text_] )
         return submit_form(form)
 
-    return HttpResponseRedirect(reverse('lb_dash'))
+    return HttpResponseRedirect(reverse('lb_apply'))
 
