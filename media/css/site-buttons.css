@@ -1,14 +1,25 @@
 /* ------------------->>> Button Styles <<<-----------------------*/
 button {
+	position: relative;
 	border: 0; 
+	padding: 0;
 	cursor: pointer; 
-	text-align: center;
-	outline: 0;
+	overflow: visible; /* removes extra side padding in IE */
 }
 button span, a.large span, a.medium span, a.small span { 
+	display: block;
 	position: relative;  
 	white-space: nowrap;
 	text-decoration: none;
+}
+button::-moz-focus-inner {
+	border: none;  /* overrides extra padding in Firefox */
+}
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+	/* Safari and Google Chrome only - fix margins */
+	button span {
+		margin-top: -1px;
+	}
 }
 
 .button {
@@ -32,7 +43,7 @@ button span, a.large span, a.medium span, a.small span {
 	text-align: left;
 	padding-right: 4px;
 	margin-right: 4px;
-	background: url(/media/img/slidingDoors/btn-menu-right.png) bottom right no-repeat;	
+	background: url(../img/slidingDoors/btn-menu-right.png) bottom right no-repeat;	
 }
 .button.menu:hover, .button.menu.active {
 	background-position: top right;
@@ -44,20 +55,19 @@ button span, a.large span, a.medium span, a.small span {
 		line-height: 30px; 
 		color: black;
 		padding-left: 13px;
-     	padding-right: 8px;    
-		background: url(/media/img/slidingDoors/btn-menu-left.png) left no-repeat;
+		padding-right: 9px;
+		background: url(../img/slidingDoors/btn-menu-left.png) bottom left no-repeat;
 	}
 	.button.menu:hover span, .button.menu.active span {
 		color: white;
-		background-position: left;
+		background-position: top left;
 	}
 
 .button.orange {
-	width: 161px;
 	cursor: pointer;
 	text-align: left;
-	padding-right: 0px;
-	background: url(/media/img/slidingDoors/btn-orange-right.png) right no-repeat;	
+	padding-right: 3px;
+	background: url(../img/slidingDoors/btn-orange-right.png) top right no-repeat;	
 }
 .button.orange:hover, .button.orange.active {
 	
@@ -71,7 +81,7 @@ button span, a.large span, a.medium span, a.small span {
 		color: white;
 		padding-left: 27px;
 		padding-right: 6px;
-		background: url(/media/img/slidingDoors/btn-orange-left.png) top left no-repeat;
+		background: url(../img/slidingDoors/btn-orange-left.png) top left no-repeat;
 	}
 	.button.orange:hover span, .button.orange.active span {
 		color: #3d2512;
@@ -83,7 +93,7 @@ button span, a.large span, a.medium span, a.small span {
 			display: block;
 			width: 9px;
 			height: 12px;
-			background: url(/media/img/index/ico-arrow-brown.gif) center left no-repeat;
+			background: url(../img/index/ico-arrow-brown.gif) center left no-repeat;
 		}
 		
 
@@ -96,7 +106,7 @@ button span, a.large span, a.medium span, a.small span {
 		display: block;
 		width: 519px;
 		height: 3px;
-		background: url(/media/img/slidingDoors/big-box-top.png) no-repeat top left;
+		background: url(../img/slidingDoors/big-box-top.png) no-repeat top left;
 	}
 	.big-box .content {
 		position: relative;
@@ -104,7 +114,7 @@ button span, a.large span, a.medium span, a.small span {
 		width: 507px;
 		min-height: 50px;
 		padding: 0 6px;
-		background: url(/media/img/slidingDoors/big-box-content.png) repeat-y;	
+		background: url(../img/slidingDoors/big-box-content.png) repeat-y;	
 	}
 		.big-box .content form fieldset {
 			padding: 20px 23px;
@@ -114,7 +124,7 @@ button span, a.large span, a.medium span, a.small span {
 		display: block;
 		width: 519px;
 		height: 8px;
-		background: url(/media/img/slidingDoors/big-box-bottom.png) no-repeat top left;	
+		background: url(../img/slidingDoors/big-box-bottom.png) no-repeat top left;	
 	}
 
 

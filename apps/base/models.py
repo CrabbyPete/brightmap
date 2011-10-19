@@ -36,9 +36,11 @@ class Profile( models.Model ):
 
 class Authorize( models.Model):
     user            = models.ForeignKey( User )
+
     customer_id     = models.CharField( max_length = 255 )
     profile_id      = models.CharField( max_length = 255 )
-
+    payment_profile = models.CharField( max_length = 255 )
+ 
 
 class Invoice( models.Model):
     user        = models.ForeignKey( User )

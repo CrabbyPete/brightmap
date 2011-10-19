@@ -298,7 +298,21 @@ def spreadsheet( email, password ):
                 website = sponser['Sponsor Website']
             else:
                 website = None
-
+            if 'Sponsor Phone' in sponser:
+                phone = sponser['Sponsor Phone']
+            else:
+                phone = None
+                
+            if 'Sponsor LinkedIn' in sponser:
+                linkedin = sponser['Sponsor LinkedIn']
+            else:
+                linkedin = None
+            
+            if 'Sponsor Twitter' in sponser:
+                twitter = sponser['Sponsor Twitter']
+            else:
+                twitter = None
+                
             # Get or create the user
             try:
                 user = User.objects.get(email = email)
@@ -317,9 +331,13 @@ def spreadsheet( email, password ):
                 profile = Profile( user = user )
                 profile.save()
 
-            profile.company = company
-            profile.title   = title
-            profile.website = website
+            profile.company  = company
+            profile.title    = title
+            profile.website  = website
+            profile.phone    = phone
+            profile.linkedin = linkedin
+            profile.twitter  = twitter
+            
             profile.is_leadbuyer = True
             profile.save()
 

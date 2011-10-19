@@ -148,9 +148,12 @@ def signup(request):
         user.save()
         profile = Profile( user = user)
     else:
-        if not user.check_password(password):
+        if not user.check_password(password) and profile.is_ready:
             form._errors['password'] = ErrorList(["User exist with a different password"])
             return submit_form(form)
+        else:
+            user.set_password(password)
+            user.save()
             
     profile.is_leadbuyer = True
     profile.is_agreed    = True

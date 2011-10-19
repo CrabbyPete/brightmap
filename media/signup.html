@@ -24,7 +24,7 @@
                 <div class="ctrlHolder clearfix">
                   <label for="first_name">First Name <em>*</em></label> 
                   {{form.first_name}}
- 				  {{form.first_name.errors}}
+                  {{form.first_name.errors}}
                 </div>
 
                 <div class="ctrlHolder clearfix">
@@ -41,8 +41,7 @@
 
                 <div class="ctrlHolder clearfix">
                   <label for="verify_email">Verify Email <em>*</em></label> 
-                  {{form.email_verify}}
-                  {{form.email_verify.errors}}
+                  <input name="verify_email" id="verify_email" type="text" />
                 </div>
 
                 <div class="ctrlHolder clearfix">
@@ -115,9 +114,7 @@
               </div>
 
               <div class="section">
-              	<button type="submit" class="button orange form-submitter right">
-              		<span>Create / Update Profile</span>
-              	</button>
+              	<button class="button orange right" type="submit"><span><strong>&nbsp;</strong>Create / Update Profile</span></button>
               </div>
             </fieldset>
           </form>

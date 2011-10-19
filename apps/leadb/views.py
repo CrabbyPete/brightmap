@@ -355,21 +355,20 @@ def lb_payment(request):
         return submit_form(form)
     else:
         # Check to see it if its OK
-        result = response.messages.result_code.text_.upper()
+        result = response.messages.result_code.text_
     
     # Check the reply
-    if result == 'OK':
-        authorize.profile_id = response.customer_profile_id.text_
-        authorize.save()
-        
-        profile = request.user.get_profile()
-        profile.is_ready = True
-        profile.save()
-        
-        #profile = cim_api.get_profile( customer_profile_id = authorize.profile_id )
-    else:
+    if result != 'Ok':
         form._errors['card_number'] = ErrorList( [response.messages.message.code.text_] )
         return submit_form(form)
-
+    
+    authorize.profile_id      = response.customer_profile_id.text_
+    authorize.payment_profile = response.customer_payment_profile_id_list.numeric_string.text_
+    authorize.save()
+ 
+    profile = request.user.get_profile()
+    profile.is_ready = True
+    profile.save()
+ 
     return HttpResponseRedirect(reverse('lb_apply'))
 
