@@ -8,6 +8,7 @@ from django.contrib.auth.models     import User
 from django.template                import loader, Context
 from django.core.mail               import send_mail,\
                                            EmailMessage,EmailMultiAlternatives
+
 # Local libraries
 from base.models                    import *
 from base.passw                     import gen

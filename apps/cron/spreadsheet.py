@@ -1,4 +1,5 @@
 import django_header
+
 # Python libraries
 from datetime                       import datetime
 
@@ -159,12 +160,12 @@ def spreadsheet( email, password ):
 
         # Make sure all the necessary keys are present
         try:
-            name      = organization['Organization']
-            chapter   = organization['Chapter']
-            email     = organization['Organizer Email']
-            organizer = organization['Chapter Organizer']
-            user_key  = organization['API User Key']
-            org_id    = organization['Organizer ID']
+            name      = organization['Organization'].rstrip()
+            chapter   = organization['Chapter'].rstrip()
+            email     = organization['Organizer Email'].rstrip()
+            organizer = organization['Chapter Organizer'].rstrip()
+            user_key  = organization['API User Key'].rstrip()
+            org_id    = organization['Organizer ID'].rstrip()
 
         except KeyError, error:
             print "Key Error:" + str(error)
@@ -279,37 +280,37 @@ def spreadsheet( email, password ):
 
             # Check to make sure all fields exist
             try:
-                email   = sponser['Sponsor Email']
-                first   = sponser['Sponsor First Name']
-                last    = sponser['Sponsor Last Name']
+                email   = sponser['Sponsor Email'].rstrip()
+                first   = sponser['Sponsor First Name'].rstrip()
+                last    = sponser['Sponsor Last Name'].rstrip()
             except KeyError, error:
                 print "Key Error:" + str(error)
                 continue
 
             if 'Sponsor Company' in sponser:
-                company = sponser['Sponsor Company']
+                company = sponser['Sponsor Company'].rstrip()
             else:
                 company = None
             if 'Sponsor Title' in sponser:
-                title = sponser['Sponsor Title']
+                title = sponser['Sponsor Title'].rstrip()
             else:
                 title = None
             if 'Sponsor Website' in sponser:
-                website = sponser['Sponsor Website']
+                website = sponser['Sponsor Website'].rstrip()
             else:
                 website = None
             if 'Sponsor Phone' in sponser:
-                phone = sponser['Sponsor Phone']
+                phone = sponser['Sponsor Phone'].rstrip()
             else:
                 phone = None
                 
             if 'Sponsor LinkedIn' in sponser:
-                linkedin = sponser['Sponsor LinkedIn']
+                linkedin = sponser['Sponsor LinkedIn'].rstrip()
             else:
                 linkedin = None
             
             if 'Sponsor Twitter' in sponser:
-                twitter = sponser['Sponsor Twitter']
+                twitter = sponser['Sponsor Twitter'].rstrip()
             else:
                 twitter = None
                 
