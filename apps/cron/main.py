@@ -179,8 +179,8 @@ def database_attendees( evb, event ):
                                               email    = attendee['email'],
                                               password = password
                                             )
-            user.first_name = attendee['first_name'].capitalize()
-            user.last_name  = attendee['last_name'].capitalize()
+            user.first_name = attendee['first_name'].strip().capitalize()
+            user.last_name  = attendee['last_name'].rstrip().capitalize()
             user.save()
             profile = Profile( user = user )
         
@@ -195,9 +195,9 @@ def database_attendees( evb, event ):
         profile.is_attendee = True
 
         if 'company' in attendee:
-            profile.company = attendee['company']
+            profile.company = attendee['company'].rstrip()
         if 'cell_phone' in attendee:
-            profile.phone = attendee['cell_phone']
+            profile.phone = attendee['cell_phone'].rstrip()
         profile.save()
 
         # Return attendees who answered the survey
