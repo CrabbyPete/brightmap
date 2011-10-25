@@ -9,8 +9,8 @@
             <th scope="col">Organization</th>
             <th scope="col">Status</th>
             <th scope="col">Terms</th>
-            <th scope="col">Leads Sent</th>
-            <th scope="col">Lead Price</th>
+            <th scope="col">Leads</th>
+            <th scope="col">Lead</th>
             <th scope="col">Total</th>
             <th scope="col">Action</th>
         </tr>
@@ -43,13 +43,12 @@
     {% csrf_token %}
     	<fieldset>
        		<div class="clearfix">
-           		<span class="orange-circle left">1</span>
                 <h1 class="left">Monthly Budget</h1>
             </div>
             <div class="personal">
             	<div class="ctrlHolder clearfix">
-            		{{form}}
- 				  	{{form.errors}}
+            		{{form.budget}}
+ 				  	{{form.budget.errors}}
            		</div>
            		<div class="section">
               	<button type="submit" class="button orange form-submitter right">

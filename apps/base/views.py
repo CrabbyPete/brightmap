@@ -30,7 +30,7 @@ def homepage( request ):
         return welcome(request)
 
     #return login(request)
-    return render_to_response('home.html', {}, context_instance=RequestContext(request))
+    return render_to_response('index.html', {}, context_instance=RequestContext(request))
 
 @csrf_protect
 def welcome( request ):
@@ -60,7 +60,7 @@ def login(request):
 
     def submit_form(form):
         c = {'form':form}
-        return render_to_response('index.html', c, context_instance=RequestContext(request))
+        return render_to_response('login.html', c, context_instance=RequestContext(request))
 
     if request.method == 'GET':
         form = LoginForm()
