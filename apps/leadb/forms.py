@@ -120,10 +120,7 @@ class BudgetForm(forms.Form):
     budget          = forms.DecimalField( label = 'Monthly Budget')
 
 
-from fields import CreditCardField, \
-                    CreditCardExpiryField, \
-                    CreditCardCVV2Field, \
-                    CountryField
+from fields import CreditCardField, CreditCardExpiryField, CreditCardCVV2Field, CountryField
 
 class CIMPaymentForm(forms.Form):
     card_number     = CreditCardField(label="Credit Card Number")

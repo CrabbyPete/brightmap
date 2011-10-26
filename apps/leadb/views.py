@@ -323,15 +323,20 @@ def lb_payment(request):
         return submit_form(form)
 
     try:
-        authorize = Authorize.objects.get(user = request.user)
+        authorize = Authorize.objects.get( user = request.user )
 
     except Authorize.DoesNotExist:
         authorize = Authorize( user = request.user )
         customer_id = 1000 + request.user.pk
         authorize.customer_id = str( customer_id )
         authorize.save()
-        
 
+    try:
+        lb = LeadBuyer.objects.get( user = request.user )
+    except LeadBuyer.DoesNotExist:
+        form._errors['budget'] = ErrorList(["Apply as leader first"])
+        return submit_form(form)
+ 
     # Initialize the API class
     cim_api = cim.Api( unicode(settings.AUTHORIZE['API_LOG_IN_ID']),
                        unicode(settings.AUTHORIZE['TRANSACTION_ID']) 
@@ -366,6 +371,9 @@ def lb_payment(request):
     authorize.payment_profile = response.customer_payment_profile_id_list.numeric_string.text_
     authorize.save()
  
+    lb.budget = form.cleaned_data['budget']
+    lb.save()
+    
     profile = request.user.get_profile()
     profile.is_ready = True
     profile.save()
