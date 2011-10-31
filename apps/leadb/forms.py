@@ -132,10 +132,10 @@ class CIMPaymentForm(forms.Form):
     
     billing_addr    = forms.CharField   ( required = False,
                                           max_length = 255,
-                                          widget = forms.TextInput(attrs={'class':'txtBox1',
-                                          'value':"eg. Floor 12, 200 Varick St, New York, NY 010013",
-                                          'onfocus':"if(this.value == '')this.value = ''",
-                                          'onblur' :"if(this.value == '') this.value = 'eg. 200 Varick St, New York, NY 010013'"
+                                          widget = forms.TextInput(attrs={
+                                          'value':"street, city, state zipcode",
+                                          'onfocus':"if(this.value == 'street, city, state zipcode') this.value = ''",
+                                          'onblur' :"if(this.value == '') this.value = 'street, city, state zipcode'"
                                           })
                                          )
     

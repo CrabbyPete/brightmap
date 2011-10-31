@@ -403,29 +403,6 @@ def lb_payment(request):
     
     authorize.profile_id      = response.customer_profile_id.text_
     authorize.payment_profile = response.customer_payment_profile_id_list.numeric_string.text_
-    """
-    # Validate the credit card
-    try:
-        kw.update( dict( customer_profile_id         = authorize.profile_id,
-                         customer_payment_profile_id = authorize.payment_profile,
-                         validation_mode             = VALIDATION_LIVE
-                       )
-                  )
-        
-        # Add the billing info
-        kw.update(billing)
-        response = cim_api.update_payment_profile(**kw)
-        #response = cim_api.validate_payment_profile( **kw )
-                      
-    except AuthorizeError, e:
-        form._errors['card_number'] = ErrorList([e])
-        return submit_form(form)
-    
-    result = response.messages.result_code.text_
-    if result != 'Ok':
-        form._errors['card_number'] = ErrorList( [response.messages.message.code.text_] )
-        return submit_form(form)
-    """
     authorize.save()
     
     # Check if there was a budget input
