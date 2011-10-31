@@ -1,4 +1,4 @@
-from django.conf.urls.defaults  import *
+from django.conf.urls.defaults      import  patterns, url
 
 urlpatterns = patterns('leadb.views',
     url(r'^lb_profile/$',            'lb_profile',            name='lb_profile'            ),

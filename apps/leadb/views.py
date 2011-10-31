@@ -384,7 +384,7 @@ def lb_payment(request):
                 customer_id     = unicode( authorize.customer_id ),          
                 profile_type    = CREDIT_CARD,
                 email           = user.email,
-                validation_mode = VALIDATION_TEST
+                validation_mode = VALIDATION_LIVE
                )
     
     kw.update(billing)
