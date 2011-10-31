@@ -41,6 +41,8 @@ def main():
     month = datetime.today()
     month = month.replace( month = month.month - 1)
 
+    print "Invoicing for the month of: " + month.strftime("%B %Y")
+    
    # Initialize the API class
     cim_api = cim.Api( unicode(AUTHORIZE['API_LOG_IN_ID']),
                        unicode(AUTHORIZE['TRANSACTION_ID']) 

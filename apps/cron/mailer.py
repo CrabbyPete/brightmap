@@ -36,7 +36,7 @@ def get_attendees( evb, event_id ):
     Get all the attendees for an event from Eventbrite
     """
     attendee_list = []
- 
+
     # Get all the attendees of each event (New York, Boston, Toronto ..)
     try:
         attendees = evb.event_list_attendees( {'id': event_id} )
@@ -122,29 +122,21 @@ def get_latest_events( evb, organizer_id ):
     return event_ids
 
 
-def database_events(organizer, evb = None):
+def database_events(events):
     """
     Put the latest event in the database
     """
-    if evb == None:
-
-        # Open a new Eventbrite client
-        evb = EventbriteClient( app_key  = EVENTBRITE['APP_KEY' ],
-                                user_key = organizer.user_key     )
-
-    # Get the latest from Eventbrite
-    events = get_latest_events(evb, int(organizer.organizer_id) )
     event_list = []
 
     # Add each event and find the right organizer
     for event in events:
         try:
-            event_rec = Event.objects.get(event_id = event[1])
+            event_rec = Event.objects.get(event_id = event['event_id'])
         except Event.DoesNotExist:
-            event_rec = Event( event_id        = event[1],
-                               describe        = event[0],
-                               date            = event[2],
-                               chapter         = organizer.chapter
+            event_rec = Event( event_id        = event['event_id'],
+                               describe        = event['describe'],
+                               date            = event['date'],
+                               chapter         = event['organizer']['chapter']
                               )
             event_rec.save()
 
@@ -153,14 +145,7 @@ def database_events(organizer, evb = None):
     # Return the events list
     return event_list
 
-def database_attendees( evb, event ):
-    """
-    Generator to put the attendees in the database, returns attendees who
-    answered the survey
-    """
-
-    # Get all the attendees for the event from Eventbrite
-    attendees = get_attendees( evb, event.event_id )
+def database_attendees( event, attendees ):
 
     # Add all attendees to the database
     for attendee in attendees:
@@ -183,11 +168,11 @@ def database_attendees( evb, event ):
             user.last_name  = attendee['last_name'].rstrip().capitalize()
             user.save()
             profile = Profile( user = user )
-        
+
         except KeyError,e:
             print log("No email address for:%s %s"%(attendee['first_name'],attendee['last_name']))
             continue
-        
+
         else:
             profile = user.get_profile()
 
@@ -197,7 +182,7 @@ def database_attendees( evb, event ):
         # Don't change the company name if the person is a leadbuyer
         if 'company' in attendee and not profile.is_leadbuyer:
             profile.company = attendee['company'].rstrip()
-        
+
         if 'cell_phone' in attendee:
             profile.phone = attendee['cell_phone'].rstrip()
         profile.save()
@@ -395,7 +380,7 @@ def main():
                 app_key  = EVENTBRITE['APP_KEY' ]
                 user_key = ticket.user_key
                 evb = EventbriteClient( tokens = app_key, user_key = user_key )
-        
+
                 #Get the email template for this organization
                 letter = chapter.letter
                 if letter != None:
@@ -434,6 +419,52 @@ def main():
 
                             # Connect attendees and mail contacts
                             make_contact( survey, deal, template )
+
+
+
+
+import zmq
+def mailer():
+    context = zmq.Context()
+    socket  = context.socket(zmq.REP)
+    socket.bind('tcp://127.0.0.1:10001')
+
+    while True:
+        """
+        msg['event']['attendees']
+        msg['site']['responder']
+        """
+        msg = socket.recv(copy=False)
+
+    if 'event' in msg:
+        for surveys in database_attendees( evb, event ):
+
+                        # For each interest match sponsers
+                        for survey in surveys:
+                            try:
+                                deal = chapter.deal( survey.interest )
+
+                            # This can happen if no deal for a survey item
+                            except Deal.DoesNotExist:
+                                print log( chapter.name +        \
+                                           ' has no deal for ' + \
+                                           survey.interest.interest
+                                          )
+                                continue
+                            else:
+                                if deal == None:
+                                    print log( chapter.name +        \
+                                           ' has no deal for ' + \
+                                           survey.interest.interest
+                                          )
+                                    continue
+
+                            # Connect attendees and mail contacts
+                            make_contact( survey, deal, template )
+
+
+
+
 
 import optparse
 if __name__ == '__main__':

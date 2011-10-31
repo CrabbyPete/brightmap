@@ -72,3 +72,10 @@ form .section {
 	form .section .errorMsg-under p {
 		text-align: left;
 	}
+
+input.txtBox1 {
+    background-color: #FFFFFF;
+    border: 1px solid #89C3D7;
+    color: #7E8E95;
+    font-size: 12px;
+    height: 19px;

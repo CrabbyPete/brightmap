@@ -16,13 +16,14 @@ from django.core.mail               import  send_mail, EmailMultiAlternatives
 
 #Authorize imports
 from authorize                      import cim
-from authorize.gen_xml              import VALIDATION_TEST
+from authorize.gen_xml              import VALIDATION_LIVE,VALIDATION_TEST,BUSINESS,CREDIT_CARD
 from authorize.responses            import AuthorizeError, _cim_response_codes
 
 #Local imports
 from base.models                    import *
 from social.models                  import *
 from forms                          import *
+from geo                            import geocode
 
 def mail_organizer( user, deal, term, deal_type ):
     # Render the letter
@@ -46,11 +47,12 @@ def mail_organizer( user, deal, term, deal_type ):
                                   recipients,
                                   ['requests@brightmap.com']
                                 )
-    try:
-        msg.send( fail_silently = False )
-    except:
-        err = "Email Send Error For: " + organizer.email
-        logger.error(err)
+    if settings.SEND_EMAIL:
+        try:
+            msg.send( fail_silently = False )
+        except:
+            err = "Email Send Error For: " + organizer.email
+            logger.error(err)
 
 
 @csrf_protect
@@ -322,17 +324,22 @@ def lb_payment(request):
     if not form.is_valid():
         return submit_form(form)
 
+    user    = request.user
+    profile = user.get_profile()
+    
+    # Get the current Authorize record or create a new one
     try:
-        authorize = Authorize.objects.get( user = request.user )
+        authorize = Authorize.objects.get( user = user )
 
     except Authorize.DoesNotExist:
-        authorize = Authorize( user = request.user )
-        customer_id = 1000 + request.user.pk
+        authorize = Authorize( user = user )
+        customer_id = 1000 + user.pk
         authorize.customer_id = str( customer_id )
         authorize.save()
 
+    # Get the LeadBuy record
     try:
-        lb = LeadBuyer.objects.get( user = request.user )
+        lb = LeadBuyer.objects.get( user = user )
     except LeadBuyer.DoesNotExist:
         form._errors['budget'] = ErrorList(["Apply as leader first"])
         return submit_form(form)
@@ -342,39 +349,90 @@ def lb_payment(request):
                        unicode(settings.AUTHORIZE['TRANSACTION_ID']) 
                       )
     
-    # Get the card and expiration date
-    card_number     = form.cleaned_data[u'card_number']
-    expiration      = form.cleaned_data[u'expiration_date']
-    expiration      = unicode( expiration.strftime(u'%Y-%m') )
+    # Get the card, expiration date, address and budget
+    card_number = form.cleaned_data[u'card_number']
+    expiration  = form.cleaned_data[u'expiration_date'].strftime(u'%Y-%m')
+    budget      = form.cleaned_data['budget']
+    address     = form.cleaned_data['billing_addr']
+    
+    billing = dict( bill_first_name = user.first_name,
+                    bill_last_name  = user.last_name,
+                    bill_company    = profile.company,
+                    bill_phone      = profile.phone
+                  )
+    
+    # Use Google to verify the address string
+    if address != '':
+        try:
+            local = geocode(address)
+        except:
+             form._errors['billing_addr'] = ErrorList(["Not a valid address"])
+             return submit_form(form)
 
-
+        billing['bill_address'] = local.get('street',None)
+        billing['bill_city']    = local.get('city',None)
+        billing['bill_state']   = local.get('state',None)
+        billing['bill_zip']     = local.get('zipcode',None)
+        billing['bill_country'] = local.get('country',None)
+        
+        if 'address' in local:
+            profile.address = local['address']
+ 
     # Create a Authorize.net CIM profile
+    kw = dict ( card_number     = card_number,
+                expiration_date = unicode(expiration),
+                customer_id     = unicode( authorize.customer_id ),          
+                profile_type    = CREDIT_CARD,
+                email           = user.email,
+                validation_mode = VALIDATION_TEST
+               )
+    
+    kw.update(billing)
     try:
-        response = cim_api.create_profile( card_number = card_number,
-                                           expiration_date = expiration,
-                                           email = request.user.email,
-                                           customer_id = unicode( authorize.customer_id )
-                                          )
+         response = cim_api.create_profile( **kw )
+ 
     except AuthorizeError, e:
         form._errors['card_number'] = ErrorList([e])
         return submit_form(form)
-    else:
-        # Check to see it if its OK
-        result = response.messages.result_code.text_
-    
-    # Check the reply
+ 
+    # Check to see it if its OK
+    result = response.messages.result_code.text_
     if result != 'Ok':
         form._errors['card_number'] = ErrorList( [response.messages.message.code.text_] )
         return submit_form(form)
     
     authorize.profile_id      = response.customer_profile_id.text_
     authorize.payment_profile = response.customer_payment_profile_id_list.numeric_string.text_
+    """
+    # Validate the credit card
+    try:
+        kw.update( dict( customer_profile_id         = authorize.profile_id,
+                         customer_payment_profile_id = authorize.payment_profile,
+                         validation_mode             = VALIDATION_LIVE
+                       )
+                  )
+        
+        # Add the billing info
+        kw.update(billing)
+        response = cim_api.update_payment_profile(**kw)
+        #response = cim_api.validate_payment_profile( **kw )
+                      
+    except AuthorizeError, e:
+        form._errors['card_number'] = ErrorList([e])
+        return submit_form(form)
+    
+    result = response.messages.result_code.text_
+    if result != 'Ok':
+        form._errors['card_number'] = ErrorList( [response.messages.message.code.text_] )
+        return submit_form(form)
+    """
     authorize.save()
- 
-    lb.budget = form.cleaned_data['budget']
+    
+    # Check if there was a budget input
+    if budget:
+        lb.budget = budget
     lb.save()
     
-    profile = request.user.get_profile()
     profile.is_ready = True
     profile.save()
  

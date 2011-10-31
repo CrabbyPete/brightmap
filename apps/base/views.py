@@ -167,6 +167,9 @@ def signup(request):
     if 'company' in form.cleaned_data:
         profile.company = form.cleaned_data['company']
         
+    if 'title' in form.cleaned_data:
+        profile.title = form.cleaned_data['title']
+        
     if 'website' in form.cleaned_data:
         profile.website = form.cleaned_data['website']
     
