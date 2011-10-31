@@ -953,3 +953,28 @@ def buy_deal(request):
                             )
             cancel.save()
     return HttpResponseRedirect('/')
+
+
+class ChapterView(View):
+    """
+    A basic view, that can be handle GET and POST requests.
+    Applies some simple form validation on POST requests.
+    """
+
+    def get(self, request, num):
+        """
+        Handle GET requests.
+        Returns a simple string indicating which view the GET request was for.
+        """
+        if int(num) > 2:
+            return Response(status.HTTP_404_NOT_FOUND)
+        return "GET request to AnotherExampleResource %s" % num
+    
+    def post(self, request, num):
+        """
+        Handle POST requests, with form validation.
+        Returns a simple string indicating what content was supplied.
+        """
+        if int(num) > 2:
+            return Response(status.HTTP_404_NOT_FOUND)
+        return "POST request to AnotherExampleResource %s, with content: %s" % (num, repr(self.CONTENT))
