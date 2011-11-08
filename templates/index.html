@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block menu_block %}
+   <a href = '{% url login %}'>Log In</a>
+{% endblock %}
+
+{% block body_block %}
+    <table width="100%" border="0" cellspacing="20" cellpadding="5">
+
+      <tr>
+        <th scope="col" width="50%" bgcolor="#cccccc" style="border:solid 2px #ccc">For Community/Event Organizers</th>
+        <th scope="col" width="50%" bgcolor="#cccccc" style="border:solid 2px #ccc">For Professional Service Providers</th>
+      </tr>
+      <tr>
+        <td align="left"><ul>
+          <li>Monetize your community events without increasing ticket prices</li>
+
+          <li>Make valuable introductions for your members</li>
+          <li>Free marketing for your community events</li>
+        </ul>        </td>
+        <td align="left"><ul>
+          <li>Receive active, qualified, trackable leads to new business opportunities</li>
+          <li>Save time at networking events with advance introductions to attendees in the market for your service</li>
+
+          <li>All leads are community-validated and strictly &quot;opt-in&quot;</li>
+        </ul>        </td>
+      </tr>
+      <tr>
+        <th scope="col" width="50%" bgcolor="#cccccc" style="border:solid 2px #ccc">Business Communities on BrightMap</th>
+        <th scope="col" width="50%" bgcolor="#cccccc" style="border:solid 2px #ccc">Service Providers on BrightMap</th>
+
+      </tr>
+      <tr>
+        <td align="left"><ul>
+          <li><a href="http://www.doitinperson.com/">Do It In Person</a></li>
+          <li><a href="http://www.techdrinkup.com/">Tech Drinkup</a></li>
+          <li><a href="http://ultralightstartups.com/">Ultra Light Startups</a></li>
+        </ul>        </td>
+
+        <td align="left"><ul>
+          <li><a href="http://www.datagram.com/">Datagram</a> (web hosting provider)</li>
+          <li><a href="http://www.envoydesign.com/">Envoy Design</a> (mobile app design/dev)</li>
+          <li><a href="http://www.freshtilledsoil.com/">Fresh Tilled Soil</a> (web design/dev)</li>
+
+          <li><a href="http://mintzlevin.com/">Mintz Levin</a> (law)</li>
+          <li><a href="http://reitlerlaw.com/">Reitler Kailas &amp; Rosenblatt</a> (law)</li>
+          <li><a href="http://www.sourcepad.com/">SourcePad</a> (web design/dev)</li>
+
+          <li><a href="http://www.thetaxclub.com/">The Tax Club</a> (accounting)</li>
+        </ul>        </td>
+      </tr>
+      <tr>
+        <td align="center" bgcolor="#faa71d" style="border:solid 2px #000"><p><a href='#'><strong>Join BrightMap<br>Community/Event Organizer</strong></a></p></td>
+        <td align="center" bgcolor="#faa71d" style="border:solid 2px #000"><p><a href='{% url lb_signup %}'><strong>Join BrightMap<br>Professional Service Provider</strong></a></p></td>
+      </tr>
+    </table>
+    <table width="100%" border="0" cellspacing="20" cellpadding="5">
+      <tr>
+        <td><a href="#">About</a></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+{% endblock %}

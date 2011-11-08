@@ -96,8 +96,11 @@ def geocode(addr):
 
             # 3: Sub-region (county, municipality, etc.) level accuracy.
             if accuracy >= 3:
-                county = country["AdministrativeArea"]["SubAdministrativeArea"]
-                results['county'] = county["SubAdministrativeAreaName"]
+                if "SubAdministrativeArea" in country["AdministrativeArea"]:
+                    county = country["AdministrativeArea"]["SubAdministrativeArea"]
+                    results['county'] = county["SubAdministrativeAreaName"]
+                else:
+                    county = country["AdministrativeArea"]
 
                 # 4: 	Town (city, village) level accuracy.
                 if accuracy >= 4:

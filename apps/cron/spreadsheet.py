@@ -5,16 +5,16 @@ from datetime                       import datetime
 
 # Django libraries
 from django.contrib.auth.models     import User
-from django.template                import loader, Context
-from django.core.mail               import send_mail,EmailMessage, \
-                                           EmailMultiAlternatives
+#from django.template                import loader, Context
+#from django.core.mail               import EmailMultiAlternatives
 # Local libraries
-from base.models                    import *
+from base.models                    import ( Term, Cancel, Expire, Deal, Count, Connects, Budget, Interest,
+                                             Organization, Profile, Chapter, LeadBuyer, Eventbrite
+                                           )
+
 from client                         import EventbriteClient
 from google                         import GoogleSpreadSheet
 from settings                       import SPREADSHEET, EVENTBRITE
-
-
 
 valid_deals = ('cancel','sponsored','exclusive','expire')
 
@@ -36,7 +36,7 @@ def update_term( term, term_type, cost ):
             term.canceled()
             term.save()
             
-            deal = term.deal
+            #deal = term.deal
             term = new_term(term.deal, term.buyer, term_type, cost )
             return term
         else: 
@@ -143,7 +143,7 @@ def new_term( deal, user, term_type, cost ):
 
 def spreadsheet( email, password ):
 
-   # Open Google Docs and get the spreadsheet
+    # Open Google Docs and get the spreadsheet
     spreadsheet = GoogleSpreadSheet( email, password )
     result = spreadsheet.getSpreadSheet(SPREADSHEET)
     if result == None or result.title.text != SPREADSHEET:
@@ -373,7 +373,7 @@ def spreadsheet( email, password ):
                     interest = Interest( interest = key )
                     interest.save()
 
-                 # Get or create a deal
+                # Get or create a deal
                 try:
                     deal = Deal.objects.get( chapter = d_chapter,
                                              interest = interest

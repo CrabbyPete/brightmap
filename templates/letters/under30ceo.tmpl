@@ -1,0 +1,16 @@
+{% load phone %}{% autoescape off %}
+Hey {{sponser.first_name}} and {{attendee.first_name}},
+
+I wanted to quickly introduce you two before the Under30CEO event on {{event.date|date:"M d"}}.  {{attendee.first_name}}, I saw that when you registered for our event you said you were interested in meeting someone who could help you out with {{interest}}.  {{sponser.first_name}} is who we refer all our Under30CEO readers to and he's been extremely helpful to several people I know.  {{sponser.first_name}}'s company, {{sponser.get_profile.company}} has been around for a while and does great work.  Hopefully you two can be in touch before the event.
+
+I'm looking forward to seeing you both and let me know how this introduction works out.  Hope this message serves you well. 
+
+Thanks,
+
+Matt
+
+-- 
+Matt Wilson
++1 (917) 740-8610
+Under30CEO.com
+{% endautoescape %}

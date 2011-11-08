@@ -1,28 +1,37 @@
 import settings
+import logging
+logger = logging.getLogger('leadbuer')
+
+
 from datetime                       import datetime
 from dateutils                      import relativedelta
 
 # Django imports
+from django.views.generic.edit      import  FormView
 from django.contrib                 import  auth
 from django.contrib.auth.models     import  User
 from django.http                    import  HttpResponseRedirect
 from django.forms.util              import  ErrorList
 from django.shortcuts               import  render_to_response
 from django.template                import  RequestContext, Context, loader
-from django.views.decorators.csrf   import  csrf_protect, csrf_exempt
+from django.views.decorators.csrf   import  csrf_protect
 from django.core.urlresolvers       import  reverse
-from django.core.exceptions         import  ObjectDoesNotExist
-from django.core.mail               import  send_mail, EmailMultiAlternatives
+from django.core.mail               import  EmailMultiAlternatives
 
 #Authorize imports
 from authorize                      import cim
-from authorize.gen_xml              import VALIDATION_LIVE,VALIDATION_TEST,BUSINESS,CREDIT_CARD
-from authorize.responses            import AuthorizeError, _cim_response_codes
+from authorize.gen_xml              import VALIDATION_LIVE, CREDIT_CARD
+from authorize.responses            import AuthorizeError #, _cim_response_codes
 
 #Local imports
-from base.models                    import *
-from social.models                  import *
-from forms                          import *
+from base.models                    import ( LeadBuyer, Chapter, Expire, Cancel, Connection, Authorize,
+                                             Deal, Term, Interest, Profile
+                                            )
+
+from social.models                  import LinkedInProfile
+
+
+from forms                          import DEAL_CHOICES, BuyerForm, ApplyForm, BudgetForm, CIMPaymentForm
 from geo                            import geocode
 
 def mail_organizer( user, deal, term, deal_type ):
@@ -55,6 +64,83 @@ def mail_organizer( user, deal, term, deal_type ):
             logger.error(err)
 
 
+class  SignUp( FormView ):
+    template_name = 'leadb/signup.html'
+    form_class    = BuyerForm
+
+    def form_valid( self, form ):
+
+        # Get the email address and see if they are in the database
+        email          = form.cleaned_data['email']
+        email_verify   = form.cleaned_data['email_verify']
+        if email != email_verify:
+            form._errors['email'] = ErrorList(["The emails do not match"])
+            return self.form_invalid(form)
+    
+        # Check the passwords match
+        password     = form.cleaned_data['password']
+        pass_confirm = form.cleaned_data['pass_confirm']
+        if password != pass_confirm:
+            form._errors['password'] = ErrorList(["The passwords do not match"])
+            return self.form_invalid(form)
+
+        # Make sure they agree
+        if not form.cleaned_data['agree']:
+            form._errors['agree'] = ErrorList(["Please check agreement"])
+            return self.form_invalid(form)
+    
+        try:
+            user = User.objects.get(email = email)
+            profile = user.get_profile()
+
+        except User.DoesNotExist:
+            username = email[0:30]
+            user  = User.objects.create_user( username = username,
+                                              email = email,
+                                              password = password
+                                            )
+        
+            user.first_name = form.cleaned_data['first_name'].capitalize()
+            user.last_name  = form.cleaned_data['last_name'].capitalize()
+
+            user.save()
+            profile = Profile( user = user)
+        else:
+            if not user.check_password(password) and profile.is_ready:
+                form._errors['password'] = ErrorList(["User exist with a different password"])
+                return self.form_invalid(form)
+            else:
+                user.set_password(password)
+                user.save()
+            
+        profile.is_leadbuyer = True
+        profile.is_agreed    = True
+      
+        profile.phone = form.cleaned_data['phone']
+        profile.address = form.cleaned_data['address']
+        profile.company = form.cleaned_data['company']
+        profile.title = form.cleaned_data['title']
+        profile.website = form.cleaned_data['website']
+        profile.twitter = form.cleaned_data['twitter']
+        profile.linkedin = form.cleaned_data['linkedin']
+    
+        profile.save()
+    
+        # Check if there is a leadbuyer record for this user
+        try:
+            leadb = LeadBuyer.objects.get(user = user)
+        except LeadBuyer.DoesNotExist:
+            leadb = LeadBuyer(user = user)
+            leadb.save()
+
+        # Login the new user
+        user = auth.authenticate(username=user.username, password=password)
+        if user is not None and user.is_active:
+            auth.login(self.request, user)
+
+        return HttpResponseRedirect ( reverse('lb_payment') )
+
+ 
 @csrf_protect
 def lb_profile(request):
     """
@@ -178,26 +264,18 @@ def lb_profile(request):
 # Initialize the TYPE List form form.DEAL_CHOICES
 DEAL_TYPES = [c[0] for c in DEAL_CHOICES]
 
-@csrf_protect
-def lb_apply(request):
+
+class Apply( FormView ):
     """
     Apply to buy a deal
     """
-    def submit_form(form):
-        c = {'form':form }
-        return render_to_response( 'leadb/lb_apply.html', c,
-                                   context_instance=RequestContext(request) )
-    # GET
-    if request.method == 'GET':
-        form = ApplyForm()
-        return submit_form(ApplyForm())
-
-    # POST
-    if request.method == 'POST':
-        form = ApplyForm(request.POST)
-        if not form.is_valid():
-            return submit_form(form)
-
+    template_name = 'organ/lb_apply.html'
+    form_class    = ApplyForm
+    
+    def form_valid(self,form):
+        """
+        Process a valid application form
+        """
         chapter   = form.cleaned_data['chapter']
         interest  = form.cleaned_data['interest']
         deal_type = form.cleaned_data['deal_type']
@@ -224,11 +302,11 @@ def lb_apply(request):
             expire = Expire( deal   = deal,
                              date   = one_month,
                              cost   = 0,
-                             buyer  = request.user,
+                             buyer  = self.request.user,
                              status = 'pending'
                             )
             expire.save()
-            mail_organizer( request.user, deal, expire, deal_type )
+            mail_organizer( self.request.user, deal, expire, deal_type )
         else:
             if deal_type == 'Exclusive':
                 cost = 50
@@ -245,14 +323,13 @@ def lb_apply(request):
             cancel = Cancel( deal = deal,
                              cost = cost,
                              exclusive = exclusive,
-                             buyer = request.user,
+                             buyer = self.request.user,
                              status = 'pending'
                             )
             cancel.save()
-            mail_organizer( request.user, deal, cancel, deal_type )
+            mail_organizer( self.request.user, deal, cancel, deal_type )
 
-
-    return HttpResponseRedirect(reverse('lb_dash'))
+        return HttpResponseRedirect(reverse('lb_dash'))
 
 @csrf_protect
 def lb_dash(request):
@@ -305,113 +382,103 @@ def lb_details(request):
         return submit_form(connections)
 
  
+class Payment( FormView ):
+    template_name = 'leadb/lb_payment.html'
+    form_class    = CIMPaymentForm
 
-@csrf_protect
-def lb_payment(request):
+    def form_valid(self, form):
 
-    def submit_form(form):
-        c = {'form':form }
-        return render_to_response( 'leadb/lb_payment.html', c,
-                                   context_instance=RequestContext(request) )
-
-    #GET
-    if request.method == 'GET':
-        form = CIMPaymentForm()
-        return submit_form(form)
-
-    #POST
-    form = CIMPaymentForm(request.POST)
-    if not form.is_valid():
-        return submit_form(form)
-
-    user    = request.user
-    profile = user.get_profile()
+        user    = self.request.user
+        profile = user.get_profile()
     
-    # Get the current Authorize record or create a new one
-    try:
-        authorize = Authorize.objects.get( user = user )
+        # Get the current Authorize record or create a new one
+        try:
+            authorize = Authorize.objects.get( user = user )
 
-    except Authorize.DoesNotExist:
-        authorize = Authorize( user = user )
-        customer_id = 1000 + user.pk
-        authorize.customer_id = str( customer_id )
-        authorize.save()
+        except Authorize.DoesNotExist:
+            authorize = Authorize( user = user )
+            customer_id = 1000 + user.pk
+            authorize.customer_id = str( customer_id )
+            authorize.save()
 
-    # Get the LeadBuy record
-    try:
-        lb = LeadBuyer.objects.get( user = user )
-    except LeadBuyer.DoesNotExist:
-        form._errors['budget'] = ErrorList(["Apply as leader first"])
-        return submit_form(form)
+        # Get the LeadBuy record
+        try:
+            lb = LeadBuyer.objects.get( user = user )
+        except LeadBuyer.DoesNotExist:
+            form._errors['budget'] = ErrorList(["Apply as leader first"])
+            return self.form_invalid(form)
  
-    # Initialize the API class
-    cim_api = cim.Api( unicode(settings.AUTHORIZE['API_LOG_IN_ID']),
-                       unicode(settings.AUTHORIZE['TRANSACTION_ID']) 
+        # Initialize the API class
+        cim_api = cim.Api( unicode(settings.AUTHORIZE['API_LOG_IN_ID']),
+                           unicode(settings.AUTHORIZE['TRANSACTION_ID']) 
+                         )
+    
+        # Get the card, expiration date, address and budget
+        card_number = form.cleaned_data[u'number']
+        expiration  = form.cleaned_data[u'expiration'].strftime(u'%Y-%m')
+        budget      = form.cleaned_data['budget']
+        address     = form.cleaned_data['address']
+        city        = form.cleaned_data['city']
+        state       = form.cleaned_data['state']
+    
+        billing = dict( bill_first_name = user.first_name,
+                        bill_last_name  = user.last_name,
+                        bill_company    = profile.company,
+                        bill_phone      = profile.phone
                       )
     
-    # Get the card, expiration date, address and budget
-    card_number = form.cleaned_data[u'card_number']
-    expiration  = form.cleaned_data[u'expiration_date'].strftime(u'%Y-%m')
-    budget      = form.cleaned_data['budget']
-    address     = form.cleaned_data['billing_addr']
-    
-    billing = dict( bill_first_name = user.first_name,
-                    bill_last_name  = user.last_name,
-                    bill_company    = profile.company,
-                    bill_phone      = profile.phone
+        # Use Google to verify the address string
+        address += ", " + city + " " + state
+        if address:
+            try:
+                local = geocode(address)
+            except Exception, e:
+                form._errors['address'] = ErrorList(["Not a valid address"])
+                return self.form_invalid(form)
+
+            billing['bill_address'] = local.get('street',None)
+            billing['bill_city']    = local.get('city',None)
+            billing['bill_state']   = local.get('state',None)
+            billing['bill_zip']     = local.get('zipcode',None)
+            billing['bill_country'] = local.get('country',None)
+        
+        # Save the address
+        profile.address = local['address']
+ 
+        # Create a Authorize.net CIM profile
+        kw = dict ( card_number     = card_number,
+                    expiration_date = unicode(expiration),
+                    customer_id     = unicode( authorize.customer_id ),          
+                    profile_type    = CREDIT_CARD,
+                    email           = user.email,
+                    validation_mode = VALIDATION_LIVE
                   )
     
-    # Use Google to verify the address string
-    if address != '':
+        kw.update(billing)
         try:
-            local = geocode(address)
-        except:
-             form._errors['billing_addr'] = ErrorList(["Not a valid address"])
-             return submit_form(form)
-
-        billing['bill_address'] = local.get('street',None)
-        billing['bill_city']    = local.get('city',None)
-        billing['bill_state']   = local.get('state',None)
-        billing['bill_zip']     = local.get('zipcode',None)
-        billing['bill_country'] = local.get('country',None)
-        
-        if 'address' in local:
-            profile.address = local['address']
+            response = cim_api.create_profile( **kw )
  
-    # Create a Authorize.net CIM profile
-    kw = dict ( card_number     = card_number,
-                expiration_date = unicode(expiration),
-                customer_id     = unicode( authorize.customer_id ),          
-                profile_type    = CREDIT_CARD,
-                email           = user.email,
-                validation_mode = VALIDATION_LIVE
-               )
-    
-    kw.update(billing)
-    try:
-         response = cim_api.create_profile( **kw )
+        except AuthorizeError, e:
+            form._errors['card_number'] = ErrorList([e])
+            return self.form_invalid(form)
  
-    except AuthorizeError, e:
-        form._errors['card_number'] = ErrorList([e])
-        return submit_form(form)
+        # Check to see it if its OK
+        result = response.messages.result_code.text_
+        if result != 'Ok':
+            form._errors['card_number'] = ErrorList( [response.messages.message.text_] )
+            return self.form_invalid(form)
+    
+        authorize.profile_id      = response.customer_profile_id.text_
+        authorize.payment_profile = response.customer_payment_profile_id_list.numeric_string.text_
+        authorize.save()
+    
+        # Check if there was a budget input
+        if budget:
+            lb.budget = budget
+            lb.save()
+    
+        profile.is_ready = True
+        profile.save()
  
-    # Check to see it if its OK
-    result = response.messages.result_code.text_
-    if result != 'Ok':
-        form._errors['card_number'] = ErrorList( [response.messages.message.code.text_] )
-        return submit_form(form)
-    
-    authorize.profile_id      = response.customer_profile_id.text_
-    authorize.payment_profile = response.customer_payment_profile_id_list.numeric_string.text_
-    authorize.save()
-    
-    # Check if there was a budget input
-    if budget:
-        lb.budget = budget
-    lb.save()
-    
-    profile.is_ready = True
-    profile.save()
- 
-    return HttpResponseRedirect(reverse('lb_apply'))
+        return HttpResponseRedirect(reverse('lb_apply'))
 

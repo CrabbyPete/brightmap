@@ -6,6 +6,8 @@ urlpatterns = patterns('',
     url(r'^$',          'base.views.homepage',  name='homepage'    ),
     (r'^base/',         include('base.urls')                       ),
     (r'^leadb/',        include('leadb.urls')                      ),
+    #(r'^organ/',        include('organ.urls')                      ),
+    (r'^api/',          include('api.urls')                        ),
     (r'^social/',       include('social.urls')                     ),
 
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')   ),

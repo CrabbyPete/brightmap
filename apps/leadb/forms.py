@@ -1,8 +1,11 @@
 from django                                 import forms
 from django.utils.translation               import ugettext_lazy
-from django.contrib.localflavor.us.forms    import USPhoneNumberField
+from django.contrib.localflavor.us.forms    import USPhoneNumberField, USZipCodeField
 
-from base.models                            import *
+
+from base.models                            import Interest, Chapter
+from fields                                 import CreditCardField, CreditCardExpiryField, CreditCardCVV2Field, CreditCardExpiryWidget
+from radio                                  import ChoiceWithOtherField, ChoiceWithOtherWidget
 
 class BuyerForm(forms.Form):
     email           = forms.EmailField  ( required = True,
@@ -11,6 +14,11 @@ class BuyerForm(forms.Form):
                                             widget= forms.TextInput(attrs={'class':'row','size':40})
                                          )
 
+    email_verify   = forms.EmailField  ( required = True,
+                                            label = 'Confirm Email Address:',
+                                            max_length = 60,
+                                            widget= forms.TextInput(attrs={'class':'row','size':40})
+                                         )
 
     phone           = USPhoneNumberField( required = False,
                                             label = 'Phone:',
@@ -120,27 +128,38 @@ class BudgetForm(forms.Form):
     budget          = forms.DecimalField( label = 'Monthly Budget')
 
 
-from fields import CreditCardField, CreditCardExpiryField, CreditCardCVV2Field, CountryField
 
 class CIMPaymentForm(forms.Form):
-    card_number     = CreditCardField(label="Credit Card Number")
+    number          = CreditCardField()
     
-    expiration_date = CreditCardExpiryField(label="Expiration Date")
+    expiration      = CreditCardExpiryField(widget =CreditCardExpiryWidget({'class':"selectbox1"} ) )
     
-    card_code       = CreditCardCVV2Field( required = False,
-                                           label="Card Security Code")
+    #cvv             = CreditCardCVV2Field( required = False )
     
-    billing_addr    = forms.CharField   ( required = False,
-                                          max_length = 255,
-                                          widget = forms.TextInput(attrs={
-                                          'value':"street, city, state zipcode",
-                                          'onfocus':"if(this.value == 'street, city, state zipcode') this.value = ''",
-                                          'onblur' :"if(this.value == '') this.value = 'street, city, state zipcode'"
-                                          })
-                                         )
+    address         = forms.CharField   ( max_length = 100,
+                                          widget = forms.TextInput()
+                                        )
     
+    city            = forms.CharField   ( max_length = 100,
+                                          widget = forms.TextInput()
+                                        )
+    
+    state           = forms.CharField   ( max_length = 2,
+                                          widget = forms.TextInput()  
+                                        )
+
+    zipcode         = USZipCodeField    ( required = False,
+                                            widget= forms.TextInput()
+                                        )
+    
+    budget          = ChoiceWithOtherField ( choices = [('0', 'No budget'),
+                                                        ('1', 'Budget')]
+                                           )
+        
+    
+    """    
     budget          = forms.CharField   ( required = False,
                                           max_length = 40,
                                           widget = forms.TextInput(attrs={})
                                          )
- 
+    """

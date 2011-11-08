@@ -4,14 +4,12 @@ from datetime                   import datetime
 
 # Import Django
 from django.core.mail           import EmailMultiAlternatives
-from django.contrib             import auth
-from django.contrib.auth.models import User
 from django.template            import loader, Context
 
 # Import local stuff
-from base.models                import *
-from pycron                     import pycron
-from mail                       import Mailer
+from base.models                import Profile, Interest
+#from pycron                     import pycron
+#from mail                       import Mailer
 
 
 def report_interests ( date = None ):

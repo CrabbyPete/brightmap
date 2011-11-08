@@ -6,7 +6,7 @@ from django.forms                           import ModelForm
 
 #from radio                                  import ChoiceWithOtherField
 from radio2                                 import ChoiceWithOtherField
-from models                                 import *
+from models                                 import Profile, LeadBuyer, Interest, Chapter, Letter
 
 class LoginForm(forms.Form):
     username        = forms.EmailField   ( max_length = 45,

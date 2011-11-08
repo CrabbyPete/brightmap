@@ -4,7 +4,6 @@ urlpatterns = patterns('base.views',
     # default index
     url(r'^$',                      'homepage',             name='homepage'             ),
     url(r'^login/$',                'login',                name='login'                ),
-    url(r'^signup/$',               'signup',               name='signup'               ),
     url(r'^logout/$',               'logout',               name='logout'               ),
     url(r'^community/$',            'community',            name='community'            ),
     url(r'^edit_profile/$',         'edit_profile',         name='edit_profile'         ),

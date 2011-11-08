@@ -1,0 +1,9 @@
+{% block body_block %}
+	<div id='show_available_leads'>
+		<form action="{% url or_catagories %}" method="post">
+			{% csrf_token %}
+			{{form}}
+		 	<input type="image" name="submit" src=/media/img/btn-submit.gif />
+		</form>
+	</div>
+{% endblock %}

@@ -1,19 +1,9 @@
-#-------------------------------------------------------------------------------
-# Name:        Accounting
-# Purpose:
-#
-# Author:      Douma
-#
-# Created:     23/09/2011
-# Copyright:   (c) Douma 2011
-#-------------------------------------------------------------------------------
 # Import Python librariess
-import                              django_header
-import                              calendar
-from datetime                       import date, datetime
+import                              django_head
+from datetime                       import datetime
 
 # Import local library
-from base.models                    import *
+from base.models                    import Profile, Connection, Authorize
 from settings                       import AUTHORIZE
 
 # Import for authorize
@@ -22,7 +12,6 @@ from authorize.gen_xml              import VALIDATION_TEST, AUTH_ONLY
 from authorize.responses            import AuthorizeError, _cim_response_codes
 
 def connections_for( user, month ):
-    dow,last_day = calendar.monthrange( month.year, month.month )
     first = month.replace( day = 1 )
     last  = first.replace( month = first.month + 1 )
 
@@ -43,7 +32,7 @@ def main():
 
     print "Invoicing for the month of: " + month.strftime("%B %Y")
     
-   # Initialize the API class
+    # Initialize the API class
     cim_api = cim.Api( unicode(AUTHORIZE['API_LOG_IN_ID']),
                        unicode(AUTHORIZE['TRANSACTION_ID']) 
                       )

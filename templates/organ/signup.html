@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load smartif %}
+
+{% block body_block %}
+	 <form action="{% url or_signup %}" method="post" >
+       {% csrf_token %}
+       	<fieldset>
+ 			{{form}}
+        	<input type="image" name="submit" src=/media/img/btn-submit.gif />
+    	</fieldset>
+    </form>
+	
+{% endblock %}
+
+
+
+
+
+

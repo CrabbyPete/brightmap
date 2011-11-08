@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load smartif %}
+
+{% block body_block %}
+<!--Body section-->
+<div id="bodysection">
+    <div class="insidesection">
+        <article class="profile">
+            <section class="bodybg">
+                <nav class="step">
+                    <ul>
+                    <li><a href="#" class="active">STEP 1 of 3</a></li>
+                    <li><a href="#">STEP 2 of 3</a></li>
+                    <li><a href="#" class="step3">STEP 3 of 3</a></li>
+                    </ul>
+                </nav>
+				<h2 class="number"><span></span>Lead-Buyer Profile</h2>
+                <form id="profile" name="" method="post" action="{% url lb_signup %}">
+                {% csrf_token %}
+                    <section id="my-border">
+                        <p class="lftcontent">First Name <span>*</span></p>
+                        <p>{{form.first_name}}</p>
+                        {{form.first_name.errors}}
+
+                        <p class="lftcontent">Last Name <span>*</span></p>
+                        <p>{{form.last_name}}</p>
+                        {{form.last_name.errors}}
+
+                        <p class="lftcontent">Lead-Buyer Email <span>*</span></p>
+                        <p>{{form.email}}</p>
+                        {{form.email.errors}}
+
+                        <p class="lftcontent">Verify Email <span>*</span></p>
+                        <p>{{form.email_verify}}</p>
+                        {{form.email_verify.errors}}
+
+                        <p class="lftcontent">Password <span>*</span></p>
+                        <p>{{form.password}}</p>
+                        {{form.password.errors}}
+
+                        <p class="lftcontent">Verify Password <span>*</span></p>
+                        <p>{{form.pass_confirm}}</p>
+                        {{form.pass_confirm.errors}}
+
+                        <p class="lftcontent">Company <span>*</span></p>
+                        <p>{{form.company}}</p>
+                        {{form.company.errors}}
+
+                        <p class="lftcontent">Title <span>*</span></p>
+                        <p>{{form.title}}</p>
+                        {{form.title.errors}}
+
+                        <p class="lftcontent">Website <span>*</span></p>
+                        <p>{{form.website}}</p>
+                        {{form.website.errors}}
+
+                        <p class="lftcontent">Phone</p>
+                        <p>{{form.phone}}</p>
+                        {{form.phone.errors}}
+
+                    </section>
+
+                    <section id="my-bluecurved">
+                        <p class="lftcontent">Linkedln</p>
+                        <p>{{form.linkedin}}</p>
+                        {{form.linkedin.errors}}
+
+                        <p class="lftcontent">Twitter</p>
+                        <p>{{form.twitter}}</p>
+                        {{form.twitter.errors}}
+                    </section>
+
+                    <p class="confirmtermstxt">Confirm Terms and Conditions</p>
+                    <p class="chkbox">{{form.agree}}{{form.agree.errors}}
+                        <span>I hereby agree to the BrightMap <a href="#">Terms and Conditions</a> for lead buyers.</span>
+                    </p>
+                    <p class="fieldmakestxt">Fields marked with <span>*</span> are mandatory</p>
+                    <p class="monthlybudget"><input name="" type="submit" value="Create/Update profile" class="submitbutt"></p>
+                </form>
+            </section>
+        <div class="botbg">&nbsp;</div>
+        </article>
+    </div>
+</div>
+<!--Body section-->
+{% endblock %}
+
+
+
+
+
+

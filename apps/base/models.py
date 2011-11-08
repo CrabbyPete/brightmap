@@ -107,13 +107,6 @@ class Chapter( models.Model ):
                     buyers.append(term.buyer)
         return buyers
 
-
-    def terms( self, user = None ):
-        deals = self.deals()
-        terms = Term.objects.filter()
-
-
-
     def __unicode__(self):
         return self.name
 
@@ -196,12 +189,15 @@ class Interest(models.Model):
     interest        = models.CharField( unique = True, max_length = 255 )
     occupation      = models.CharField( max_length = 255, default = None, null = True )
     objects         = InterestManager()
+    status          = models.CharField( max_length = 20, default = 'standard' )
 
     def __unicode__(self):
         return self.interest
 
     def events(self, day = None, open = False ):
-        # Return all the events that have this interest
+        """
+        Return all the events that have this interest
+        """
         report = {}
         if day == None:
             day = datetime.today()
@@ -209,6 +205,7 @@ class Interest(models.Model):
         query = Survey.objects.filter( interest = self,
                                        event__date__gte = day )
         for survey in query:
+            
             # Check is exclusive, if there is a deal and its exclusive, ignore
             if open:
                 deal = survey.event.chapter.deal( self )
@@ -299,10 +296,9 @@ class Term( models.Model ):
         return connections
 
     def total(self):
-        cost = 0
-        for connection in self.connections():
-            cost += self.cost
-        return cost
+        connections = self.connections()
+        price = self.cost * len(connections)
+        return price
 
     def canceled(self):
         self.status = 'canceled'
@@ -353,7 +349,7 @@ class Budget( Term ):
         # Refill on day 1
         today = date.today()
         if today.day == 1:
-            remaining = buyer.budget
+            self.remaining = self.buyer.budget
 
         # Is money left to do this?
         if self.remaining < self.cost:
@@ -419,6 +415,7 @@ class Letter( models.Model ):
     Customized Email template letters to attendees and buyer Connections
     """
     letter      = models.FileField(upload_to = 'letters')
+    name        = models.CharField(max_length = 255, default = None, null = True )
 
     def __unicode__(self):
         return self.letter
@@ -451,8 +448,7 @@ class Event(models.Model):
     def surveys(self):
         return self.survey_set.all()
 
-    def connections(self):
-        return self.connection_set.all()
+
 
     def attendees(self, attendee = None):
         # Return attendess for this event. If attendee is None return all
@@ -502,33 +498,20 @@ class Event(models.Model):
             else:
                 interests[survey.interest.interest] += 1
         return interests
-
+    
     def connections(self):
-        connections = []
-        for survey in self.survey_set.all():
-            if not survey.interest:
-                continue
-            for c in Connection.objects.filter(survey = survey):
-                connections.append(c)
-        return connections
-
+        return self.connection_set.all()
+    
 
     def deals( self, interest ):
         """
         Get deals for a normalized interest for this event
-        If exclusive return only exclusive deals
         """
-
-        deal_list = []
         normal_interest = Interest.objects.close_to( interest )
         deals = Deal.objects.filter( chapter  = self.chapter,
                                      interest = normal_interest
                                    )
-        for deal in deals:
-            for event in deal.chapter.events():
-                deal_list.append(deal)
-
-        return deal_list
+        return deals
 
 
     def add_connection( self, survey, term ):

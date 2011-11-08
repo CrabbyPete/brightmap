@@ -1,20 +1,24 @@
 import django_header
 
 # Python libraries
-from datetime                       import datetime, date
+from datetime                       import datetime
 
 # Django libraries
 from django.contrib.auth.models     import User
+
 from django.template                import loader, Context
-from django.core.mail               import send_mail,\
-                                           EmailMessage,EmailMultiAlternatives
+from django.core.mail               import EmailMultiAlternatives
 
 # Local libraries
-from base.models                    import *
+from base.models                    import Event, Profile, Survey, Interest, Deal, Organization
 from base.passw                     import gen
+
 from client                         import EventbriteClient
-#from meetup                         import MeetUpAPI
+
+""""
+from meetup                         import MeetUpAPI
 from social.models                  import MeetupProfile
+"""
 
 import logging
 logger = logging.getLogger('main.py')
@@ -184,7 +188,7 @@ def database_attendees( evb, event ):
             user.save()
             profile = Profile( user = user )
         
-        except KeyError,e:
+        except KeyError:
             print log("No email address for:%s %s"%(attendee['first_name'],attendee['last_name']))
             continue
         
@@ -295,7 +299,14 @@ def make_contact( survey, deal, template ):
         interest     = deal.interest
         organizer    = survey.event.chapter.organizer
         chapter      = event.chapter
-
+        
+        # Check if the leadbuyer is the organizer and if they have a letter
+        if sponser == organizer:
+            if sponser.letter:
+                letter = sponser.letter
+                template = loader.get_template('letters/' + letter.name)
+                
+        # Set up the context
         c = Context({'interest'    :interest,
                      'attendee'    :attendee,
                      'sponser'     :sponser,
@@ -398,8 +409,8 @@ def main():
         
                 #Get the email template for this organization
                 letter = chapter.letter
-                if letter != None:
-                    template = loader.get_template(letter.letter)
+                if letter:
+                    template = loader.get_template('letters/'+letter.name)
                 else:
                     template = loader.get_template( 'letters/default.tmpl' )
 

@@ -1,6 +1,5 @@
 # Python imports
 import settings
-import logging
 
 from datetime                       import datetime
 from dateutils                      import relativedelta
@@ -11,18 +10,22 @@ from django.contrib.auth.models     import  User
 from django.http                    import  HttpResponseRedirect
 from django.forms.util              import  ErrorList
 from django.shortcuts               import  render_to_response
-from django.template                import  RequestContext, Context, loader
-from django.views.decorators.csrf   import  csrf_protect, csrf_exempt
+from django.template                import  RequestContext
+from django.views.decorators.csrf   import  csrf_protect
 from django.core.urlresolvers       import  reverse
 from django.core.exceptions         import  ObjectDoesNotExist
-from django.core.mail               import  send_mail, EmailMultiAlternatives
 
 
 # Local imports
-from models                         import *
-from forms                          import *
-from passw                          import gen
-from social.models                  import *
+from models                         import ( Organization, Event, Chapter, Profile, Interest, LeadBuyer,  
+                                             Deal, Term, Cancel, Expire, Connection, Letter 
+                                           )
+
+from forms                          import ( LoginForm, BuyerForm, InterestForm, DealForm, BuyDealForm,
+                                             LeadBuyerForm, ProfileForm, ChapterForm, LetterForm
+                                           )
+
+from social.models                  import LinkedInProfile
 
 def homepage( request ):
     # Homepage
@@ -95,137 +98,6 @@ def login(request):
         return submit_form(form)
 
 
-@csrf_protect
-def signup(request):
-    # Sign up for an account
-
-    def submit_form(form):
-        c = {'form':form }
-        return render_to_response('signup.html', c, context_instance=RequestContext(request))
-
-    #GET
-    if request.method == 'GET':
-        return submit_form(BuyerForm())
-
-    # POST
-    form = BuyerForm(request.POST)
-    if not form.is_valid():
-        return submit_form(form)
-
-    # Get the email address and see if they are in the database
-    email          = form.cleaned_data['email']
-    email_verify   = form.cleaned_data['email_verify']
-    if email != email_verify:
-        form._errors['email'] = ErrorList(["The emails do not match"])
-        return submit_form(form)
-    
-    # Check the passwords match
-    password     = form.cleaned_data['password']
-    pass_confirm = form.cleaned_data['pass_confirm']
-    if password != pass_confirm:
-        form._errors['password'] = ErrorList(["The passwords do not match"])
-        return submit_form(form)
-
-    # Make sure they agree
-    if not form.cleaned_data['agree']:
-        form._errors['agree'] = ErrorList(["Please check agreement"])
-        return submit_form(form)
-    
-    try:
-        user = User.objects.get(email = email)
-        profile = user.get_profile()
-
-    except User.DoesNotExist:
-        username = email[0:30]
-        user  = User.objects.create_user( username = username,
-                                          email = email,
-                                          password = password
-                                         )
-        
-        user.first_name = form.cleaned_data['first_name'].capitalize()
-        user.last_name  = form.cleaned_data['last_name'].capitalize()
-
-        user.save()
-        profile = Profile( user = user)
-    else:
-        if not user.check_password(password) and profile.is_ready:
-            form._errors['password'] = ErrorList(["User exist with a different password"])
-            return submit_form(form)
-        else:
-            user.set_password(password)
-            user.save()
-            
-    profile.is_leadbuyer = True
-    profile.is_agreed    = True
-      
-    if 'phone' in form.cleaned_data:
-        profile.phone = form.cleaned_data['phone']
-
-    if 'address' in form.cleaned_data:
-        profile.address = form.cleaned_data['address']
-    
-    if 'company' in form.cleaned_data:
-        profile.company = form.cleaned_data['company']
-        
-    if 'title' in form.cleaned_data:
-        profile.title = form.cleaned_data['title']
-        
-    if 'website' in form.cleaned_data:
-        profile.website = form.cleaned_data['website']
-    
-    if 'twitter' in form.cleaned_data:
-        profile.twitter = form.cleaned_data['twitter']
-    
-    if 'linkedin' in form.cleaned_data:
-        profile.linkedin = form.cleaned_data['linkedin']
-    
-    profile.save()
-    
-    # Check if there is a leadbuyer record for this user
-    if profile.is_leadbuyer:
-        try:
-             leadb = LeadBuyer.objects.get(user = user)
-        except LeadBuyer.DoesNotExist:
-            leadb = LeadBuyer(user = user)
-            leadb.save()
-
-    # Login the new user
-    user = auth.authenticate(username=user.username, password=password)
-    if user is not None and user.is_active:
-        auth.login(request, user)
-
-    return HttpResponseRedirect(reverse('lb_payment'))
-
-    # Email the new user their password
-    """
-    url = settings.SITE_BASE + reverse('login')
-    c = Context({'password' :password,
-                 'user'     :user,
-                 'url'      :url
-                })
-
-    # Render the letter
-    template = loader.get_template('letters/signup.tmpl')
-    message = template.render(c)
-
-    subject = "Welcome to BrightMap"
-    recipients = [ user.email ]
-
-    msg = EmailMultiAlternatives( subject,
-                                  message,
-                                  'welcome@brightmap.com',
-                                  recipients
-                                )
-    try:
-        msg.send( fail_silently = False )
-    except:
-        err = "Email Send Error For: " + event.chapter.organizer.email
-        logger.error("Email Send Error:")
-
-    return render_to_response('thanks.html', {},
-                               context_instance=RequestContext(request))
-    """
-
 def community(request):
     return render_to_response('community.html', {},
                                context_instance=RequestContext(request))
@@ -249,7 +121,7 @@ def  edit_profile(request):
                                    context_instance=RequestContext(request)
                                  )
 
-   # Need to know what user this is
+    # Need to know what user this is
     user    = request.user
     profile = user.get_profile()
     default_password ='3dhl4df6ajhhd9ir'
@@ -344,6 +216,12 @@ def show_chapter(request):
     # GET: All organizations
     if 'organizer' in request.GET:
         return submit_form(Organization.objects.all())
+    
+    if 'organization' in request.GET:
+        name = request.GET['organization']
+        organization = Organization.objects.get( name = name )
+        
+        return submit_form([organization])
 
     organizations = []
     for chapter in Chapter.objects.filter(organizer = request.user):
@@ -374,28 +252,12 @@ def edit_chapter( request ):
     form = ChapterForm(request.POST)
     if not form.is_valid():
         return submit_form(form)
-
+    """
     user_key        = form.cleaned_data['user_key']
     organizer_id    = form.cleaned_data['organizer_id']
     organization    = form.cleaned_data['organization']
-
-    # Edit an existing chapter
-    try:
-        organizer = Organizer.objects.get(organizer_id = organizer_id)
-
-    # Create a new one
-    except Organizer.DoesNotExist:
-        organizer = Organizer( user         = request.user,
-                               user_key     = user_key,
-                               organizer_id = organizer_id,
-                               organization = organization
-                             )
-    else:
-        organizer.user_key = user_key
-        organizer.organization = organization
-
-    organizer.save()
-
+    organizer       = form.cleaned_data['organizer']
+    """
     return HttpResponseRedirect('/')
 
 @csrf_protect
@@ -441,7 +303,7 @@ def show_event(request):
                                    { 'event':event, 'attendees':attendees },
                                    context_instance=RequestContext(request) )
 
-   # GET: All the attendees for a given event
+    # GET: All the attendees for a given event
     if request.method == 'GET' and 'event' in request.GET:
         event = Event.objects.get(pk = request.GET['event'])
         attendees   = event.attendees()
@@ -501,17 +363,10 @@ def edit_deal(request):
 
     # POST:
     form = DealForm(request.POST)
-    terms = TermForm(request.POST)
-
     if not form.is_valid():
-        return submit_form(form, terms)
-
+        return submit_form(form)
+    """
     add_terms = form.cleaned_data['add_terms']
-
-    organizer = Organizer.objects.get(pk = form.cleaned_data['organizer'])
-    if 'delete' in form.cleaned_data:
-        pass
-
     interest  = Interest.objects.get(interest = form.cleaned_data['interest'])
 
     # Check if the deal exist already
@@ -568,6 +423,7 @@ def edit_deal(request):
     deal.terms.add(term)
 
     deal.save()
+    """
     return HttpResponseRedirect(reverse('show_organizer'))
 
 def show_deals(request):
@@ -580,9 +436,6 @@ def show_deals(request):
                                  )
 
     if request.method == 'GET':
-        if 'open' in request.GET:
-            open = request.GET['open']
-
         if 'chapter' in request.GET:
             chapter = Chapter.objects.get( pk = request.GET['chapter'])
             deals = chapter.deals()
@@ -742,11 +595,11 @@ def add_buyer(request):
     if request.method == 'GET':
         if 'term' in request.GET:
             data = {'term':  request.GET['term'] }
-            form = BuyersForm(data)
+            form = BuyerForm(data)
             return submit_form(form)
 
     if request.method == 'POST':
-        form = BuyersForm(request.POST)
+        form = BuyerForm(request.POST)
         if not form.is_valid():
             return submit_form(form)
 
@@ -766,11 +619,6 @@ def show_survey(request):
                                     context_instance=RequestContext(request) )
     if 'event' in request.GET:
         event = Event.objects.get( pk = request.GET['event'] )
-
-        if 'open' in request.GET:
-            open = request.GET['open']
-        else:
-            open = True
 
         surveys = []
         for survey in event.surveys():
@@ -828,9 +676,6 @@ def edit_letter(request):
                                    {'form':form },
                                    context_instance=RequestContext(request) )
     if request.method == 'GET':
-        if 'organizer' in request.GET:
-            organizer = request.GET['organizer']
-
         return submit_form(LetterForm())
 
     form = LetterForm( request.POST, request.FILES )
@@ -842,14 +687,14 @@ def edit_letter(request):
 
     # Upload the file
     # Note: make sure the file name is unique
-    file = request.FILES['letter']
+    fil = request.FILES['letter']
     file_to_open = settings.MEDIA_ROOT+'//letters//'+ organizer.organization + '.tmp'
     fd = open(file_to_open, 'wb+')
     if file.multiple_chunks():
         for chunk in file.chunks():
             fd.write(chunk)
     else:
-        fd.write(file.read())
+        fd.write(fil.read())
     fd.close()
 
     # Save a record in the database
