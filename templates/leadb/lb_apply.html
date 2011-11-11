@@ -1,44 +1,70 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block body_block %}
+<!--Body section-->
+<div id="bodysection">
+	<div class="insidesection">
+		<article class="profile"> <section class="bodybg">
+		<nav class="step">
+		<ul>
+			<li><a href="#">STEP 1 of 3</a>
+			</li>
+			<li><a href="#" class="active">STEP 2 of 3</a>
+			</li>
+			<li><a href="#" class="step3to3bg">STEP 3 of 3</a>
+			</li>
+		</ul>
+		</nav>
+		<h2 class="paymethod">Apply to Buy Leads from a Community</h2>
+		<p class="paybudgetttxt">Complete this form to purchase leads from
+			a particular community. The community organizer must review and
+			approve your application before we can send you leads. You will be
+			notified via email about the community organizer's decision.</p>
 
-{% block body_block %}
-    <p>
-    Complete this form to purchase leads from a particular community. The community
-    organizer must review and approve your application before we can send you leads. You will
-    be notified via email about the community organizer's decision.
-    </p>
-	<form class="clearfix" action="{% url lb_apply %}" method="post">
-    {% csrf_token %}
-    	<fieldset>
-		<div class="clearfix">
-                <h1 class="left">Apply For Leads</h1>
-        </div>
-        <div class="personal">
-        	<div class="ctrlHolder clearfix">
-        	{{form.chapter}}
-        	{{form.chapter.errors}}
-        	</div>
-        	
-        	<div class="ctrlHolder clearfix">
-            {{form.interest}}
-            {{form.interest.errors}}
-           	</div>
-  
-        	<div class="ctrlHolder">
-            {{form.deal_type}}
-            {{form.deal_type.errors}}
-           	</div>
-      		<br />
-      		<br />
-      		<br />
-      		<br />
-      		<br />
-        	<div class="section">
-        		<button type="submit" class="button orange form-submitter right">
-        			<span><strong>&nbsp;</strong>Apply For Leads</span>
-        		</button>
-        	</div>
-         </div>
-   		</fieldset>
-	</form>
+		<form id="profile" name="" method="post" action="{% url lb_apply %}">
+			{% csrf_token %}
+			<section id="my-details">
+			<p class="lftcontent">Community</p>
+			<p>{{form.chapter}}</p>
+			{{form.chapter.errors}}
+			</section>
+
+
+			<section id="my-categories">
+			<p class="lftcontent lftcontent-monthbudget">Lead Category</p>
+			<p>
+			{{form.interest}}
+			</p>
+			{{form.interest.errors}}
+
+			<p class="anyleads">Any leads from a category not already used by
+				this organization will be $50</p>
+			<p class="anyleads">Exclusive leads</p>
+
+			</section>
+
+
+			<section id="my-border" style="margin-top:20px;">
+			<p class="lftcontent lftcontent-monthbudget">Terms</p>
+			{{form.deal_type}}
+			{{form.deal_type.errors}}
+			</section>
+
+
+			<p class="applicationleads">
+				<input name="" type="submit" value="Save profile" class="submitapp">
+			</p>
+		</form>
+		<section class="finish">
+		<p class="finishtxt">
+			<a href="{% url lb_dash %}">Finish</a>
+		</p>
+
+		</section> </section>
+		<div class="botbg">&nbsp;</div>
+		</article>
+
+	</div>
+
+</div>
+<!--Body section-->
 
 {% endblock %}

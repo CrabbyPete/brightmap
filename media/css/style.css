@@ -13,6 +13,10 @@ header, hgroup, nav, section, article, aside, footer, td, th, img, p, a, ul, h1,
 img{
 	display:block;
 	border:none;
+	font-size:0;
+	line-height:0;
+	padding:0;
+	margin:0;
 }
 a{
 	text-decoration:none;
@@ -150,6 +154,7 @@ nav.step ul li a{
 	line-height:44px;
 	font-size:14px;
 	padding:0 35px 0 35px;
+	margin:o;
 }
 nav.step ul li a.noimg{
 	background-image:none !important;
@@ -176,7 +181,7 @@ nav.step ul li a.steptwothree{
 	background-color:inherit;
 	color:#000;
 	background-image:none;
-	padding:0 47px 0 48px;
+	padding:0 47px 0 46px;
 }
 nav.step ul li a.step3{
 	background-image:none;
@@ -188,8 +193,12 @@ nav.step ul li a.step3to3bg{
 	height:44px;
 	color:#fff;
 	text-align:center;
-	padding:0;
-}
+	margin:0;
+	padding:0!important;
+	display:block;
+	}	
+	
+
 .botbg{
 	background:url(/media/img/shadow-botbg.gif) no-repeat 0 0;
 	height:9px;
@@ -220,6 +229,8 @@ border-radius: 5px;
 background-color:#F6F6F7;
 margin-left:17px;
 padding:9px 0 0 0;
+height:100%;
+overflow:hidden;
 }
 section#my-details {
 width:473px;
@@ -238,7 +249,9 @@ border-radius:5px;
 border-radius: 5px;
 background-color:#F6F6F7;
 margin-left:17px;
-padding:9px 0 9px 0;
+padding:9px 0 0 0;
+height:100%;
+overflow:hidden;
 }
 section#my-bluecurved {
 width:473px;
@@ -508,6 +521,14 @@ section.leadbuyerrept{
 	height:100%;
 	overflow:hidden;
 }
+section.leadbuyerrept h2{
+	background-color:#FCB43D;
+	font:bold 18px/44px "Futura Md BT", Arial, Helvetica, sans-serif;
+	color:#fff;
+	padding:0 0 0 11px;
+	border-bottom:solid 1px #000;
+	width:960px;
+}
 .leadbuyerbotdiv{
 	background:url(/media/img/lead-buyer-bottom.jpg) no-repeat 0 0;
 	height:12px;
@@ -519,6 +540,7 @@ section.leadbuyerrept{
 	color:#fff;
 	padding:0 0 0 11px;
 	border-bottom:solid 1px #000;
+	text-align:left;
 	
 	
 	
@@ -534,6 +556,7 @@ section.leadbuyerrept{
 	font-weight:bold;
 	text-transform:uppercase;
 	height:39px;
+	text-align:left;
 	}
 .interestright{
 	border-right:none;
@@ -996,7 +1019,7 @@ section.finish p.finishtxt a{
 	
 }
 section.finish p.leadbuyer{
-padding:0 0 0 298px;
+padding:0 0 0 290px;
 	
 }
 section.finish p.leadbuyer a{
@@ -1009,4 +1032,124 @@ section.finish p.leadbuyer a{
 }
 section.finish p.leadbuyer a:hover{
 	text-decoration:underline;
+}
+
+
+.leadbuyerrept ul.pastinvoice, .leadbuyerrept ul.rightpastinvoice{
+	padding:15px 0 0 10px;
+	margin:0;
+	width:233px;
+	float:left;
+}
+.leadbuyerrept ul.rightpastinvoice{
+	width:230px;
+	float:right;
+	padding:15px 10px 10px 0;
+	margin:0;
+}
+.leadbuyerrept ul.pastinvoice li{
+	border-bottom:solid 1px #E8E8E7;
+}
+.leadbuyerrept ul.pastinvoice li.nobdr{
+	border-bottom:none;
+}
+.leadbuyerrept ul.pastinvoice li a{
+	background:url(/media/img/orrange-arrow2.gif) no-repeat 5px 50% ;
+	font-size:12px;
+	line-height:30px;
+	font-weight:bold;
+	display:block;
+	color:#000;
+	padding:0 0 0 18px;
+}
+.leadbuyerrept ul.pastinvoice li a:hover{
+	background:url(/media/img/orrange-arrow2.gif) no-repeat 5px 50% #F5F6F6;
+} 
+
+nav.backnxt{
+	width:80px;
+	float:right;
+	padding:5px 0 0 0;
+	font-weight:bold;
+}
+nav.backnxt span{
+	padding:0 5px;
+}
+nav.backnxt a{
+	color:#000;
+	background-color:inherit;
+}
+nav.backnxt a:hover{
+	text-decoration:underline;
+}
+nav.leadbuyer{
+	width:980px;
+	margin:0 auto;
+	height:40px;
+	padding:0;
+}
+nav.leadbuyer ul{
+	padding:0;
+	margin:0;
+}
+nav.leadbuyer ul li{
+	float:left;
+	padding-right:5px;
+}
+nav.leadbuyer ul li a{
+	color:#fff;
+	background-color:inherit;
+	font-weight:bold;
+	font-size:12px;
+	line-height:33px;
+	display:block;
+	padding:0 0 0 24px;
+}
+nav.leadbuyer ul li a:hover{
+	color:#000;
+	background-color:inherit;
+}
+nav.leadbuyer ul li a.upprofile{
+	background:url(/media/img/update-profilebutt.gif) no-repeat 0 0;
+	width:93px;
+	height:33px;
+}
+nav.leadbuyer ul li a.uppayment{
+	background:url(/media/img/update-paymtbudget.gif) no-repeat 0 0;
+	width:159px;
+	height:33px;
+}
+nav.leadbuyer ul li a.registernewdeal{
+	background:url(/media/img/request-newdealbutt.gif) no-repeat 0 0;
+	width:124px;
+	height:33px;
+}
+p.returndeals{
+	width:135px;
+	float:right;	
+}
+p.returndeals a{
+	background:url(/media/img/orrange-arrow2.gif) no-repeat 0 50%;
+	font-size:12px;
+	line-height:14px;
+	font-weight:bold;
+	color:#000;
+	padding:0 0 0 13px;
+}
+p.returndeals a:hover{
+	text-decoration:underline;
+}
+
+ul.monthlyright{
+	width: 290px;
+	float:left;
+	padding:0 0 0 20px;
+}
+ul.monthlyright li{
+	padding-bottom:8px;
+}
+input.radiomonthly{
+	margin:0 5px 0 0 !important;
+	height:13px!important;
+	width:13px!important;
 }

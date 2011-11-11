@@ -7,13 +7,14 @@
     <div class="insidesection">
         <article class="profile">
             <section class="bodybg">
-                <nav class="step">
-                    <ul>
-                    <li><a href="#" class="active">STEP 1 of 3</a></li>
-                    <li><a href="#">STEP 2 of 3</a></li>
-                    <li><a href="#" class="step3">STEP 3 of 3</a></li>
+            	<nav class="step">
+                	<ul>
+                    	<li><a href="#" class="stepone">STEP 1 of 3</a></li>
+                        <li><a href="#">STEP 2 of 3</a></li>
+                        <li><a href="#" class="step3">STEP 3 of 3</a></li>
                     </ul>
                 </nav>
+ 
 				<h2 class="number"><span></span>Lead-Buyer Profile</h2>
                 <form id="profile" name="" method="post" action="{% url lb_signup %}">
                 {% csrf_token %}
@@ -75,7 +76,8 @@
                         <span>I hereby agree to the BrightMap <a href="#">Terms and Conditions</a> for lead buyers.</span>
                     </p>
                     <p class="fieldmakestxt">Fields marked with <span>*</span> are mandatory</p>
-                    <p class="monthlybudget"><input name="" type="submit" value="Create/Update profile" class="submitbutt"></p>
+                    <p class="monthlybudget"><input name="" type="submit" value="Save profile" class="submitbutt"></p>
+                    
                 </form>
             </section>
         <div class="botbg">&nbsp;</div>

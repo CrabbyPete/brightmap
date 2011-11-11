@@ -1,63 +1,146 @@
-{% extends "base.html" %}
+{% extends 'base.html' %} 
 {% load smartif %}
 
 {% block body_block %}
- 
-	<table width="100%" border="1" cellspacing="0" cellpadding="0">
-    	<tr>
-        	<th scope="col">Interest</th>
-            <th scope="col">Organization</th>
-            <th scope="col">Status</th>
-            <th scope="col">Terms</th>
-            <th scope="col">Leads</th>
-            <th scope="col">Lead</th>
-            <th scope="col">Total</th>
-            <th scope="col">Action</th>
-        </tr>
-        {% for term in terms %}
-        <tr>
-        	<td>{{term.deal.interest.interest}}</td>
-            <td>{{term.deal.chapter.name}}</td>
-            <td>{{term.status}}</td>
-            {% if term.cancel %}
-            	{% if term.exclusive %}
-                	<td>Exclusive</td>
-                {% else %}
-                	<td>Non Exclusive</td>
-                {% endif %}
-            {% else %}
-            	<td>Trial</td>
-            {% endif %}
+<!--Body section-->
+<div id="bodysection">
+	<div class="insidesection">
+		<section class="leadbuyer">
 
-            <td>{{term.connections|length}}</td>
-            <td>{{term.cost}}</td>
-            <td>{{term.total}}</td>
-            <td><a href='{% url lb_details %}?term={{term.pk}}'>Details</a></td>
-         </tr>
-		{% endfor %}
-	</table>
-    <a href="{% url lb_apply %}">Apply to buy leads from a new community</a>
- 	<br />
- 	<br />
-	<form class="clearfix" action="{% url lb_dash %}" method="post">
-    {% csrf_token %}
-    	<fieldset>
-       		<div class="clearfix">
-                <h1 class="left">Monthly Budget</h1>
-            </div>
-            <div class="personal">
-            	<div class="ctrlHolder clearfix">
-            		{{form.budget}}
- 				  	{{form.budget.errors}}
-           		</div>
-           		<div class="section">
-              	<button type="submit" class="button orange form-submitter right">
-              		<span><strong>&nbsp;</strong>Update Budget</span>
-              	</button>
-              </div>
-           	</div>
-         </fieldset>
-	</form>
-	<br />
-	<a href="{% url lb_profile %}">Update Your Profile</a>
+		<p class="profileupdate">
+			<span>Profile Updated</span>
+		</p>
+		<h2 class="leadbuyer">Lead-Buyer Dashboard</h2>
+		</section>
+		<nav class="leadbuyer">
+		<ul>
+			<li><a href="{% url lb_signup %}" class="upprofile">Update Profile</a></a>
+			</li>
+			<li><a href="{% url lb_payment %}" class="uppayment">Update Payment &amp;
+					Budget</a>
+			</li>
+			<li><a href="{% url lb_apply %}" class="registernewdeal">Request a New Deal</a>
+			</li>
+		</ul>
+		</nav>
+		<article class="leastrecived">
+		<div class="leadbuyertopdiv">&nbsp;</div>
+		<section class="leadbuyerrept">
+
+		<table class="ins">
+			<caption class="latestrecived">Deals</caption>
+
+			<tr>
+				<td style="background-color: #F5F6F6;">
+					<table class="ins">
+						<tr>
+							<th class="interest">Interest</th>
+							<th class="interest">Organization</th>
+							<th class="interest ">TERMS</th>
+							<th class="interest">START DATE</th>
+							<th class="interest">Leads<br> Sent</th>
+							<th class="interest">Lead<br>PRICE</th>
+
+							<th class="interest">TOTAL</th>
+							<th class="interest interestright">ACTION</th>
+						</tr>
+						{% for term in terms %}
+						<tr>
+							<td class="recivedcontent">{{term.deal.interest.interest}}</td>
+							<td class="recivedcontent">{{term.deal.chapter.name}}</td>
+							{% if term.status == 'canceled' %}
+								<td class="recivedcontent">Canceled</td>
+							{% else %}
+								{% if term.status == 'pending' %}
+									<td class="recivedcontent">Pending</td>
+								{% else %}
+									{% if term.cancel %}
+            							{% if term.exclusive %}
+                							<td class="recivedcontent">Exclusive</td>
+                						{% else %}
+                							<td class="recivedcontent">Non Exclusive</td>
+                						{% endif %}
+            						{% else %}
+            							<td class="recivedcontent">Trial</td>
+            						{% endif %}
+            					{% endif %}
+            				{% endif %}
+							<td class="recivedcontent">{{term.modified|date:"d M Y"}}</td>
+							<td class="recivedcontent">{{term.connections|length}}</td>
+							<td class="recivedcontent">{{term.cost}}</td>
+							<td class="recivedcontent">{{term.total}}</td>
+							<td class="recivedcontent interestright"><a href="#">Cancel</a>
+							</td>
+						</tr>
+						{% endfor %}
+
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td><p class="totaltxt">
+						Total:<span>$1,700</span>
+					</p>
+				</td>
+			</tr>
+		</table>
+
+		</section>
+		<div class="leadbuyerbotdiv">&nbsp;</div>
+		</article>
+
+
+		<article class="leastrecived" style="margin-bottom:0px;">
+		<div class="leadbuyertopdiv">&nbsp;</div>
+		<section class="leadbuyerrept">
+		<h2 class="latestrecived">Past Invoices</h2>
+		<ul class="pastinvoice">
+			<li><a href="#">August 2011</a>
+			</li>
+			<li><a href="#">July 2011</a>
+			</li>
+			<li class="nobdr"><a href="#">June 2011</a>
+			</li>
+		</ul>
+
+		<ul class="pastinvoice">
+			<li><a href="#">August 2011</a>
+			</li>
+			<li><a href="#">July 2011</a>
+			</li>
+			<li class="nobdr"><a href="#">June 2011</a>
+			</li>
+		</ul>
+
+		<ul class="pastinvoice">
+			<li><a href="#">August 2011</a>
+			</li>
+			<li><a href="#">July 2011</a>
+			</li>
+			<li class="nobdr"><a href="#">June 2011</a>
+			</li>
+		</ul>
+		<ul class=" pastinvoice rightpastinvoice">
+			<li><a href="#">August 2011</a>
+			</li>
+			<li><a href="#">July 2011</a>
+			</li>
+			<li class="nobdr"><a href="#">June 2011</a>
+			</li>
+		</ul>
+
+		</section>
+		<div class="leadbuyerbotdiv">&nbsp;</div>
+		</article>
+		<nav class="backnxt">
+		<a href="#">Back</a>
+		<span>|</span>
+		<a href="#">Next</a></nav>
+
+	</div>
+
+
+
+</div>
+<!--Body section-->
 {% endblock %}

@@ -93,13 +93,10 @@ class InterestForm(forms.Form):
         self.fields['interests'].choices = [(i.interest,i.interest) for i in Interest.objects.all()]
 
 
-TERM_CHOICES = [('Cancel','Until Cancel', forms.RadioSelect  ),
-                ('Expire','Until Date',   forms.DateInput    ),
-                ('Count' ,'Until Count',  forms.TextInput    ),
-                ('Budget','Under Budget', forms.TextInput    ),
-               ]
 
 class DealForm(forms.Form):
+    
+    
 
     organizer       = forms.IntegerField( required = False,
                                           widget=forms.HiddenInput() )
@@ -113,7 +110,18 @@ class DealForm(forms.Form):
 
     cost            = forms.CharField( max_length = 10 )
 
-    terms           = ChoiceWithOtherField( choices = TERM_CHOICES )
+    w1  = forms.RadioSelect()
+    w2  = forms.DateInput()
+    w3  = forms.TextInput()
+    w4  = forms.TextInput()
+    
+    terms           = ChoiceWithOtherField( choices =  
+                                            [('Cancel','Until Cancel', w1  ),
+                                             ('Expire','Until Date',   w2  ),
+                                             ('Count' ,'Until Count',  w3  ),
+                                             ('Budget','Under Budget', w4  ),
+                                            ]
+                                          )
 
     buyers          = forms.ChoiceField( required = False,
                                          choices=(),
@@ -269,6 +277,9 @@ class ProfileForm( SignUpForm ):
                                          )
 
 
+
+
+
 DEAL_CHOICES = (('Exclusive','Exclusive ($50.00 per Introduction)'),
                 ('Nonexclusive','Nonexclusive ($20.00 per Introduction'),
                 ('Trial' ,'Trial (free for 1 month)')
@@ -303,6 +314,7 @@ class LeadBuyerForm(ModelForm):
 class ChapterForm(ModelForm):
     class Meta:
         model = Chapter
+        exclude = ('letter')
 
 class LetterForm(ModelForm):
     class Meta:

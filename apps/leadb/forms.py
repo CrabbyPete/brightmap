@@ -1,11 +1,16 @@
+# Python imports
+from datetime                               import date
+
+# Django imports
 from django                                 import forms
 from django.utils.translation               import ugettext_lazy
 from django.contrib.localflavor.us.forms    import USPhoneNumberField, USZipCodeField
 
-
+# Local imports
 from base.models                            import Interest, Chapter
-from fields                                 import CreditCardField, CreditCardExpiryField, CreditCardCVV2Field, CreditCardExpiryWidget
-from radio                                  import ChoiceWithOtherField, ChoiceWithOtherWidget
+from base.radio2                            import ChoiceWithOtherField 
+from fields                                 import CreditCardField
+
 
 class BuyerForm(forms.Form):
     email           = forms.EmailField  ( required = True,
@@ -94,47 +99,54 @@ class BuyerForm(forms.Form):
                                           widget = forms.CheckboxInput(attrs={'class':'supf'})
                                          )
 
-DEAL_CHOICES = (('Sponsored','Sponsored (free)'),
+DEAL_CHOICES = [('Sponsored','Sponsored (free)'),
                 ('Exclusive','Exclusive ($50.00 per Introduction)'),
                 ('Nonexclusive','Nonexclusive ($20.00 per Introduction'),
                 ('Trial' ,'Trial (free for 1 month)')
-               )
+               ]
+
+
+APPLY_CHOICES = [('Non-Standard', 'Non-Standard', forms.Select     ),
+                 ('Custom'      , 'Custom',       forms.TextInput  ),
+                ]
 
 class ApplyForm(forms.Form):
     chapter          = forms.ChoiceField( choices=(),
-                                            widget=forms.Select()
+                                          widget=forms.Select(attrs={'class':"selectbox"})
                                         )
 
     interest         = forms.ChoiceField( choices=(),
-                                         widget=forms.Select() )
-
-    deal_type        = forms.ChoiceField( required = False,
-                                            choices=DEAL_CHOICES,
-                                            widget=forms.RadioSelect(attrs={})
-                                       )
-    suggest          = forms.CharField  ( required = False,
-                                            label = 'Suggestion',
-                                            max_length =45,
-                                            widget = forms.TextInput(attrs={'size':40})
+                                          widget=forms.Select(attrs={'class':"selectbox"}) 
                                         )
 
+    other            = ChoiceWithOtherField( choices = APPLY_CHOICES )
+  
+    
+    deal_type        = forms.ChoiceField( required = False,
+                                          choices=DEAL_CHOICES,
+                                          widget=forms.RadioSelect(attrs={'class':"selectbox"})
+                                        )
+ 
     def __init__(self, *args, **kwargs):
         super(ApplyForm, self).__init__(*args, **kwargs)
         self.fields['interest'].choices = [(i.interest,i.interest) for i in Interest.objects.all()]
         self.fields['chapter'].choices = [(i.name,i.name) for i in Chapter.objects.all()]
 
 
-class BudgetForm(forms.Form):
-    budget          = forms.DecimalField( label = 'Monthly Budget')
 
+MONTH_CHOICES = [(1,'January'),(2,'February'),(3,'March'),(4,'April'),(5,'May'),(6,'June'),
+                 (7,'July'),(8,'August'),(9,'September'),(10,'October'),(11,'November'),(12,'December')]
 
-
-class CIMPaymentForm(forms.Form):
-    number          = CreditCardField()
+class PaymentForm(forms.Form):
+    number          = CreditCardField(widget = forms.TextInput(attrs = {'class':"inputext"}))
     
-    expiration      = CreditCardExpiryField(widget =CreditCardExpiryWidget({'class':"selectbox1"} ) )
+    #expiration      = CreditCardExpiryField(widget =CreditCardExpiryWidget({'class':"selectbox1"} ) )
+    expire_month    = forms.ChoiceField( choices = MONTH_CHOICES,
+                                         widget = forms.Select(attrs={'class':"selectbox1"})
+                                       )
     
-    #cvv             = CreditCardCVV2Field( required = False )
+    expire_year     = forms.ChoiceField( choices = [],
+                                         widget = forms.Select(attrs={'class':"selectbox1"}))
     
     address         = forms.CharField   ( max_length = 100,
                                           widget = forms.TextInput()
@@ -144,22 +156,24 @@ class CIMPaymentForm(forms.Form):
                                           widget = forms.TextInput()
                                         )
     
-    state           = forms.CharField   ( max_length = 2,
-                                          widget = forms.TextInput()  
+    state           = forms.CharField   ( max_length = 40,
+                                          widget = forms.TextInput(attrs={'id':"inputext4"})  
                                         )
 
     zipcode         = USZipCodeField    ( required = False,
-                                            widget= forms.TextInput()
+                                          widget= forms.TextInput(attrs={'id':"inputext4"})
                                         )
     
-    budget          = ChoiceWithOtherField ( choices = [('0', 'No budget'),
-                                                        ('1', 'Budget')]
-                                           )
-        
     
-    """    
-    budget          = forms.CharField   ( required = False,
-                                          max_length = 40,
-                                          widget = forms.TextInput(attrs={})
-                                         )
-    """
+    BUDGET_CHOICES = [
+                      ('Budget'   , 'Budget'   , forms.TextInput(attrs={'id':"inputext5",'class':"radiobutt"}) ),
+                      ('No Budget', 'No Budget', forms.RadioSelect(attrs={'class':"radiobutt2",})),
+                     ]
+    
+    
+    budget          = ChoiceWithOtherField ( choices = BUDGET_CHOICES )
+
+    
+    def __init__(self,*args, **kwargs):
+        super(PaymentForm, self).__init__(*args, **kwargs)
+        self.fields['expire_year'].choices =  [(yr,yr) for yr in xrange(date.today().year,date.today().year + 15)]

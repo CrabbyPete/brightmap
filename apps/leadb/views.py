@@ -7,6 +7,7 @@ from datetime                       import datetime
 from dateutils                      import relativedelta
 
 # Django imports
+from django.views.generic.base      import  TemplateView
 from django.views.generic.edit      import  FormView
 from django.contrib                 import  auth
 from django.contrib.auth.models     import  User
@@ -31,7 +32,7 @@ from base.models                    import ( LeadBuyer, Chapter, Expire, Cancel,
 from social.models                  import LinkedInProfile
 
 
-from forms                          import DEAL_CHOICES, BuyerForm, ApplyForm, BudgetForm, CIMPaymentForm
+from forms                          import DEAL_CHOICES, BuyerForm, ApplyForm, PaymentForm
 from geo                            import geocode
 
 def mail_organizer( user, deal, term, deal_type ):
@@ -269,7 +270,7 @@ class Apply( FormView ):
     """
     Apply to buy a deal
     """
-    template_name = 'organ/lb_apply.html'
+    template_name = 'leadb/lb_apply.html'
     form_class    = ApplyForm
     
     def form_valid(self,form):
@@ -331,40 +332,30 @@ class Apply( FormView ):
 
         return HttpResponseRedirect(reverse('lb_dash'))
 
-@csrf_protect
-def lb_dash(request):
+
+class Dash( TemplateView ):
     """
     Show the buyers dash board
     """
-    def submit_form(form, terms, connections ):
-        c = { 'form':form, 'terms':terms,'connections':connections }
-        return render_to_response( 'leadb/lb_dash.html', c,
-                                   context_instance=RequestContext(request) )
+    template_name = 'leadb/lb_dash.html'
+    
+    """
+    <td class="recivedcontent">Web Design / Development</td>
+    <td class="recivedcontent">Tech Drinkup</td>
+    <td class="recivedcontent">Exclusive</td>
+    <td class="recivedcontent">12-Jun-11</td>
+    <td class="recivedcontent">20</td>
+    <td class="recivedcontent">$50</td>
+    <td class="recivedcontent">$1000</td>
+    <td class="recivedcontent interestright"><a href="#">Cancel</a></td>
+    """
+    def get_context_data(self, **kwargs):
+        buyer = self.request.user
+        terms = Term.objects.filter(buyer = buyer)
+        args = dict(terms = terms)
+        return args
 
-    if request.method == 'GET':
-        terms = Term.objects.filter(buyer = request.user)
-        connections = Connection.objects.for_user(request.user)
-        try:
-            lb = LeadBuyer.objects.get(user = request.user)
-        except LeadBuyer.DoesNotExist:
-            lb = LeadBuyer(user = request.user)
-            lb.save()
-
-        form = BudgetForm(initial = {'budget':lb.budget})
-        return submit_form(form, terms, connections)
-
-    if request.method == 'POST':
-        form = BudgetForm(request.POST)
-        if not form.is_valid():
-            return submit_form(form)
-
-        budget = form.cleaned_data['budget']
-        lb = LeadBuyer.objects.get(user = request.user)
-        lb.budget = budget
-        lb.save()
-
-        return HttpResponseRedirect(reverse('lb_dash'))
-
+ 
 def lb_details(request):
     
     def submit_form(connections):
@@ -384,7 +375,7 @@ def lb_details(request):
  
 class Payment( FormView ):
     template_name = 'leadb/lb_payment.html'
-    form_class    = CIMPaymentForm
+    form_class    = PaymentForm
 
     def form_valid(self, form):
 

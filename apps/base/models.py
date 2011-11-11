@@ -500,7 +500,14 @@ class Event(models.Model):
         return interests
     
     def connections(self):
-        return self.connection_set.all()
+        #return self.connection_set.all()
+        conns = []
+        for survey in self.survey_set.all():
+            if not survey.interest:
+                continue
+            for c in Connection.objects.filter(survey = survey):
+                conns.append(c)
+        return conns
     
 
     def deals( self, interest ):

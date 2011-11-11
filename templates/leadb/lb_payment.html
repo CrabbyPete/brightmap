@@ -1,69 +1,89 @@
+ {% extends 'base.html' %} 
+ {% block body_block %}
 
-{% extends 'base.html' %}
-{% block body_block %}
-
+<!--Body section-->
 <div id="bodysection">
-		<div class="insidesection">
-                    <article class="profile">
-                        <section class="bodybg">
-                        	<nav class="step">
-                            	<ul>
-                                	<li><a href="#" class="noimg">STEP 1 of 3</a></li>
-                                    <li><a href="#" class="steptwothree">STEP 2 of 3</a></li>
-                                    <li><a href="#" class="step3">STEP 3 of 3</a></li>
-                                </ul>
-                            </nav>
-                            <h2 class="paymethod">Payment Method and Budget</h2>
-                            <p class="paybudgetttxt">You must provide your credit card details before receiving any leads from BrightMap. We will
-validate your card up to your monthly budget, but you will not be charged until after the leads are
-sent. You will not be charged for free leads  (e.g. Sponsored leads or Trial leads).</p>
+	<div class="insidesection">
+		<article class="profile"> <section class="bodybg">
+		<nav class="step">
+		<ul>
+			<li><a href="#" class="noimg">STEP 1 of 3</a>
+			</li>
+			<li><a href="#" class="steptwothree">STEP 2 of 3</a>
+			</li>
+			<li><a href="#" class="step3">STEP 3 of 3</a>
+			</li>
+		</ul>
+		</nav>
+		<h2 class="paymethod">Payment Method and Budget</h2>
+		<p class="paybudgetttxt">You must provide your credit card details
+			before receiving any leads from BrightMap. We will validate your card
+			up to your monthly budget, but you will not be charged until after
+			the leads are sent. You will not be charged for free leads (e.g.
+			Sponsored leads or Trial leads).</p>
 
-                            <form id="profile" name="" method="post" action="{% url lb_payment %}">
-                            {% csrf_token %}
+		<form id="profile" name="" method="post" action="{% url lb_payment %}">
 
-                            <section id="my-border">
-                            	<p class="lftcontent">Credit Card Number</p>
-                                <p>{{form.number}}</p>
-                                {{form.number.errors}}
+			<section id="my-border">
+			<p class="lftcontent">Credit Card Number</p>
+			<p>
+				{{form.number}}
+			</p>
+			{{form.number.error}}
 
-                                <p class="lftcontent">Expiration</p>
-                                <p>{{form.expiration}}</p>
-                                {{form.expiration.errors}}
-                  
-                                <p class="lftcontent">Billing Address</p>
-                                <p>{{form.address}}</p>
-                                {{form.address.errors}}
 
-                                <p class="lftcontent">City</p>
-                                <p>{{form.city}}</p>
-                                {{form.city.errors}}
+			<p class="lftcontent">Expiration</p>
+			<p>
+				{{form.expire_month}}
+				{{form.expire_year}}
+			</p>
+			{{form.expire_month.errors}}
 
-                                <p class="lftcontent">State</p>
-                                <p>{{form.state}}</p>
-                                {{form.state.errors}}
+			<p class="lftcontent">Billing Address</p>
+			<p>
+				{{form.address}}
+			</p>
+			{{form.address.errors}}
+			
+			<p class="lftcontent">City</p>
+			<p>
+				{{form.city}}
+			</p>
+			{{form.city.errors}}
+			
+			<p class="lftcontent">State</p>
+			<p>
+			{{form.state}}
+			</p>
+			{{form.state.errors}}
 
-                                <p class="lftcontent">Zip Code</p>
-                                <p>{{form.zipcode}}</p>
-                                {{form.zipcode.errors}}
+			<p class="lftcontent">Zip Code</p>
+			<p>
+			{{form.zipcode}}
+			</p>
+			{{form.zipcode.errors}}
 
-                               </section>
-                               
-                               <p class="budgetdeterminetxt">
-                               		Your budget determines the maximum dollar value of leads you will receive each month.</p>
-                               
-                               <section id="my-categories">
-                            		<p class="lftcontent lftcontent-monthbudget">Monthly Budget</p>
-                            		<p>{{form.budget}}</p>
-                            		{{form.budget.errors}}
-                               </section>
+			</section>
+			<p class="budgetdeterminetxt">Your budget determines the maximum
+				dollar value of leads you will receive each month.</p>
+			<section id="my-categories">
+			<p class="lftcontent lftcontent-monthbudget">Monthly Budget</p>
+			<p class = "monthlyright">{{form.budget}}</p>
+			{{form.budget.errors}}
 
-                            	<p class="paddingmethod">
-                            		<input name="" type="submit" value="Save profile" class="paymentmethod">
-                            	</p>
-                            </form>
-                        </section>
-                        <div class="botbg">&nbsp;</div>
-                    </article>
-           </div>
+			</section>
+
+			<p class="paddingmethod">
+				<input name="" type="submit" value="Save profile"
+					class="paymentmethod">
+			</p>
+		</form>
+		</section>
+		<div class="botbg">&nbsp;</div>
+		</article>
+
+	</div>
+
 </div>
+<!--Body section-->
 {% endblock %}
