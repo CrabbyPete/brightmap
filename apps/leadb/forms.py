@@ -7,10 +7,9 @@ from django.utils.translation               import ugettext_lazy
 from django.contrib.localflavor.us.forms    import USPhoneNumberField, USZipCodeField
 
 # Local imports
-from base.models                            import Interest, Chapter
-from base.radio2                            import ChoiceWithOtherField 
-from fields                                 import CreditCardField
-
+from base.models                            import  Interest, Chapter
+from base.radio                             import  ChoiceWithOtherField 
+from creditfields                           import  CreditCardField
 
 class BuyerForm(forms.Form):
     email           = forms.EmailField  ( required = True,
@@ -33,16 +32,16 @@ class BuyerForm(forms.Form):
 
     first_name      = forms.RegexField  ( required = False,
                                             label = 'First Name:',
-                                            max_length =45, regex=r'^[a-zA-Z]+$',
-                                            error_message = ugettext_lazy("Only letters are allowed; 3 letters at least"),
+                                            max_length =45, regex=r'^[a-zA-Z\40]+$',
+                                            error_message = ugettext_lazy("Only letters spaces are allowed; 3 letters at least"),
                                             widget = forms.TextInput(attrs={'class':'row','size':40})
                                         )
 
     last_name       = forms.RegexField  ( required = False,
                                             max_length = 45,
                                             label = 'Last Name:',
-                                            regex=r'^[a-zA-Z]+$',
-                                            error_message = ugettext_lazy("Only letters are allowed"),
+                                            regex=r'^[a-zA-Z\40]+$',
+                                            error_message = ugettext_lazy("Only letters and spaces are allowed"),
                                             widget = forms.TextInput(attrs={'class':'row','size':40})
                                         )
 
@@ -120,6 +119,10 @@ class ApplyForm(forms.Form):
                                         )
 
     other            = ChoiceWithOtherField( choices = APPLY_CHOICES )
+    
+    custom           = forms.CharField( max_length = 100,
+                                        widget = forms.TextInput()
+                                      )
   
     
     deal_type        = forms.ChoiceField( required = False,
@@ -134,19 +137,26 @@ class ApplyForm(forms.Form):
 
 
 
-MONTH_CHOICES = [(1,'January'),(2,'February'),(3,'March'),(4,'April'),(5,'May'),(6,'June'),
-                 (7,'July'),(8,'August'),(9,'September'),(10,'October'),(11,'November'),(12,'December')]
+MONTH_CHOICES = [ (1,'January'),(2,'February'),(3,'March'),(4,'April'),(5,'May'),(6,'June'),
+                  (7,'July'),(8,'August'),(9,'September'),(10,'October'),(11,'November'),(12,'December')
+                ]
+
+BUDGET_CHOICES = [ ('No Budget', 'No Budget' ),
+                   ('Budget'   , 'Budget' )
+                 ] 
+
+
 
 class PaymentForm(forms.Form):
-    number          = CreditCardField(widget = forms.TextInput(attrs = {'class':"inputext"}))
+    number          = CreditCardField()
     
-    #expiration      = CreditCardExpiryField(widget =CreditCardExpiryWidget({'class':"selectbox1"} ) )
     expire_month    = forms.ChoiceField( choices = MONTH_CHOICES,
                                          widget = forms.Select(attrs={'class':"selectbox1"})
                                        )
     
     expire_year     = forms.ChoiceField( choices = [],
-                                         widget = forms.Select(attrs={'class':"selectbox1"}))
+                                         widget = forms.Select(attrs={'class':"selectbox1"})
+                                       )
     
     address         = forms.CharField   ( max_length = 100,
                                           widget = forms.TextInput()
@@ -165,15 +175,9 @@ class PaymentForm(forms.Form):
                                         )
     
     
-    BUDGET_CHOICES = [
-                      ('Budget'   , 'Budget'   , forms.TextInput(attrs={'id':"inputext5",'class':"radiobutt"}) ),
-                      ('No Budget', 'No Budget', forms.RadioSelect(attrs={'class':"radiobutt2",})),
-                     ]
-    
-    
     budget          = ChoiceWithOtherField ( choices = BUDGET_CHOICES )
 
-    
+  
     def __init__(self,*args, **kwargs):
         super(PaymentForm, self).__init__(*args, **kwargs)
         self.fields['expire_year'].choices =  [(yr,yr) for yr in xrange(date.today().year,date.today().year + 15)]

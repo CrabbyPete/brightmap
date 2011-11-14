@@ -1,5 +1,6 @@
+
 from difflib                                import SequenceMatcher
-from datetime                               import datetime,date
+from datetime                               import datetime, date, time, timedelta
 
 from django.db                              import models
 from django.contrib.auth.models             import User
@@ -34,7 +35,7 @@ class Profile( models.Model ):
     def __unicode__(self):
         return self.user.email
 
-class Authorize( models.Model):
+class Authorize( models.Model ):
     user            = models.ForeignKey( User )
 
     customer_id     = models.CharField( max_length = 255 )
@@ -42,15 +43,26 @@ class Authorize( models.Model):
     payment_profile = models.CharField( max_length = 255 )
  
 
-class Invoice( models.Model):
+class Invoice( models.Model ):
     user        = models.ForeignKey( User )
-    cost        = models.DecimalField( max_digits = 10,
-                                       decimal_places = 2,
-                                       default = 0.00
-                                     )
-    issued      = models.DateTimeField( auto_now = True )
-    status      = models.CharField( max_length = 20, default ='issued' )
+    title       = models.CharField( max_length = 255, blank = True, null = True )
 
+    cost        = models.DecimalField( max_digits = 10, decimal_places = 2, default = 0.00 )
+    issued      = models.DateTimeField( auto_now = True )
+
+    first_day   = models.DateField()
+    last_day    = models.DateField()
+    
+    status      = models.CharField( max_length = 20, default ='issued' )
+ 
+    def connections(self):
+        return Connection.objects.for_user(self.user,[self.first_day, self.last_day])
+    
+    def bill(self):
+        return self.issued.strftime('%B %Y')
+        
+    def __unicode__(self):
+        return self.user.email +'-'+self.title
 
 class Organization( models.Model ):
     """
@@ -586,6 +598,12 @@ class ConnectionManager(models.Manager):
         profile = user.get_profile()
         connections = []
 
+        if isinstance(date_range[0], date):
+            date_range[0] = datetime.combine(date_range[0], time() )
+        if isinstance(date_range[1], date):
+            date_range[1] = datetime.combine(date_range[1], time() )
+            
+
         if profile.is_leadbuyer:
             terms = Term.objects.filter(buyer = user)
             for term in terms:
@@ -593,7 +611,7 @@ class ConnectionManager(models.Manager):
                 for c in self.filter(term = term):
                     if date_range == None:
                         connections.append(c)
-                    else:
+                    else: 
                         if c.date >= date_range[0] and\
                            c.date <  date_range[1]     :
                             connections.append(c)

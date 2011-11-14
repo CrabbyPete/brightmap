@@ -41,8 +41,8 @@ class CreditCardExpiryWidget(forms.MultiWidget):
             return [None, None]
 
     def format_output(self, rendered_widgets):
-        html = u' / '.join(rendered_widgets)
-        return u'<p class = "lftcontent" style="white-space: nowrap">%s</p>' % html
+        html = rendered_widgets[0]+rendered_widgets[1]
+        return u'<span>%s</span>' % html
 
 
 class CreditCardExpiryField(forms.MultiValueField):

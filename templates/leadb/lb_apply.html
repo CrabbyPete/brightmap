@@ -29,16 +29,17 @@
 
 
 			<section id="my-categories">
-			<p class="lftcontent lftcontent-monthbudget">Lead Category</p>
+			<p class="lftcontent">Lead Category</p>
 			<p>
 			{{form.interest}}
 			</p>
 			{{form.interest.errors}}
 
-			<p class="anyleads">Any leads from a category not already used by
+			<p class="anyleads">Any custom leads from a category not already used by
 				this organization will be $50</p>
-			<p class="anyleads">Exclusive leads</p>
-
+			<p class="anyleads">Request A Custom Lead Category</p>
+			<p id="inputext4">{{form.custom}}</p>
+			{{form.custom.errors}}
 			</section>
 
 

@@ -23,13 +23,13 @@
 			Sponsored leads or Trial leads).</p>
 
 		<form id="profile" name="" method="post" action="{% url lb_payment %}">
-
+			{% csrf_token %}
 			<section id="my-border">
 			<p class="lftcontent">Credit Card Number</p>
 			<p>
 				{{form.number}}
 			</p>
-			{{form.number.error}}
+			{{form.number.errors}}
 
 
 			<p class="lftcontent">Expiration</p>
@@ -37,7 +37,7 @@
 				{{form.expire_month}}
 				{{form.expire_year}}
 			</p>
-			{{form.expire_month.errors}}
+			{{form.expire_month.errors}}{{form.expire_year.errors}}
 
 			<p class="lftcontent">Billing Address</p>
 			<p>

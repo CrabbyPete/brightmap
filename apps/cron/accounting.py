@@ -1,9 +1,9 @@
 # Import Python librariess
-import                              django_head
-from datetime                       import datetime
+import                              django_header
+from datetime                       import datetime, date, timedelta
 
 # Import local library
-from base.models                    import Profile, Connection, Authorize
+from base.models                    import Profile, Connection, Authorize, Invoice
 from settings                       import AUTHORIZE
 
 # Import for authorize
@@ -11,11 +11,8 @@ from authorize                      import cim
 from authorize.gen_xml              import VALIDATION_TEST, AUTH_ONLY
 from authorize.responses            import AuthorizeError, _cim_response_codes
 
-def connections_for( user, month ):
-    first = month.replace( day = 1 )
-    last  = first.replace( month = first.month + 1 )
-
-    connections = Connection.objects.for_user(user,[first,last])
+def connections_for( user, first_day, last_day ):
+    connections = Connection.objects.for_user(user,[first_day,last_day])
     return connections
 
 
@@ -27,10 +24,11 @@ def main():
     Main program to do accounting for all lead buyers and organizers
     """
     # Bill for last month
-    month = datetime.today()
-    month = month.replace( month = month.month - 1)
+    first_day = date.today().replace(day = 1)
+    first_day = first_day.replace( month = first_day.month - 1 )
+    last_day  = first_day.replace (month = first_day.month + 1 ) - timedelta( days = 1 )
 
-    print "Invoicing for the month of: " + month.strftime("%B %Y")
+    print "Invoicing for the month of: " + first_day.strftime("%B %Y")
     
     # Initialize the API class
     cim_api = cim.Api( unicode(AUTHORIZE['API_LOG_IN_ID']),
@@ -42,13 +40,13 @@ def main():
     profiles = Profile.objects.filter( is_leadbuyer = True )
     for profile in profiles:
 
-        invoice = 0
+        total = 0
         itemize = []
         
-        connections = connections_for( profile.user, month )
+        connections = connections_for( profile.user, first_day, last_day )
         if connections != None:
             for connection in connections:
-                invoice += connection.term.cost
+                total += connection.term.cost
                 details = { 'date'     :connection.date.strftime("%Y-%m-%d"),
                             'chapter'  :connection.survey.event.chapter.name,
                             'person'   :connection.survey.attendee.first_name + ' '  + connection.survey.attendee.last_name,
@@ -57,10 +55,23 @@ def main():
                           }
                 itemize.append(details)
                 print details['date'] + ' ' + details['chapter'] + ' ' + details['person'] + ' ' + details['email'] + ' ' + details['interest']
-            print profile.user.first_name + ' ' + profile.user.last_name + ' Total: $' +str(invoice)
-  
             
-            if invoice > 0: 
+            print profile.user.first_name + ' ' + profile.user.last_name + ' Total: $' +str(total)
+  
+            # Create the invoice
+           
+            
+            if total > 0: 
+                # Create an invoice 
+                invoice = Invoice( user = profile.user, 
+                                   title = first_day.strftime("%B %Y"),
+                                   cost = total, 
+                                   first_day = first_day, 
+                                   last_day = last_day 
+                                 )
+                invoice.save()
+            
+                # Try and bill to the credit card
                 try:  
                     authorize = Authorize.objects.get( user = profile.user )
                 except Authorize.DoesNotExist:
@@ -79,9 +90,12 @@ def main():
                     result = response.messages.result_code.text_.upper()
    
                 if result == 'OK':
-                    send_email(user, invoice )
+                    invoice.status = 'paid'
+                    
+                    send_email(profile.user, invoice )
                 else:
-                    pass
+                    invoice.status = 'rejected'
+                invoice.save()
                 
 if __name__ == '__main__':
     main()

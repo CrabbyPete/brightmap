@@ -46,27 +46,11 @@
 						</tr>
 						{% for term in terms %}
 						<tr>
-							<td class="recivedcontent">{{term.deal.interest.interest}}</td>
-							<td class="recivedcontent">{{term.deal.chapter.name}}</td>
-							{% if term.status == 'canceled' %}
-								<td class="recivedcontent">Canceled</td>
-							{% else %}
-								{% if term.status == 'pending' %}
-									<td class="recivedcontent">Pending</td>
-								{% else %}
-									{% if term.cancel %}
-            							{% if term.exclusive %}
-                							<td class="recivedcontent">Exclusive</td>
-                						{% else %}
-                							<td class="recivedcontent">Non Exclusive</td>
-                						{% endif %}
-            						{% else %}
-            							<td class="recivedcontent">Trial</td>
-            						{% endif %}
-            					{% endif %}
-            				{% endif %}
-							<td class="recivedcontent">{{term.modified|date:"d M Y"}}</td>
-							<td class="recivedcontent">{{term.connections|length}}</td>
+							<td class="recivedcontent">{{term.interest}}</td>
+							<td class="recivedcontent">{{term.chapter}}</td>
+							<td class="recivedcontent">{{term.status}}</td>
+							<td class="recivedcontent">{{term.date|date:"d M Y"}}</td>
+							<td class="recivedcontent">{{term.connections}}</td>
 							<td class="recivedcontent">{{term.cost}}</td>
 							<td class="recivedcontent">{{term.total}}</td>
 							<td class="recivedcontent interestright"><a href="#">Cancel</a>
@@ -79,7 +63,7 @@
 			</tr>
 			<tr>
 				<td><p class="totaltxt">
-						Total:<span>$1,700</span>
+						Total:<span>{{total.total}}</span>
 					</p>
 				</td>
 			</tr>
@@ -94,41 +78,12 @@
 		<div class="leadbuyertopdiv">&nbsp;</div>
 		<section class="leadbuyerrept">
 		<h2 class="latestrecived">Past Invoices</h2>
+		{% for invoice in invoices %}
 		<ul class="pastinvoice">
-			<li><a href="#">August 2011</a>
-			</li>
-			<li><a href="#">July 2011</a>
-			</li>
-			<li class="nobdr"><a href="#">June 2011</a>
-			</li>
+			<li><a href="{% url lb_bill %}?invoice={{invoice.pk}}">{{invoice.bill}}</a></li>
 		</ul>
-
-		<ul class="pastinvoice">
-			<li><a href="#">August 2011</a>
-			</li>
-			<li><a href="#">July 2011</a>
-			</li>
-			<li class="nobdr"><a href="#">June 2011</a>
-			</li>
-		</ul>
-
-		<ul class="pastinvoice">
-			<li><a href="#">August 2011</a>
-			</li>
-			<li><a href="#">July 2011</a>
-			</li>
-			<li class="nobdr"><a href="#">June 2011</a>
-			</li>
-		</ul>
-		<ul class=" pastinvoice rightpastinvoice">
-			<li><a href="#">August 2011</a>
-			</li>
-			<li><a href="#">July 2011</a>
-			</li>
-			<li class="nobdr"><a href="#">June 2011</a>
-			</li>
-		</ul>
-
+		{% endfor %}
+		
 		</section>
 		<div class="leadbuyerbotdiv">&nbsp;</div>
 		</article>
