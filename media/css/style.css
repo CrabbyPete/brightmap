@@ -52,7 +52,8 @@ nav.topmenu{
 	width:980px;
 	background:url(/media/img/border-round.jpg) no-repeat 0 100% ;
 	padding-bottom:6px;
-	height:31px;
+	height:33px;
+	
 	}
 nav.topmenu ul{
 	padding:0;
@@ -207,7 +208,7 @@ h2.number{
 	font:bold 18px/33px "Futura Md BT", Arial, Helvetica, sans-serif;
 	color:#FCB43D;
 	background-color:inherit;
-	background:url(/media/img/number-rounfbg.gif) no-repeat 0 21px;
+	/*background:url(/media/img/number-rounfbg.gif) no-repeat 0 21px;*/
 	margin:0 0 14px 17px;
 	padding:21px 0 0 0;
 }
@@ -253,8 +254,6 @@ padding:9px 0 0 0;
 height:100%;
 overflow:hidden;
 }
-
-
 section#my-bluecurved {
 width:473px;
 border-radius:5px;
@@ -274,20 +273,14 @@ section#my-border p.lftcontent, section#my-bluecurved p.lftcontent, section#my-d
 	font-size:12px;
 	font-weight:bold;
 }
-
 section#my-categories p.lftcontent-monthbudget, section#my-border p.lftcontent-monthbudget{
-	width:130px;
-	float:left;	
-}
-
-section#my-categories input[type="text"] {
-	float:right;
-	margin-right: 15px;	
+width:130px;
+float:left;	
 }
 section#my-border p.lftcontent-monthbudget{
 	min-height:111px;
 }
-section#my-border p.lftcontent span, section#my-details p.lftcontent span, ection#my-details p.lftcontent p{
+section#my-border p.lftcontent span, section#my-details p.lftcontent span{
 	color:#FBA61D;
 	background-color:inherit;
 }
@@ -438,6 +431,10 @@ h2.comunityorganizer{
 	font:bold 24px/24px "Futura Md BT", Arial, Helvetica, sans-serif;
 	padding-bottom:12px;
 }
+ h2.professionalprovider{
+ 	color:#ff0000;
+	background-color:inherit;
+ }
 p.giventtxt{
 	padding-bottom:20px;
 }
@@ -1160,4 +1157,191 @@ input.radiomonthly{
 	margin:0 5px 0 0 !important;
 	height:13px!important;
 	width:13px!important;
+}
+
+section#my-categories input[type="radio"]{
+	margin:0 5px 10px 0 !important;
+	padding:0!important;
+	height:13px!important;
+	width:13px!important;
+	float:left;
+}
+
+nav.topmenu form{
+	width:411px;
+	float:right;
+	}
+nav.topmenu form input[type="text"], nav.topmenu form input[type="password"]{
+	width:155px;
+	height:31px;
+	border:solid 1px #E8E8E8;
+	background-color:#fff;
+	color:#736D6D;
+	padding:0 0 0 11px;
+	float:left;
+	margin-right:4px;
+	line-height:31px;
+}
+nav.topmenu form input.loginbutt{
+	background:url(/media/img/login.gif) no-repeat 0 0;
+	width:66px !important;
+	height:33px!important;
+	cursor:pointer;
+	border:none;
+	padding:0;
+	margin:0;
+	font-size:0;
+	line-height:0;
+	float:left;
+	}
+.videobg{
+	width:730px;
+	background:url(/media/img/pattern-home.jpg) repeat 0 0;
+	padding:23px 0 23px 250px;
+	
+	
+}
+video.new{
+	width:480px;
+	height:386px;
+	}
+article.orgprovides{
+	width:980px;
+	margin:20px auto 0;
+	height:100%;
+	overflow:hidden;
+}
+.comtopbg{
+	background:url(/media/img/comunity-top.jpg) no-repeat 0 0;
+	width:484px;
+	height:4px;
+}
+.combotbg{
+	background:url(/media/img/comunity-bot.jpg) no-repeat 0 0;
+	width:484px;
+	height:4px;
+}
+section.organiger{
+	width:474px;
+	background:url(/media/img/comunity-reptbg.jpg) repeat-y 0 0;
+	padding:0 5px;
+	height:100%;
+	overflow:hidden;
+	}
+div.floating{
+	float:left;
+}
+div.floatingright{
+	float:right;
+}
+section.organiger h2.comunity, section.organiger h2.rpoviders{
+	width:474px;
+	height:45px;
+	background:url(/media/img/pattern-home.jpg) repeat 10px 0;
+	color:#4EB856;
+	background-color:inherit;
+	font:bold 18px/45px "Futura Md BT", Arial, Helvetica, sans-serif;
+	text-align:center;
+	display:block;
+}
+section.organiger h2.rpoviders{
+	color:#258EAC;
+	background-color:inherit;
+}
+section.organiger ul.evtorganizer{
+	padding:36px 0 27px 42px;
+	margin:0;
+}
+section.organiger ul.evtorganizer li{
+	background:url(/media/img/green-bulet.gif) no-repeat 0 50%;
+	font:normal 14px/22px Arial, Helvetica, sans-serif;
+	color:#000;
+	padding:0 0 0 21px;
+}
+
+section.organiger ul.servprovider{
+	padding:36px 0 27px 42px;
+	margin:0;
+}
+section.organiger ul.servprovider li{
+	background:url(/media/img/blue-bullet.gif) no-repeat 0 50%;
+	font:normal 14px/22px Arial, Helvetica, sans-serif;
+	color:#000;
+	padding:0 0 0 21px;
+}
+.eventlogo{
+	border-bottom:solid 1px #E4E4E4;
+	border-top:solid 1px #E4E4E4;
+	height:100%;
+	overflow:hidden;
+	}
+.companylogo{
+	width:190px;
+	padding:18px 0 0 30px;
+	height:100%;
+	overflow:hidden;
+	float:left;
+}
+.eventlogo img{
+	padding-bottom:20px;
+	
+}
+a.learnmore{
+	background:url(/media/img/learnmore-butt.gif) no-repeat 0 0;
+	width:99px;
+	height:43px;
+	line-height:43px;
+	color:#fff;
+	background-color:inherit;
+	display:block;
+	font-size:16px;
+	font-weight:bold;
+	padding:0 0 0 28px;
+	margin:18px 0 18px 158px;
+}
+a.learnmore:hover{
+	color:#000;
+	background-color:inherit;
+}
+
+a.learnmore2{
+	background:url(/media/img/learnmore-bluebutt.gif) no-repeat 0 0;
+	width:99px;
+	height:43px;
+	line-height:43px;
+	color:#fff;
+	background-color:inherit;
+	display:block;
+	font-size:16px;
+	font-weight:bold;
+	padding:0 0 0 28px;
+	margin:21px 0 21px 158px;
+}
+a.learnmore2:hover{
+	color:#000;
+	background-color:inherit;
+}
+table.invoice{
+	width:960px;
+	border-collapse: collapse;
+	margin:16px auto;
+	
+}
+
+table.invoice a{
+	background:url(/media/img/orrange-arrow2.gif) no-repeat 5px 50% ;
+	font-size:12px;
+	line-height:30px;
+	font-weight:bold;
+	display:block;
+	color:#000;
+	padding:0 0 0 18px;
+	border-bottom:solid 1px #E8E8E7;
+	width:212px;
+}
+table.invoice a:hover{
+	background:url(/media/img/orrange-arrow2.gif) no-repeat 5px 50% #F5F6F6;
+} 
+table.invoice a.bordernone{
+	border-bottom:none;
 }

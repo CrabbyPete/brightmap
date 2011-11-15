@@ -9,19 +9,12 @@ from radio2                                 import ChoiceWithOtherField
 from models                                 import Profile, LeadBuyer, Interest, Chapter, Letter
 
 class LoginForm(forms.Form):
-    username        = forms.EmailField   ( max_length = 45,
-                                            widget = forms.TextInput(attrs={'class':'txtBox1','size':19, 'id':'user',
-                                            'value':"Email Address",
-                                            'onfocus':"if(this.value == 'Email Address')this.value = ''",
-                                            'onblur' :"if(this.value == '') this.value = 'User Name or Email Address'"}
+    username        = forms.EmailField  ( max_length = 45,
+                                          widget = forms.TextInput( attrs={ 'value':"Email Address"} )
                                         )
 
-                                        )
     password        = forms.CharField   ( max_length = 45,
-                                            widget = forms.PasswordInput(attrs={'class':'txtBox1','size':19,
-                                            'value':"Password",
-                                            'onfocus':"if(this.value == 'Password')this.value = ''",
-                                            'onblur' :"if(this.value == '') this.value = 'Password'"})
+                                          widget = forms.PasswordInput( attrs={} )
                                         )
 
 class SignUpForm(forms.Form):

@@ -1,7 +1,4 @@
-{% extends 'base.html' %} 
-{% load smartif %}
-
-{% block body_block %}
+{% extends 'base.html' %} {% load smartif %} {% block body_block %}
 <!--Body section-->
 <div id="bodysection">
 	<div class="insidesection">
@@ -14,13 +11,12 @@
 		</section>
 		<nav class="leadbuyer">
 		<ul>
-			<li><a href="{% url lb_signup %}" class="upprofile">Update Profile</a></a>
-			</li>
-			<li><a href="{% url lb_payment %}" class="uppayment">Update Payment &amp;
-					Budget</a>
-			</li>
-			<li><a href="{% url lb_apply %}" class="registernewdeal">Request a New Deal</a>
-			</li>
+			<li><a href="{% url lb_signup %}" class="upprofile">Update
+					Profile</a></a></li>
+			<li><a href="{% url lb_payment %}" class="uppayment">Update
+					Payment &amp; Budget</a></li>
+			<li><a href="{% url lb_apply %}" class="registernewdeal">Request
+					a New Deal</a></li>
 		</ul>
 		</nav>
 		<article class="leastrecived">
@@ -58,14 +54,12 @@
 						</tr>
 						{% endfor %}
 
-					</table>
-				</td>
+					</table></td>
 			</tr>
 			<tr>
 				<td><p class="totaltxt">
 						Total:<span>{{total.total}}</span>
-					</p>
-				</td>
+					</p></td>
 			</tr>
 		</table>
 
@@ -73,25 +67,29 @@
 		<div class="leadbuyerbotdiv">&nbsp;</div>
 		</article>
 
-
 		<article class="leastrecived" style="margin-bottom:0px;">
 		<div class="leadbuyertopdiv">&nbsp;</div>
 		<section class="leadbuyerrept">
 		<h2 class="latestrecived">Past Invoices</h2>
-		{% for invoice in invoices %}
-		<ul class="pastinvoice">
-			<li><a href="{% url lb_bill %}?invoice={{invoice.pk}}">{{invoice.bill}}</a></li>
-		</ul>
-		{% endfor %}
-		
+		<table class="invoice">
+			{% for invoice in invoices %}
+			<tr>
+				{% for i in invoice %}
+				<td><a href="{% url lb_bill %}?invoice={{i.pk}}">{{i.title}}</a>
+				</td> 
+				{% endfor %}
+			</tr>
+			{% endfor %}
+		</table>
+
 		</section>
 		<div class="leadbuyerbotdiv">&nbsp;</div>
 		</article>
-		<nav class="backnxt">
-		<a href="#">Back</a>
-		<span>|</span>
-		<a href="#">Next</a></nav>
-
+		<!--  
+		<nav class="backnxt"> <a href="#">Back</a> <span>|</span> <a
+			href="#">Next</a>
+		</nav>
+		-->
 	</div>
 
 

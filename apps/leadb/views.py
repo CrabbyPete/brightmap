@@ -27,9 +27,9 @@ from authorize.responses            import AuthorizeError #, _cim_response_codes
 from base.models                    import ( LeadBuyer, Chapter, Expire, Cancel, Connection, Authorize,
                                              Deal, Term, Interest, Profile, Invoice
                                             )
+from base.forms                     import LoginForm
 
 from social.models                  import LinkedInProfile
-
 
 from forms                          import DEAL_CHOICES, BuyerForm, ApplyForm, PaymentForm
 from geo                            import geocode
@@ -71,12 +71,23 @@ class  SignUp( FormView ):
     
     
     def get_initial(self):
+        """
+        Get initial values for the Signup/Profile page
+        """    
+         
+        # An established user is changing profile
         if 'buyer' in self.request.GET:
             user = User.objects.get(pk = self.request.GET['buyer'])
             profile = user.get_profile
-        else:
+        
+        # Someone changing profile data
+        elif self.request.user.is_authenticated():
             user = self.request.user
             profile = user.get_profile()
+        
+        # A new user is signing up
+        else:
+            return {}
 
         # Check if they have a LinkedIn profile
         """
@@ -136,9 +147,15 @@ class  SignUp( FormView ):
         
             user.first_name = form.cleaned_data['first_name'].capitalize()
             user.last_name  = form.cleaned_data['last_name'].capitalize()
-
+            
             user.save()
             profile = Profile( user = user)
+            
+            # Log them in
+            user = auth.authenticate(username=user.username, password=password)
+            if user is not None and user.is_active:
+                auth.login(self.request, user)
+
         else:
             if password != self.default_password:
                 if not user.check_password(password) and profile.is_ready:
@@ -186,6 +203,9 @@ class Apply( FormView ):
     template_name = 'leadb/lb_apply.html'
     form_class    = ApplyForm
     
+    def form_invalid(self, form):
+        pass
+    
     def form_valid(self,form):
         """
         Process a valid application form
@@ -193,14 +213,21 @@ class Apply( FormView ):
         chapter   = form.cleaned_data['chapter']
         interest  = form.cleaned_data['interest']
         deal_type = form.cleaned_data['deal_type']
+        custom    = form.cleaned_data['custom']
         
         # Make sure a deal type was chosen
         if not deal_type in DEAL_TYPES:
             form._errors['deal_type'] = ErrorList(["Please choose one"])
             return self.form_invalid(form)
 
+        # Check if this is a custom request
+        if custom:
+            interest = Interest( interest = custom, status = 'custom')
+            interest.save()
+        else:
+            interest = Interest.objects.get(interest = interest)
+        
         # Check if there are any existing deals
-        interest = Interest.objects.get(interest = interest)
         chapter  = Chapter.objects.get(name = chapter)
         try:
             deal = Deal.objects.get( chapter = chapter, interest = interest )
@@ -211,7 +238,19 @@ class Apply( FormView ):
             deal.save()
 
         # Check the type of deal
-        if deal_type == 'Trial':
+        if custom:
+            deal_type = 'Exclusive'
+            cancel = Cancel( deal = deal,
+                             cost = 50,
+                             exclusive = True,
+                             buyer = self.request.user,
+                             status = 'pending'
+                            )
+            cancel.save()
+            mail_organizer( self.request.user, deal, cancel, deal_type )
+        
+        
+        elif deal_type == 'Trial':
             one_month = datetime.now() + relativedelta(months=+1)
             expire = Expire( deal   = deal,
                              date   = one_month,
@@ -244,7 +283,6 @@ class Apply( FormView ):
             mail_organizer( self.request.user, deal, cancel, deal_type )
 
         return HttpResponseRedirect(reverse('lb_dash'))
-
 
 class Dash( TemplateView ):
     """
@@ -291,11 +329,21 @@ class Dash( TemplateView ):
         total = dict(total = total)
         kwargs = dict( terms = term_list, total = total ) # {terms:terms, total:total, invoices:invoices }
         
-        # Now get Invoices
-        invoices = Invoice.objects.filter(user = buyer)
+        # Now get Invoices and put them in an 4 wide  array
+        invoices = []
+        l4 = []
+        for i, invoice in enumerate(Invoice.objects.filter(user = buyer)):
+            if i % 4 == 0:
+                if i:
+                    invoices.append(l4)
+                
+                l4 = [invoice]
+            else:
+                l4.append(invoice) 
+        invoices.append(l4)
+        
         kwargs.update(invoices=invoices)
         return kwargs
-    
     
     
 class Bill( TemplateView ):
@@ -312,10 +360,11 @@ class Bill( TemplateView ):
             for connection in connections:
                 detail = dict( organization = connection.survey.event.chapter.name,
                                event        = connection.survey.event.describe,
-                               date         = connection.date,
+                               date         = connection.survey.event.date,
                                name         = connection.survey.attendee.first_name + ' ' + connection.survey.attendee.last_name, 
                                email        = connection.survey.attendee.email,
                                company      = connection.survey.attendee.get_profile().company,
+                               connected    = connection.date,
                                price        = connection.term.cost
                               )
                 bills.append(detail)

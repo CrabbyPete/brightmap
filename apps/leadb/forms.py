@@ -114,17 +114,19 @@ class ApplyForm(forms.Form):
                                           widget=forms.Select(attrs={'class':"selectbox"})
                                         )
 
-    interest         = forms.ChoiceField( choices=(),
+    
+    interest         = forms.ChoiceField( required = False,
+                                          choices=(),
                                           widget=forms.Select(attrs={'class':"selectbox"}) 
                                         )
 
-    other            = ChoiceWithOtherField( choices = APPLY_CHOICES )
+    #other            = ChoiceWithOtherField( choices = APPLY_CHOICES )
+    
     
     custom           = forms.CharField( max_length = 100,
                                         widget = forms.TextInput()
                                       )
   
-    
     deal_type        = forms.ChoiceField( required = False,
                                           choices=DEAL_CHOICES,
                                           widget=forms.RadioSelect(attrs={'class':"selectbox"})

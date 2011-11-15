@@ -1,11 +1,9 @@
-{% extends 'base.html' %} 
-{% load smartif %} 
-{% block body_block %}
-
+{% extends 'base.html' %} {% load smartif %} {% block body_block %}
 <!--Body section-->
 <div id="bodysection">
 	<div class="insidesection">
 		<section class="leadbuyer">
+
 
 		<h2 class="leadbuyer">Lead-Buyer Invoice</h2>
 		</section>
@@ -25,9 +23,9 @@
 							<th class="interest">Event Name</th>
 							<th class="interest ">Event Date</th>
 							<th class="interest">Lead Name</th>
-							<th class="interest">Lead Email</th>
+							<th class="interest">Lead Name</th>
 							<th class="interest">Company</th>
-							<!--  <th class="interest">Date sent</th> -->
+							<th class="interest">Date sent</th>
 							<th class="interest interestright">Rate</th>
 						</tr>
 						
@@ -35,14 +33,14 @@
 						<tr>
 							<td class="recivedcontent">{{bill.organization}}</td>
 							<td class="recivedcontent">{{bill.event}}</td>
-							<td class="recivedcontent">{{bill.date|date:"d M Y"}}</td>
+							<td class="recivedcontent">{{bill.date|date:"d-M-y"}}</td>
 							<td class="recivedcontent">{{bill.name}}</td>
 							<td class="recivedcontent">{{bill.email}}</td>
 							<td class="recivedcontent">{{bill.company}}</td>
+							<td class="recivedcontent">{{bill.connected|date:"d-M-y"}}</td>
 							<td class="recivedcontent interestright">{{bill.price}}</td>
 						</tr>
-						{% endfor %}
-						
+						{% endfor  %}
 					</table>
 				</td>
 			</tr>
@@ -61,7 +59,10 @@
 		<p class="returndeals">
 			<a href="#">Return to Dashboard</a>
 		</p>
+
 	</div>
 </div>
 <!--Body section-->
+
+
 {% endblock %}

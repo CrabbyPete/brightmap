@@ -30,9 +30,16 @@ def update_term( term, term_type, cost ):
         return None
     
     cterm.cost = cost
+    if isinstance(cterm,Cancel):
+        if term_type[0] == 'sponsored' or term_type[0] == 'exclusive':
+            term.exclusive = True
+            term.save()
+            return term
+            
+    
     if isinstance(cterm,Expire):
         # If this is a new type you have to change the old deal
-        if term_type[0] != 'Trial':
+        if term_type[0] != 'trial':
             term.canceled()
             term.save()
             
@@ -313,6 +320,12 @@ def spreadsheet( email, password ):
                 twitter = sponser['Sponsor Twitter'].rstrip()
             else:
                 twitter = None
+           
+            if 'Sponsor Deal' in sponser:
+                deal_term = sponser['Sponsor Deal'].rstrip()
+            else:
+                deal_term = 'cancel: ,20' 
+    
                 
             # Get or create the user
             try:
@@ -349,27 +362,22 @@ def spreadsheet( email, password ):
                 lb = LeadBuyer(user = user)
                 lb.save()
 
-            # Any key that does not start with Sponsor is an interest
-            keys = sponser.keys()
-
-            # Default deal is good til cancel
-            deal_term = "cancel: ,20"
-            for key in keys:
+            # Any key that does not start with Sponsor is an interest key = ( key, value )
+            for key in sponser.iteritems():
 
                 # Check optional sponsor details
-                if 'Sponsor' in key:
-                    if key == 'Sponsor Deal':
-                        deal_term = sponser['Sponsor Deal']
+                if 'Sponsor' in key[0]:
                     continue
 
                 # Get or create an interest, make sure their is an 'x' in the box
-                if sponser[key] != 'x':
+                if key[1] != 'x':
                     continue
 
+                # Get the interest
+                key = key[0].lstrip().rstrip()
                 try:
                     interest = Interest.objects.get(interest = key)
                 except Interest.DoesNotExist:
-                    key = key.lstrip().rstrip()
                     interest = Interest( interest = key )
                     interest.save()
 

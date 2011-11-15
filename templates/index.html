@@ -1,104 +1,66 @@
-{% extends 'base.html' %}
-
-{% block menu_block %}
-   <a href = '{% url login %}'>Log In</a>
-{% endblock %}
-
+{% extends 'base.html' %} 
 {% block body_block %}
-    <table width="100%" border="0" cellspacing="20" cellpadding="5">
+<!--Body section-->
+<div id="bodysection">
+	<div class="insidesection">
 
-      <tr>
-        <th scope="col" width="50%" bgcolor="#cccccc" style="border:solid 2px #ccc">For Community/Event Organizers</th>
-        <th scope="col" width="50%" bgcolor="#cccccc" style="border:solid 2px #ccc">For Professional Service Providers</th>
-      </tr>
-      <tr>
-        <td align="left"><ul>
-          <li>Monetize your community events without increasing ticket prices</li>
+		<section class="videobg"> <video width="480" height="386"
+			controls="controls" class="new"> <img
+			src="/media/img/video-img.gif" alt=""> </video> </section>
 
-          <li>Make valuable introductions for your members</li>
-          <li>Free marketing for your community events</li>
-        </ul>        </td>
-        <td align="left"><ul>
-          <li>Receive active, qualified, trackable leads to new business opportunities</li>
-          <li>Save time at networking events with advance introductions to attendees in the market for your service</li>
+		<article class="orgprovides">
+		<div class="floating">
+			<div class="comtopbg">&nbsp;</div>
+			<section class="organiger">
+			<h2 class="comunity">Community &amp; Event Organizers</h2>
+			<ul class="evtorganizer">
+				<li>Help your attendees with valuable introductions</li>
+				<li>Increase loyalty within your community</li>
+				<li>Earn more money hosting events</li>
+			</ul>
+			<!--logo panel -->
+			<div class="eventlogo">
+				<div class="companylogo">
+					<img src="/media/img/techdrinkup.gif" alt=""> <img
+						src="/media/img/breakfast.jpg" alt="">
+				</div>
+				<div class="companylogo">
+					<img src="/media/img/do-it-in-person.gif" alt=""> <img
+						src="/media/img/mxm.jpg" alt="">
+				</div>
+			</div>
+			<!--logo panel --> <a href="{% url community %}" class="learnmore">Learn More</a> </section>
+			<div class="combotbg">&nbsp;</div>
+		</div>
 
-          <li>All leads are community-validated and strictly &quot;opt-in&quot;</li>
-        </ul>        </td>
-      </tr>
-      <tr>
-        <th scope="col" width="50%" bgcolor="#cccccc" style="border:solid 2px #ccc">Business Communities on BrightMap</th>
-        <th scope="col" width="50%" bgcolor="#cccccc" style="border:solid 2px #ccc">Service Providers on BrightMap</th>
+		<div class="floatingright">
+			<div class="comtopbg">&nbsp;</div>
+			<section class="organiger">
+			<h2 class="rpoviders">Professional Service Providers</h2>
 
-      </tr>
-      <tr>
-        <td align="left"><ul>
-          <li><a href="http://www.doitinperson.com/">Do It In Person</a></li>
-          <li><a href="http://effectivemysql.com/">Effective MySQL</a></li>
-          <li><a href="http://entrepreneurweek.net/">EW</a> + <a href="http://www.startuponestop.com/">SOS</a> + <a href="http://eranyc.com/">ERA</a></li>
-          <li><a href="http://ibreakfast.com/">iBreakfast</a></li>
-          <li><a href="http://theleanstartupmachine.com/">Lean Startup Machine</a></li>
-          <li><a href="http://www.mediacrossmedia.com/">Media Cross Media</a></li>
-          <li><a href="http://www.techdrinkup.com/">Tech Drinkup</a></li>
-          <li><a href="http://ultralightstartups.com/">Ultra Light Startups</a></li>
-          <li><a href="http://under30ceo.com/">Under30CEO</a></li>
-          <li><a href="http://workbarboston.com/">WorkBar</a></li>
-          <li><a href="http://worldwideinvestornetwork.com/">Worldwide Investor Network</a></li>
-        </ul>        </td>
+			<ul class="servprovider">
+				<li>Get qualified leads</li>
+				<li>Referrals from trusted community leaders</li>
+				<li>Great value with less effort</li>
+			</ul>
+			<!--logo panel -->
+			<div class="eventlogo">
+				<div class="companylogo">
+					<img src="/media/img/thetaxclub.jpg" alt=""> <img
+						src="/media/img/cresa-partners.jpg" alt="">
+				</div>
+				<div class="companylogo">
+					<img src="/media/img/mintz-levin.jpg" alt=""> <img
+						src="/media/img/datagram.jpg" alt="">
+				</div>
+			</div>
+			<!--logo panel --> <a href="{% url lb_signup %}" class="learnmore2">Learn More</a> </section>
+			<div class="combotbg">&nbsp;</div>
+		</div>
+		</article>
 
-        <td align="left"><h2>- Legal -</h2>
-        <ul>
-          <li><a href="http://reitlerlaw.com/">Reitler, Kailas &amp; Rosenblatt</a></li>
-          <li><a href="http://mintzlevin.com/">Mintz Levin</a></li>
-          <li><a href="http://fortenbaughlaw.com/">Sam Fortenbaugh, Esq.</a></li>
-          <li><a href="http://www.rc.com/">Robinson &amp; Cole</a></li>
-          <li><a href="http://whitehouselaw.com/">Whitehouse Law</a></li>
-          <li><a href="http://www.linkedin.com/pub/jon-freedman/3/972/b32">Freedman Legal Group</a></li>
-          <li><a href="http://www.steger-law.com/">Michael D. Steger, PC</a></li>
-          <li>.</li>
-        </ul>
-        <h2>- Accounting and Financial -</h2>
-        <ul>
-          <li><a href="http://www.thetaxclub.com/">The Tax Club</a></li>
-          <li><a href="http://www.corporatetaxnetwork.com/">Corporate Tax Network</a></li>
-          <li><a href="http://fa.morganstanleyindividual.com/michael.kislin/">Morgan Stanley Smith Barney</a></li>
-          <li><a href="http://oxfordvaluationpartners.com">Oxford Valuation Partners</a></li>
-          <li>.</li>
-        </ul>
-        <h2>- Web &amp; Mobile Design/Development -</h2>
-        <ul>
-          <li><a href="http://www.envoydesign.com/">Envoy Design</a></li>
-          <li><a href="http://www.freshtilledsoil.com/">Fresh Tilled Soil</a></li>
-          <li><a href="http://www.sourcepad.com/">SourcePad</a></li>
-          <li><a href="http://www.digitalxbridge.com/">DigitalXBridge</a></li>
-          <li><a href="http://www.estrintech.com/">Estrin Technologies</a></li>
-          <li><a href="http://www.practicalstrategies.com/">Practical Strategies</a></li>
-          <li>.</li>
-          </ul>
-        <h2>- Office Space -</h2>
-        <ul>
-          <li><a href="http://www.techspace.com/">TechSpace</a></li>
-          <li><a href="http://www.bevmaxoffice.com/">Bevmax Office Centers</a></li>
-          <li><a href="http://sunshineny.com/">Sunshine Suites</a></li>
-          <li><a href="http://workbarboston.com/">WorkBar</a></li>
-          <li><a href="http://www.cresapartners.com/">CresaPartners</a></li>
-          <li>.</li>
-        </ul>
-        <h2>- Web Hosting / ISP -</h2>
-        <ul>
-          <li><a href="http://www.logicworks.net/">Logicworks</a></li>
-          <li><a href="http://voxel.net/">Voxel dot Net</a></li>
-          <li><a href="http://www.datagram.com/">Datagram</a></li>
-        </ul></td>
-      </tr>
-      <tr>
-        <td align="center" bgcolor="#faa71d" style="border:solid 2px #000"><p><a href='{% url community %}'><strong>Join BrightMap<br>Community/Event Organizer</strong></a></p></td>
-        <td align="center" bgcolor="#faa71d" style="border:solid 2px #000"><p><a href='{% url lb_signup %}'><strong>Join BrightMap<br>Professional Service Provider</strong></a></p></td>
-      </tr>
-    </table>
-    <table width="100%" border="0" cellspacing="20" cellpadding="5">
-      <tr>
-        <td><a href='{% url about %}'> About</a></td>
-      </tr>
-    </table>
-    <p>&nbsp;</p>
+	</div>
+</div>
+<!--Body section-->
+
 {% endblock %}
