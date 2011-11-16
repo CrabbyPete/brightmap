@@ -14,19 +14,22 @@
 jQuery(function ($) {
 	// Load dialog on page load
 	//$('#basic-modal-content').modal();
-
-	// Load dialog on click
-	$('#itlink').click(function (e) {
-		$('#itlinkcontent').modal();
-		return false;
-	});
 	$('#itlink2').click(function (e) {
-		$('#itlink2content').modal();
-		return false;
+        e.preventDefault();
+        $.get(this.href, function(data) {
+            var resp = $('<div></div>').append(data); // wrap response
+            $(resp).modal();
+        });
+		//$('#itlink2content').modal();
 	});
-	$('#itlink3').click(function (e) {
-		$('#itlink3content').modal();
-		return false;
-	});
-	
 });
+
+$('a.simple_modal').click(
+	    function (e) {
+	        e.preventDefault();
+	        $.get(this.href, function(data) {
+	            var resp = $('<div></div>').append(data); // wrap response
+	            $(resp).modal();
+	        });
+	    }
+	);

@@ -13,6 +13,7 @@ from django.views.generic.edit      import  FormView
 from django.template                import  loader, Context
 from django.contrib                 import  auth
 from django.contrib.auth.models     import  User
+from django.contrib.auth.decorators import  login_required
 from django.http                    import  HttpResponseRedirect
 from django.forms.util              import  ErrorList
 from django.core.urlresolvers       import  reverse
@@ -302,7 +303,8 @@ class Dash( TemplateView ):
                           date        = term.modified,
                           connections = len(term.connections()),
                           cost        = term.cost,
-                          total       = term.total()
+                          total       = term.total(),
+                          pk          = term.pk
                          )
             
             total += float(args['total'])
@@ -476,11 +478,14 @@ class Payment( FormView ):
         except AuthorizeError, e:
             form._errors['card_number'] = ErrorList([e])
             return self.form_invalid(form)
+
+        except Exception, e:
+            pass
  
         # Check to see it if its OK
         result = response.messages.result_code.text_
         if result != 'Ok':
-            form._errors['card_number'] = ErrorList( [response.messages.message.text_] )
+            form._errors['card_number'] = ErrorList( [response.messages.message.text.text_] )
             return self.form_invalid(form)
     
         authorize.profile_id      = response.customer_profile_id.text_
@@ -496,3 +501,12 @@ class Payment( FormView ):
  
         return HttpResponseRedirect(reverse('lb_apply'))
 
+@login_required
+def cancel_term(request):
+    # Cancel Terms of a Deal
+
+    if request.method == 'GET' and 'term' in request.GET:
+        term = Term.objects.get(pk = request.GET['term'])
+        term.canceled = True
+        term.save()
+    return HttpResponseRedirect(reverse('lb_dash'))

@@ -1,4 +1,15 @@
-{% extends 'base.html' %} {% load smartif %} {% block body_block %}
+{% extends 'base.html' %} 
+{% load smartif %} 
+
+{% block javascript %}
+<!--popup script start-->
+<link type='text/css' href='/media/css/basic.css' rel='stylesheet' media='screen' />
+<script type="text/javascript" src="/media/js/jquery.simplemodal.js"></script>
+<script type="text/javascript" src="/media/js/basic.js"></script>
+<!--popup script end-->
+{% endblock %}
+
+{% block body_block %}
 <!--Body section-->
 <div id="bodysection">
 	<div class="insidesection">
@@ -25,7 +36,6 @@
 
 		<table class="ins">
 			<caption class="latestrecived">Deals</caption>
-
 			<tr>
 				<td style="background-color: #F5F6F6;">
 					<table class="ins">
@@ -49,17 +59,18 @@
 							<td class="recivedcontent">{{term.connections}}</td>
 							<td class="recivedcontent">{{term.cost}}</td>
 							<td class="recivedcontent">{{term.total}}</td>
-							<td class="recivedcontent interestright"><a href="#">Cancel</a>
+							<td class="recivedcontent interestright">
+								<a href="{%url lb_cancel%}?term={{term.pk}}" id="itlink2">Cancel</a></td>
 							</td>
 						</tr>
 						{% endfor %}
-
 					</table></td>
 			</tr>
 			<tr>
 				<td><p class="totaltxt">
 						Total:<span>{{total.total}}</span>
-					</p></td>
+					</p>
+				</td>
 			</tr>
 		</table>
 
@@ -76,8 +87,7 @@
 			<tr>
 				{% for i in invoice %}
 				<td><a href="{% url lb_bill %}?invoice={{i.pk}}">{{i.title}}</a>
-				</td> 
-				{% endfor %}
+				</td> {% endfor %}
 			</tr>
 			{% endfor %}
 		</table>
@@ -91,9 +101,34 @@
 		</nav>
 		-->
 	</div>
-
-
-
 </div>
+
+
+<!--thickbox-->
+<div style='display: none'>
+	<div id="itlink2content">
+		<h2 class="popupheading1">Are you sure you want to cancel this
+			deal?</h2>
+		<p class="canceldeal">
+			<a href="{% url lb_cancel %}?term={{term.pk}}" class="canceldealq">Yes, cancel deal</a> 
+			<a href="{% url lb_dash %}" class="nokeepdeal">No, keep deal</a>
+		</p>
+	</div>
+</div>
+
+<!--thickbox-->
+<!-- preload the images -->
+<div style='display: none'>
+	<img src='images/x.png' alt='' />
+</div>
+
+
+<!--thickbox-->
+<!-- preload the images -->
+<div style='display: none'>
+	<img src='/media/img/x.png' alt='' />
+</div>
+
+
 <!--Body section-->
 {% endblock %}
