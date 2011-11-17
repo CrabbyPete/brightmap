@@ -302,9 +302,9 @@ def make_contact( survey, deal, template ):
         
         # Check if the leadbuyer is the organizer and if they have a letter
         if sponser == organizer:
-            if sponser.letter:
-                letter = sponser.letter
-                template = loader.get_template('letters/' + letter.name)
+            letter = 'self_referral.tmpl'
+            
+            template = loader.get_template('letters/' + letter )
                 
         # Set up the context
         c = Context({'interest'    :interest,

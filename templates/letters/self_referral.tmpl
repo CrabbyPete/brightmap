@@ -1,0 +1,11 @@
+{% load phone %}
+{% autoescape off %}
+{{attendee.first_name}},
+  I see when you registered for our {{chapter.name}} event on {{event.date|date:"M d"}} that you indicated you'd like an introduction to our preferred {{interest.interest}} provider.  You are in luck, because this is exactly what I do at {{organizer.get_profile.company}}.  I'd love to hear what you're working on and how I can help.  If you'd like to discuss over the phone, just send me your number and a good time to call.  Otherwise, let's try to find each other at the event.
+
+{% if sponser.get_profile.phone %}Or you can call me anytime at {{sponser.get_profile.phone|phonenumber}}.{% endif %}
+
+Best regards,
+{{organizer.first_name}} {{organizer.last_name}}
+{{chapter.name}}
+{% endautoescape %}
