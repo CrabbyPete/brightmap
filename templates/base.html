@@ -7,17 +7,12 @@
 <script src="/media/js/jquery-1.6.2.min.js"	type="text/javascript"></script>
 <script src="/media/js/shadedborder.js" 	type="text/javascript"></script>
 
-<!--popup script start-->
-<link href='/media/css/basic.css' rel='stylesheet' type='text/css' media='screen' />
-<script type="text/javascript" src="/media/js/jquery.simplemodal.js"></script>
-<script type="text/javascript" src="/media/js/basic.js"></script>
-<!--popup script end-->
-
-
 <!--[if IE]>
 	<script src="/media/js/html5.js" type="text/javascript"></script>
 <![endif]-->
 <body>
+{% block javascript %}
+{% endblock %}
 	<!--Top section-->
 	<div id="topsection">
 		<header class="tophdr">
@@ -31,12 +26,12 @@
 			{% if user.is_authenticated %}
 				<!--tabpanel -->
 				<ul>
-					<li><a href="{% url lb_dash %}"><span>Lead-Buyer Dashboard</span>
-					</a>
-					</li>
-					<li><a href="{% url community %}"><span>Event Organizer Dashboard</span>
-					</a>
-					</li>
+					{% if user.get_profile.is_leadbuyer %}
+					<li><a href="{% url lb_dash %}"><span>Lead-Buyer Dashboard</span></a></li>
+					{% endif %}
+					{% if user.get_profile.is_organizer %}
+					<li><a href="{% url community %}"><span>Event Organizer Dashboard</span></a></li>
+					{% endif %}
 				</ul>
 				<!--tabpanel -->
 
@@ -50,6 +45,7 @@
                     {{login.username }}
                     {{login.password}}
                     <input name="" type="submit" class="loginbutt" value="Log In">
+                    <br />
                     {{login.username.errors}}
                 </form>
                 {% endif %}

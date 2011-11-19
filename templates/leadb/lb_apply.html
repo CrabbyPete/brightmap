@@ -2,67 +2,66 @@
 <!--Body section-->
 <div id="bodysection">
 	<div class="insidesection">
-		<article class="profile"> <section class="bodybg">
-		<nav class="step">
-		<ul>
-			<li><a href="#">STEP 1 of 3</a>
-			</li>
-			<li><a href="#" class="active">STEP 2 of 3</a>
-			</li>
-			<li><a href="#" class="step3to3bg">STEP 3 of 3</a>
-			</li>
-		</ul>
-		</nav>
-		<h2 class="paymethod">Apply to Buy Leads from a Community</h2>
-		<p class="paybudgetttxt">Complete this form to purchase leads from
-			a particular community. The community organizer must review and
-			approve your application before we can send you leads. You will be
-			notified via email about the community organizer's decision.</p>
+		<article class="profile"> 
+		<section class="bodybg">
+			<nav class="step">
+			<ul>
+				<li><a href="#">STEP 1 of 3</a></li>
+				<li><a href="#" class="active">STEP 2 of 3</a></li>
+				<li><a href="#" class="step3to3bg">STEP 3 of 3</a></li>
+			</ul>
+			</nav>
+			<h2 class="paymethod">Apply to Buy Leads from a Community</h2>
+			<p class="paybudgetttxt">Complete this form to purchase leads from
+			 	a particular community. The community organizer must review and
+				approve your application before we can send you leads. You will be
+				notified via email about the community organizer's decision.</p>
 
-		<form id="profile" name="" method="post" action="{% url lb_apply %}">
-			{% csrf_token %}
-			<section id="my-details">
-			<p class="lftcontent">Community</p>
-			<p>{{form.chapter}}</p>
-			{{form.chapter.errors}}
-			</section>
+			<form id="profile" name="" method="post" action="{% url lb_apply %}">
+				{% csrf_token %}
+				<section id="my-details">
+					<p class="lftcontent">Community</p>
+					<p>{{form.chapter}}</p>
+				</section>
 
 
-			<section id="my-categories">
-			<p class="lftcontent">Lead Category</p>
-			<p>
-			{{form.interest}}
-			</p>
-			{{form.interest.errors}}
+				<section id="my-categories">
+					<p class="lftcontent">Lead Category</p>
+					<p>{{form.interest}}</p>
 
-			<p class="anyleads">Any custom leads from a category not already used by
-				this organization will be $50</p>
-			<p class="anyleads">Request A Custom Lead Category</p>
-			<p id="inputext4">{{form.custom}}</p>
-			{{form.custom.errors}}
-			</section>
+					<p class="anyleads">Custom leads from a category not already used
+						by this organization will be $50 and exclusive
+					</p>
+			
+					<p class="anyleads">Custom Leads</p>
 
-
-			<section id="my-border" style="margin-top:20px;">
-			<p class="lftcontent lftcontent-monthbudget">Terms</p>
-			{{form.deal_type}}
-			{{form.deal_type.errors}}
-			</section>
+					<p class="lftcontent">&nbsp;</p>
+					<p>{{form.custom}}</p>
+					<p class="lftcontent">&nbsp;</p>
+				</section>
 
 
-			<p class="applicationleads">
-				<input name="" type="submit" value="Save profile" class="submitapp">
-			</p>
-		</form>
-		<section class="finish">
-		<p class="finishtxt">
-			<a href="{% url lb_dash %}">Finish</a>
-		</p>
+				<section id="my-border" style="margin-top:20px;">
+					<p class="lftcontent lftcontent-monthbudget">Terms</p>
 
-		</section> </section>
+					<p>{{form.deal_type}}</p>
+					{{form.deal_type.errors}} 
+				</section>
+
+
+				<p class="applicationleads">
+					<input name="" type="submit" value="Save profile" class="submitapp"/>
+				</p>
+			</form>
+			<section class="finish">
+				<p class="finishtxt">
+					<a href="#">Finish</a>
+				</p>
+			</section> 
+		</section>
+		
 		<div class="botbg">&nbsp;</div>
 		</article>
-
 	</div>
 
 </div>

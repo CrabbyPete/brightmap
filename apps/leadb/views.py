@@ -1,7 +1,7 @@
 import re
 import settings
 import logging
-logger = logging.getLogger('leadbuer')
+logger = logging.getLogger('leadbuyer')
 
 
 from datetime                       import datetime
@@ -203,9 +203,6 @@ class Apply( FormView ):
     """
     template_name = 'leadb/lb_apply.html'
     form_class    = ApplyForm
-    
-    def form_invalid(self, form):
-        pass
     
     def form_valid(self,form):
         """
@@ -504,9 +501,18 @@ class Payment( FormView ):
 @login_required
 def cancel_term(request):
     # Cancel Terms of a Deal
-
     if request.method == 'GET' and 'term' in request.GET:
         term = Term.objects.get(pk = request.GET['term'])
-        term.canceled = True
+        term.status = 'canceled'
         term.save()
+    return HttpResponseRedirect(reverse('lb_dash'))
+
+@login_required
+def renew_term(request):
+    # Renew a deal that was canceled
+    if request.method == 'GET' and 'term' in request.GET:
+        term = Term.objects.get(pk = request.GET['term'])
+        term.status = 'pending'
+        term.save()
+        # Send email to organizer
     return HttpResponseRedirect(reverse('lb_dash'))

@@ -208,7 +208,7 @@ h2.number{
 	font:bold 18px/33px "Futura Md BT", Arial, Helvetica, sans-serif;
 	color:#FCB43D;
 	background-color:inherit;
-	/*background:url(/media/img/number-rounfbg.gif) no-repeat 0 21px;*/
+	background:url(/media/img/number-rounfbg.gif) no-repeat 0 21px;
 	margin:0 0 14px 17px;
 	padding:21px 0 0 0;
 }
@@ -254,10 +254,6 @@ padding:9px 0 0 0;
 height:100%;
 overflow:hidden;
 }
-
-section#my-categories p#inputext4 {
-margin-left: 172px;
-}
 section#my-bluecurved {
 width:473px;
 border-radius:5px;
@@ -283,6 +279,7 @@ float:left;
 }
 section#my-border p.lftcontent-monthbudget{
 	min-height:111px;
+	/*width:150px;*/
 }
 section#my-border p.lftcontent span, section#my-details p.lftcontent span{
 	color:#FBA61D;
@@ -559,7 +556,7 @@ section.leadbuyerrept h2{
 	border-bottom:solid 1px #fff;
 	border-right:solid 1px #fff;
 	line-height:14px;
-	padding:0 0 0 11px;
+	padding:0 0 0 8px;
 	color:#000;
 	font-size:12px;
 	font-weight:bold;
@@ -577,10 +574,34 @@ section.leadbuyerrept h2{
 	border-right:solid 1px #fff;
 	font-size:12px;
 	line-height:14px;
-	height:45px;
+	/*height:45px;*/
 	color:#000;
-	padding:0 0 0 11px;
+	padding:10px 4px 10px 8px;
 	font-weight:normal;
+}
+.orgWD{
+	width:100px;
+}
+.evtWD{
+	width:184px;
+}
+.datWD{
+	width:83px;
+}
+.Led1WD{
+	width:100px;
+}
+.Led2WD{
+	width:191px;
+}
+.comWD{
+	width:171px;
+}
+.dateWD{
+	width:85px;
+}
+.ratWD{
+	width:50px;
 }
 .recivedcontentright{
 	border-right:none;
@@ -1169,6 +1190,23 @@ section#my-categories input[type="radio"]{
 	height:13px!important;
 	width:13px!important;
 	float:left;
+}
+
+section#my-categories ul {
+	width: 290px;
+	float:left;
+	padding:0 0 0 20px;
+}
+section#my-categories ul li{
+	padding-bottom:8px;
+}
+section#my-border ul {
+	width: 290px;
+	float:left;
+	padding:0 0 0 20px;
+}
+section#my-border ul li{
+	padding-bottom:8px;
 }
 
 nav.topmenu form{

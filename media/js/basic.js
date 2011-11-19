@@ -13,23 +13,12 @@
 
 jQuery(function ($) {
 	// Load dialog on page load
-	//$('#basic-modal-content').modal();
-	$('#itlink2').click(function (e) {
-        e.preventDefault();
-        $.get(this.href, function(data) {
-            var resp = $('<div></div>').append(data); // wrap response
-            $(resp).modal();
-        });
-		//$('#itlink2content').modal();
-	});
-});
 
-$('a.simple_modal').click(
-	    function (e) {
-	        e.preventDefault();
-	        $.get(this.href, function(data) {
-	            var resp = $('<div></div>').append(data); // wrap response
-	            $(resp).modal();
-	        });
-	    }
-	);
+	// Load dialog on click
+	$('#itlink').click( function (e) { 
+		  								e.preventDefault(); 
+		  								$('a.canceldealq').attr('href',this.href)
+		  								$("#itlinkcontent").modal(); 
+		    						    //return false; 
+									 });
+});

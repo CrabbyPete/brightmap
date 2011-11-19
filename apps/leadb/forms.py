@@ -8,7 +8,7 @@ from django.contrib.localflavor.us.forms    import USPhoneNumberField, USZipCode
 
 # Local imports
 from base.models                            import  Interest, Chapter
-from base.radio                             import  ChoiceWithOtherField 
+from base.radio2                            import  ChoiceWithOtherField 
 from creditfields                           import  CreditCardField
 
 class BuyerForm(forms.Form):
@@ -100,8 +100,12 @@ DEAL_CHOICES = [('Sponsored','Sponsored (free)'),
                ]
 
 
-APPLY_CHOICES = [('Non-Standard', 'Non-Standard', forms.Select     ),
-                 ('Custom'      , 'Custom',       forms.TextInput  ),
+
+
+STANDARD_CHOICES = [(i.interest,i.interest) for i in Interest.objects.filter(status='standard')]
+
+APPLY_CHOICES = [('Standard', 'Standard', forms.Select(choices = STANDARD_CHOICES)     ),
+                 ('Custom'  , 'Custom',   forms.TextInput  ),
                 ]
 
 class ApplyForm(forms.Form):
@@ -110,12 +114,13 @@ class ApplyForm(forms.Form):
                                         )
 
     
-    interest         = forms.ChoiceField( required = False,
-                                          choices=(),
+    interest         = forms.ChoiceField( choices=(),
                                           widget=forms.Select(attrs={'class':"selectbox"}) 
                                         )
 
-    #other            = ChoiceWithOtherField( choices = APPLY_CHOICES )
+    other            = ChoiceWithOtherField( required = False,
+                                             choices = APPLY_CHOICES 
+                                           )
     
     
     custom           = forms.CharField( required = False,
@@ -125,12 +130,12 @@ class ApplyForm(forms.Form):
   
     deal_type        = forms.ChoiceField( required = True,
                                           choices=DEAL_CHOICES,
-                                          widget=forms.RadioSelect(attrs={'class':"selectbox"})
+                                          widget=forms.RadioSelect(attrs={'class':"termscode"})
                                         )
  
     def __init__(self, *args, **kwargs):
         super(ApplyForm, self).__init__(*args, **kwargs)
-        self.fields['interest'].choices = [(i.interest,i.interest) for i in Interest.objects.all()]
+        self.fields['interest'].choices = [(i.interest,i.interest) for i in Interest.objects.filter(status='standard')]
         self.fields['chapter'].choices = [(i.name,i.name) for i in Chapter.objects.all()]
 
 
@@ -139,8 +144,8 @@ MONTH_CHOICES = [ (1,'January'),(2,'February'),(3,'March'),(4,'April'),(5,'May')
                   (7,'July'),(8,'August'),(9,'September'),(10,'October'),(11,'November'),(12,'December')
                 ]
 
-BUDGET_CHOICES = [ ('No Budget', 'No Budget' ),
-                   ('Budget'   , 'Budget' )
+BUDGET_CHOICES = [('Budget'   , 'Budget',    forms.TextInput() ), 
+                  ('No Budget', 'No Budget', forms.RadioSelect )
                  ] 
 
 
@@ -157,19 +162,19 @@ class PaymentForm(forms.Form):
                                        )
     
     address         = forms.CharField   ( max_length = 100,
-                                          widget = forms.TextInput()
+                                          widget = forms.TextInput(attrs={'id':"inputext1"})
                                         )
     
     city            = forms.CharField   ( max_length = 100,
-                                          widget = forms.TextInput()
+                                          widget = forms.TextInput(attrs={'id':"inputext1"})
                                         )
     
     state           = forms.CharField   ( max_length = 40,
-                                          widget = forms.TextInput(attrs={'id':"inputext4"})  
+                                          widget = forms.TextInput(attrs={'id':"inputext1"})  
                                         )
 
     zipcode         = USZipCodeField    ( required = False,
-                                          widget= forms.TextInput(attrs={'id':"inputext4"})
+                                          widget= forms.TextInput(attrs={'class':"eightythree",'color': '#777777'})
                                         )
     
     

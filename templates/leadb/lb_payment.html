@@ -1,6 +1,4 @@
- {% extends 'base.html' %} 
- {% block body_block %}
-
+ {% extends 'base.html' %} {% block body_block %}
 <!--Body section-->
 <div id="bodysection">
 	<div class="insidesection">
@@ -23,67 +21,92 @@
 			Sponsored leads or Trial leads).</p>
 
 		<form id="profile" name="" method="post" action="{% url lb_payment %}">
-			{% csrf_token %}
+		{% csrf_token %}
 			<section id="my-border">
 			<p class="lftcontent">Credit Card Number</p>
 			<p>
-				{{form.number}}
+				{{form.number}}{{form.number.errors}}
+				<!--  
+				<input type="text" onFocus="run('inputext')" id="inputext" onBlur="run2('inputext')" style="color: #777777;">
+				-->
 			</p>
-			{{form.number.errors}}
 
 
 			<p class="lftcontent">Expiration</p>
 			<p>
-				{{form.expire_month}}
-				{{form.expire_year}}
+				{{form.expire_month}}{{form.expire_year}}
+				<!--  
+				<select name="" class="selectbox1">
+					<option>3 November</option>
+				</select> <select name="" class="selectbox1">
+					<option>2013</option>
+				</select>
+				-->
 			</p>
-			{{form.expire_month.errors}}{{form.expire_year.errors}}
 
-			<p class="lftcontent">Billing Address</p>
+			<p class="lftcontent">Street Address</p>
 			<p>
-				{{form.address}}
+				{{form.address}}{{form.address.errors}}
+				<!--  
+				<input type="text" value="" onfocus="run('inputext2')"
+					id="inputext2" onBlur="run2('inputext2')" style="color: #777777;">
+				-->
 			</p>
-			{{form.address.errors}}
-			
+
+			<p class="lftcontent">Billing Address Line 2</p>
+			<p>
+				<input type="text" value="" onFocus="run('inputext3')"
+					id="inputext3" onBlur="run2('inputext3')" style="color: #777777;">
+			</p>
+
 			<p class="lftcontent">City</p>
 			<p>
-				{{form.city}}
+				{{form.city}}{{form.city.errors}}
+				<!--  
+				<select name="" class="selectbox">
+					<option></option>
+				</select>
+				-->
 			</p>
-			{{form.city.errors}}
-			
+
 			<p class="lftcontent">State</p>
 			<p>
-			{{form.state}}
+				{{form.state}}{{form.state.errors}}
+				<!--  
+				<select name="select" class="selectbox">
+					<option></option>
+				</select>
+				-->
 			</p>
-			{{form.state.errors}}
 
 			<p class="lftcontent">Zip Code</p>
 			<p>
-			{{form.zipcode}}
+				{{form.zipcode}}{{form.zipcode.errors}}
+				<!-- 
+				<input type="text" class="eightythree" onFocus="run('inputext4')"
+					id="inputext4" onBlur="run2('inputext4')" style="color: #777777;">
+				 -->
 			</p>
-			{{form.zipcode.errors}}
-
 			</section>
+			
 			<p class="budgetdeterminetxt">Your budget determines the maximum
 				dollar value of leads you will receive each month.</p>
 			<section id="my-categories">
 			<p class="lftcontent lftcontent-monthbudget">Monthly Budget</p>
-			<p class = "monthlyright">{{form.budget}}</p>
-			{{form.budget.errors}}
-
+			<p>
+			{{form.budget}}
+			</p>
 			</section>
 
 			<p class="paddingmethod">
-				<input name="" type="submit" value="Save profile"
-					class="paymentmethod">
+				<input name="" type="submit" value="Save profile" class="paymentmethod">
 			</p>
 		</form>
 		</section>
 		<div class="botbg">&nbsp;</div>
 		</article>
-
 	</div>
-
 </div>
 <!--Body section-->
+
 {% endblock %}
