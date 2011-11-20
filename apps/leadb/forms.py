@@ -118,11 +118,12 @@ class ApplyForm(forms.Form):
                                           widget=forms.Select(attrs={'class':"selectbox"}) 
                                         )
 
+    """
     other            = ChoiceWithOtherField( required = False,
                                              choices = APPLY_CHOICES 
                                            )
     
-    
+    """
     custom           = forms.CharField( required = False,
                                         max_length = 100,
                                         widget = forms.TextInput()
@@ -170,11 +171,11 @@ class PaymentForm(forms.Form):
                                         )
     
     state           = forms.CharField   ( max_length = 40,
-                                          widget = forms.TextInput(attrs={'id':"inputext1"})  
+                                          widget = forms.TextInput(attrs={'class':"stateabbr"})  
                                         )
 
     zipcode         = USZipCodeField    ( required = False,
-                                          widget= forms.TextInput(attrs={'class':"eightythree",'color': '#777777'})
+                                          widget= forms.TextInput(attrs={'class':"eightythree"})
                                         )
     
     
