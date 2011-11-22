@@ -1,9 +1,12 @@
-from django.conf.urls.defaults import patterns, include, url
-from django.contrib import admin
+from django.conf.urls.defaults  import patterns, include, url
+from django.contrib             import admin
+from django.http                import HttpResponse
+
 admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^$',          'base.views.homepage',  name='homepage'    ),
+    (r'^robots\.txt$', lambda r: HttpResponse("User-agent: *\nDisallow: /", mimetype="text/plain")),
     (r'^base/',         include('base.urls')                       ),
     (r'^leadb/',        include('leadb.urls')                      ),
     #(r'^organ/',        include('organ.urls')                      ),
