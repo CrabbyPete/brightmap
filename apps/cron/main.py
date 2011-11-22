@@ -112,6 +112,9 @@ def get_latest_events( evb, organizer_id ):
             continue
 
         # Make sure these are not past events
+        start_date =  datetime.strptime(event['event']['start_date'],
+                                     "%Y-%m-%d %H:%M:%S")
+        
         end_date = datetime.strptime(event['event']['end_date'],
                                      "%Y-%m-%d %H:%M:%S")
         # Only get future events
@@ -150,8 +153,14 @@ def database_events(organizer, evb = None):
                                date            = event[2],
                                chapter         = organizer.chapter
                               )
-            event_rec.save()
-
+        else:
+            # Update any changes to the date or description
+            event_rec.describe = event[0]
+            event_rec.date     = event[2]
+        
+        
+        event_rec.save()
+            
         event_list.append(event_rec)
 
     # Return the events list
@@ -370,7 +379,8 @@ def print_event(event):
     Print Event details
     """
     delta = event.date - datetime.today()
-    print log('Event - ' +  event.describe + ' ' + str(delta.days) )
+    date  = event.date.strftime("%Y-%m-%d %H:%M")
+    print log('Event - ' +  event.describe + ' ' + date + ' ' + str(delta.days) )
 
 
 def print_connection( attendee, sponser, interest ):
