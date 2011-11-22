@@ -6,7 +6,6 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^$',          'base.views.homepage',  name='homepage'    ),
-    (r'^robots\.txt$', lambda r: HttpResponse("User-agent: *\nDisallow: /", mimetype="text/plain")),
     (r'^base/',         include('base.urls')                       ),
     (r'^leadb/',        include('leadb.urls')                      ),
     #(r'^organ/',        include('organ.urls')                      ),
