@@ -8,7 +8,7 @@ body {
 }
 
 header,hgroup,nav,section,article,aside,footer,td,th,img,p,a,ul,h1,h2,h3,h4,h5,h6,form,input,label,select,textarea,object,iframe
-	{
+{
 	padding: 0;
 	margin: 0;
 }
@@ -806,7 +806,7 @@ input.eightythree {
 }
 
 input.stateabbr {
-	width: 26px !important;
+	width: 25px !important;
 }
 
 form.monthlybudget input[type="button"],input[type="submit"] {
@@ -1031,6 +1031,7 @@ ul.errorlist li { /*font:normal 12px/14px Arial, Helvetica, sans-serif;
 	padding: 0 0 9px 185px !important;
 	margin: 0;
 	display: block;
+	width: 257px;
 }
 
 ul.errorlist li.nopad {

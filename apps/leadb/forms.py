@@ -8,7 +8,7 @@ from django.contrib.localflavor.us.forms    import USPhoneNumberField, USZipCode
 
 # Local imports
 from base.models                            import  Interest, Chapter
-from base.radio2                            import  ChoiceWithOtherField 
+from base.radio                             import  ChoiceWithOtherField 
 from creditfields                           import  CreditCardField
 
 class BuyerForm(forms.Form):
@@ -101,12 +101,13 @@ DEAL_CHOICES = [('Sponsored','Sponsored (free)'),
 
 
 
-
+"""
 STANDARD_CHOICES = [(i.interest,i.interest) for i in Interest.objects.filter(status='standard')]
 
 APPLY_CHOICES = [('Standard', 'Standard', forms.Select(choices = STANDARD_CHOICES)     ),
                  ('Custom'  , 'Custom',   forms.TextInput  ),
                 ]
+"""
 
 class ApplyForm(forms.Form):
     chapter          = forms.ChoiceField( choices=(),
@@ -145,11 +146,17 @@ MONTH_CHOICES = [ (1,'January'),(2,'February'),(3,'March'),(4,'April'),(5,'May')
                   (7,'July'),(8,'August'),(9,'September'),(10,'October'),(11,'November'),(12,'December')
                 ]
 
+
+""" Radio2
 BUDGET_CHOICES = [('Budget'   , 'Budget',    forms.TextInput() ), 
                   ('No Budget', 'No Budget', forms.RadioSelect )
                  ] 
 
-
+"""
+BUDGET_CHOICES = [ 
+                  ('No Budget', 'No Budget'),
+                  ('Budget'   , 'Budget' )
+                 ] 
 
 class PaymentForm(forms.Form):
     number          = CreditCardField()

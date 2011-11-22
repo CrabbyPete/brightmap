@@ -1,13 +1,13 @@
 import pdb
 import cgi
-import simplejson as json
+import simplejson  as  json
 import urllib
 
 import django_header
 
 
 from social.models      import  MeetupProfile
-from base.models        import *
+from base.models        import  Organization
 
 
 # Meetup JSON Encoding format
@@ -17,6 +17,8 @@ import settings
 PROMPT = False
 
 class MeetUpAPI(object):
+        meetup = None
+        
         def __init__(self, user):
             try:
                 self.meetup = MeetupProfile.objects.get(user = user)
@@ -26,14 +28,16 @@ class MeetUpAPI(object):
 
         def refresh(self):
             refresh_url = 'https://secure.meetup.com/oauth2/access?'
-            kwargs = { client_id     : settings.MEETUP['API_KEY'],
-                       client_secret : settings.MEETUP['APP_SECRET'],
-                       grant_type    : 'refresh_token',
-                       refresh_token : meetup.refresh
-                      }
+            
+            kwargs = dict( client_id      = settings.MEETUP['API_KEY'],
+                           client_secret  = settings.MEETUP['APP_SECRET'],
+                           grant_type     = 'refresh_token',
+                           refresh_token  = self.meetup.refresh
+                         )
+            
             url = refresh_url + urllib.urlencode(kwargs)
-            file = urllib.urlopen(url)
-            data = file.read()
+            fil = urllib.urlopen(url)
+            data = fil.read()
             response = json.loads(data, JSON_ENCODING )
             return response
 
@@ -44,9 +48,8 @@ class MeetUpAPI(object):
             what = what+'.json'
             url = 'https://api.meetup.com' + what + "?" + urllib.urlencode(kwargs)
 
-            file = urllib.urlopen(url)
-
-            data = file.read()
+            fil = urllib.urlopen(url)
+            data = fil.read()
             response = json.loads(data, JSON_ENCODING )
             return response
 
@@ -57,7 +60,6 @@ class MeetUpAPI(object):
                               )
 
             for group in groups['results']:
-
                 print group['name'] + ' = ' + str(group['id'])
                 if group['id'] == 1556336:
                     events = self.get( '/2/events',
@@ -87,9 +89,11 @@ def main():
         for chapter in organization.chapter_set.all():
             # Check for meetups
             meetup = MeetUpAPI( user = chapter.organizer )
-            if meetup:
+            if meetup.meetup:
                 meetup.get_groups()
             
+
+
 import optparse
 if __name__ == '__main__':
     op = optparse.OptionParser( usage="usage: %prog " +" [options]" )

@@ -422,7 +422,7 @@ class Payment( FormView ):
         # Check if they checked a budget put in a valid $ value. Budget is a tuple ('Budget',value)
         money = re.compile('^\$?([1-9]{1}[0-9]{0,2}(\,[0-9]{3})*(\.[0-9]{0,2})?|[1-9]{1}[0-9]{0,}(\.[0-9]{0,2})?|0(\.[0-9]{0,2})?|(\.[0-9]{1,2})?)$')
         if budget[0] == 'Budget':
-            if not money.match(budget[1]):
+            if not money.match(budget[1]) or budget[1] == '':
                 form._errors['budget'] = ErrorList(["Not a valid dollar amount"])
                 return self.form_invalid(form)
             else:
@@ -482,7 +482,7 @@ class Payment( FormView ):
         # Check to see it if its OK
         result = response.messages.result_code.text_
         if result != 'Ok':
-            form._errors['card_number'] = ErrorList( [response.messages.message.text.text_] )
+            form._errors['number'] = ErrorList( [response.messages.message.text.text_] )
             return self.form_invalid(form)
     
         authorize.profile_id      = response.customer_profile_id.text_

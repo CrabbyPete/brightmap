@@ -10,7 +10,10 @@ from models                                 import Profile, LeadBuyer, Interest,
 
 class LoginForm(forms.Form):
     username        = forms.EmailField  ( max_length = 45,
-                                          widget = forms.TextInput( attrs={ 'value':"Email Address"} )
+                                          widget = forms.TextInput( attrs={ 'value'  :"Email Address",
+                                                                            'onfocus':"if(this.value == 'Email Address')this.value = ''",
+                                                                            'onblur' :"if(this.value == '') this.value = 'Email Address'",
+                                                                           } )
                                         )
 
     password        = forms.CharField   ( max_length = 45,
