@@ -66,6 +66,7 @@ def mail_organizer( user, deal, term, deal_type ):
 
 
 class  SignUp( FormView ):
+    initial          = {}
     template_name    = 'leadb/signup.html'
     form_class       = BuyerForm
     default_password = 'A&^%4562#$743D~5RT'
@@ -75,29 +76,25 @@ class  SignUp( FormView ):
         """
         Get initial values for the Signup/Profile page
         """    
-         
-        # An established user is changing profile
-        if 'buyer' in self.request.GET:
-            user = User.objects.get(pk = self.request.GET['buyer'])
-            profile = user.get_profile
+        if self.request.method == 'GET': 
+              
+            # Someone changing profile data
+            if self.request.user.is_authenticated():
+                user = self.request.user
+                profile = user.get_profile()
         
-        # Someone changing profile data
-        elif self.request.user.is_authenticated():
-            user = self.request.user
-            profile = user.get_profile()
-        
-        # A new user is signing up
-        else:
-            return {}
+                # A new user is signing up
+            else:
+                return {}
 
-        # Check if they have a LinkedIn profile
-        """
-        try:
-            linkedin = LinkedInProfile.objects.get(user = user)
-        except LinkedInProfile.DoesNotExist:
-            pass
-        """
-        data = {
+            # Check if they have a LinkedIn profile
+            """
+            try:
+                linkedin = LinkedInProfile.objects.get(user = user)
+            except LinkedInProfile.DoesNotExist:
+                pass
+            """
+            self.initial = {
                     'first_name':   user.first_name,
                     'last_name':    user.last_name,
                     'email':        user.email,
@@ -111,7 +108,7 @@ class  SignUp( FormView ):
                     'agree':        profile.is_agreed
                 }
 
-        return data
+            return self.initial
   
     
     def form_valid( self, form ):
@@ -204,6 +201,7 @@ class Apply( FormView ):
     template_name = 'leadb/lb_apply.html'
     form_class    = ApplyForm
     
+
     def form_valid(self,form):
         """
         Process a valid application form
@@ -406,12 +404,13 @@ class Payment( FormView ):
  
         # Check the expiration date
         expiration  = form.cleaned_data['expire_year']+'-'+form.cleaned_data['expire_month']
-        today  = datetime.today()
+        
         expire = datetime.strptime(expiration,'%Y-%m').replace( day = 1 )
-        if expire < today:
+        if expire < datetime.today():
             form._errors['expire_year'] = ErrorList(["Date is in the past"])
             return self.form_invalid(form)
         
+        #pattern = r"^(?n:(?<address1>(\d{1,5}(\ 1\/[234])?(\x20[A-Z]([a-z])+)+ )|(P\.O\.\ Box\ \d{1,5}))\s{1,2}(?i:(?<address2>(((APT|APARTMENT|BLDG|BUILDING|DEPT|DEPARTMENT|FL|FLOOR|HNGR|HANGER|LOT|PIER|RM|ROOM|S(LIP|PC|T(E|OP))|TRLR|TRAILER|UNIT)\x20\w{1,5})|(BSMT|BASEMENT|FRNT|FRONT|LBBY|LOBBY|LOWR|LOWER|OFC|OFFICE|PH|REAR|SIDE|UPPR|UPPER)\.?)\s{1,2})?)(?<city>[A-Z]([a-z])+(\.?)(\x20[A-Z]([a-z])+){0,2})\, \x20(?<state>A[LKSZRAP]|C[AOT]|D[EC]|F[LM]|G[AU]|HI|I[ADL N]|K[SY]|LA|M[ADEHINOPST]|N[CDEHJMVY]|O[HKR]|P[ARW]|RI|S[CD] |T[NX]|UT|V[AIT]|W[AIVY]|[A-Z]([a-z])+(\.?)(\x20[A-Z]([a-z])+){0,2})\x20(?<zipcode>(?!0{5})\d{5}(-\d {4})?))$"
         # Get the card, expiration date, address and budget
         card_number = form.cleaned_data[u'number']
         address     = form.cleaned_data['address']
@@ -442,7 +441,10 @@ class Payment( FormView ):
                       )
     
         # Use Google to verify the address string
+        #pattern = r"^(?n:(?<address1>(\d{1,5}(\ 1\/[234])?(\x20[A-Z]([a-z])+)+ )|(P\.O\.\ Box\ \d{1,5}))\s{1,2}(?i:(?<address2>(((APT|APARTMENT|BLDG|BUILDING|DEPT|DEPARTMENT|FL|FLOOR|HNGR|HANGER|LOT|PIER|RM|ROOM|S(LIP|PC|T(E|OP))|TRLR|TRAILER|UNIT)\x20\w{1,5})|(BSMT|BASEMENT|FRNT|FRONT|LBBY|LOBBY|LOWR|LOWER|OFC|OFFICE|PH|REAR|SIDE|UPPR|UPPER)\.?)\s{1,2})?)(?<city>[A-Z]([a-z])+(\.?)(\x20[A-Z]([a-z])+){0,2})\, \x20(?<state>A[LKSZRAP]|C[AOT]|D[EC]|F[LM]|G[AU]|HI|I[ADL N]|K[SY]|LA|M[ADEHINOPST]|N[CDEHJMVY]|O[HKR]|P[ARW]|RI|S[CD] |T[NX]|UT|V[AIT]|W[AIVY]|[A-Z]([a-z])+(\.?)(\x20[A-Z]([a-z])+){0,2})\x20(?<zipcode>(?!0{5})\d{5}(-\d {4})?))$"
+
         address += ", " + city + " " + state
+        
         if address:
             try:
                 local = geocode(address)

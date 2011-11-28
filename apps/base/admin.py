@@ -2,7 +2,8 @@ from django.contrib import admin
 from models         import *
 
 class ProfileAdmin(admin.ModelAdmin):
-    ordering = ['user__email']   
+    ordering = ['user__email'] 
+      
 admin.site.register(Profile, ProfileAdmin)
 
 admin.site.register(Organization)

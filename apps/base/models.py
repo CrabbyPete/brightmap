@@ -31,7 +31,7 @@ class Profile( models.Model ):
     is_agreed     = models.BooleanField( default = False )
 
     newsletter    = models.BooleanField( default = True )
-
+        
     def __unicode__(self):
         return self.user.email
 

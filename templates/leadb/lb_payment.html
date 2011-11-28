@@ -3,16 +3,19 @@
 <div id="bodysection">
 	<div class="insidesection">
 		<article class="profile"> <section class="bodybg">
+		{% if not user.get_profile.is_ready %}
 		<nav class="step">
 		<ul>
-			<li><a href="#" class="noimg">STEP 1 of 3</a>
+			<li><a href="{% url lb_signup %}" class="noimg">STEP 1 of 3</a>
 			</li>
 			<li><a href="#" class="steptwothree">STEP 2 of 3</a>
 			</li>
-			<li><a href="#" class="step3">STEP 3 of 3</a>
+			<li><a href="{% url lb_apply %}" class="step3">STEP 3 of 3</a>
 			</li>
 		</ul>
 		</nav>
+		{% endif %}
+		
 		<h2 class="paymethod">Payment Method and Budget</h2>
 		<p class="paybudgetttxt">You must provide your credit card details
 			before receiving any leads from BrightMap. We will validate your card

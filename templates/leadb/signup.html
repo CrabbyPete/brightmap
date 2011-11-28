@@ -6,7 +6,10 @@
 <div id="bodysection">
     <div class="insidesection">
         <article class="profile">
+        	
             <section class="bodybg">
+            
+            	{% if not user.get_profile.is_agreed %}
             	<nav class="step">
                 	<ul>
                     	<li><a href="#" class="stepone">STEP 1 of 3</a></li>
@@ -14,6 +17,7 @@
                         <li><a href="#" class="step3">STEP 3 of 3</a></li>
                     </ul>
                 </nav>
+                {% endif %}
  
 				<h2 class='number'>Lead-Buyer Profile</h2>
                 <form id="profile" name="" method="post" action="{% url lb_signup %}">

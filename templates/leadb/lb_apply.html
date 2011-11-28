@@ -1,16 +1,20 @@
-{% extends 'base.html' %} {% block body_block %}
+{% extends 'base.html' %} 
+{% block body_block %}
 <!--Body section-->
 <div id="bodysection">
 	<div class="insidesection">
 		<article class="profile"> 
 		<section class="bodybg">
+			{% if user.set_leadbuyer.deals %}
 			<nav class="step">
 			<ul>
-				<li><a href="#">STEP 1 of 3</a></li>
-				<li><a href="#" class="active">STEP 2 of 3</a></li>
+				<li><a href="{% url lb_signup %}">STEP 1 of 3</a></li>
+				<li><a href="{% url lb_payment %}" class="active">STEP 2 of 3</a></li>
 				<li><a href="#" class="step3to3bg">STEP 3 of 3</a></li>
 			</ul>
 			</nav>
+			{% endif %}
+			
 			<h2 class="paymethod">Apply to Buy Leads from a Community</h2>
 			<p class="paybudgetttxt">Complete this form to purchase leads from
 			 	a particular community. The community organizer must review and
@@ -55,7 +59,7 @@
 			</form>
 			<section class="finish">
 				<p class="finishtxt">
-					<a href="#">Finish</a>
+					<a href="{% url lb_dash%}">Finish</a>
 				</p>
 			</section> 
 		</section>

@@ -90,7 +90,7 @@ def get_latest_events( evb, organizer_id ):
     """
     try:
         events = evb.organizer_list_events({'id':organizer_id})
-    except Exception, error:
+    except Exception, e:
         print log( 'Eventbrite Error: Events for ' + organizer_id )
         logger.debug('Eventbrite Error: Events for ' + organizer_id )
         return []
@@ -117,6 +117,11 @@ def get_latest_events( evb, organizer_id ):
         
         end_date = datetime.strptime(event['event']['end_date'],
                                      "%Y-%m-%d %H:%M:%S")
+        
+        # Check if this is multi-day
+        if start_date != end_date:
+            end_date = start_date
+        
         # Only get future events
         if end_date < today:
             continue
