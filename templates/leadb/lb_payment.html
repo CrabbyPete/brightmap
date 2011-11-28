@@ -2,112 +2,64 @@
 <!--Body section-->
 <div id="bodysection">
 	<div class="insidesection">
-		<article class="profile"> <section class="bodybg">
-		{% if not user.get_profile.is_ready %}
-		<nav class="step">
-		<ul>
-			<li><a href="{% url lb_signup %}" class="noimg">STEP 1 of 3</a>
-			</li>
-			<li><a href="#" class="steptwothree">STEP 2 of 3</a>
-			</li>
-			<li><a href="{% url lb_apply %}" class="step3">STEP 3 of 3</a>
-			</li>
-		</ul>
-		</nav>
-		{% endif %}
+		<article class="profile"> 
+			<section class="bodybg">
+			{% if not user.get_profile.is_ready %} 
+			<nav class="step">
+				<ul>
+					<li><a href="{% url lb_signup %}" class="noimg">STEP 1 of 3</a></li>
+					<li><a href="#" class="steptwothree">STEP 2 of 3</a></li>
+					<li><a href="{% url lb_apply %}" class="step3">STEP 3 of 3</a></li>
+				</ul>
+			</nav> 
+			{% endif %}
+
+			<h2 class="paymethod">Payment Method and Budget</h2>
 		
-		<h2 class="paymethod">Payment Method and Budget</h2>
-		<p class="paybudgetttxt">You must provide your credit card details
+			<p class="paybudgetttxt">You must provide your credit card details
 			before receiving any leads from BrightMap. We will validate your card
 			up to your monthly budget, but you will not be charged until after
 			the leads are sent. You will not be charged for free leads (e.g.
-			Sponsored leads or Trial leads).</p>
-
-		<form id="profile" name="" method="post" action="{% url lb_payment %}">
-		{% csrf_token %}
-			<section id="my-border">
-			<div>
-			<p class="lftcontent">Credit Card Number</p>
-			<p>
-				{{form.number}}{{form.number.errors}}
-				<!--  
-				<input type="text" onFocus="run('inputext')" id="inputext" onBlur="run2('inputext')" style="color: #777777;">
-				-->
-			</p>
-			</div>
-
-			<div>
-				<p class="lftcontent">Expiration</p>
-				{{form.expire_month}}{{form.expire_year}}
-				{{form.expire_month.errors}}{{form.expire_year.errors}}
-
-			</div>
-
-			<p class="lftcontent">Street Address</p>
-			<p>
-				{{form.address}}{{form.address.errors}}
-				<!--  
-				<input type="text" value="" onfocus="run('inputext2')"
-					id="inputext2" onBlur="run2('inputext2')" style="color: #777777;">
-				-->
+			Sponsored leads or Trial leads).
 			</p>
 
-			<!--  
-			<p class="lftcontent">Billing Address Line 2</p>
-			<p>
-				<input type="text" value="" onFocus="run('inputext3')"
-					id="inputext3" onBlur="run2('inputext3')" style="color: #777777;">
-			</p>
-			-->
-			<p class="lftcontent">City</p>
-			<p>
-				{{form.city}}
-				{{form.city.errors}}
-				<!--  
-				<select name="" class="selectbox">
-					<option></option>
-				</select>
-				-->
-			</p>
+			<form id="profile" name="" method="post" action="{% url lb_payment %}" >
+		
+				<section id="my-border">
+					<p class="lftcontent">Credit Card Number </p>
+					{{form.number}}{{form.number.errors}}
 
-			<p class="lftcontent">State</p>
-			<p>
-				{{form.state}}
-				{{form.state.errors}}
-				<!--  
-				<select name="select" class="selectbox">
-					<option></option>
-				</select>
-				-->
-			</p>
+					<p class="lftcontent">Expiration </p>
+					{{form.expire_month}}{{form.expire_year}}
 
-			<p class="lftcontent">Zip Code</p>
-			<p>
-				{{form.zipcode}}
-				{{form.zipcode.errors}}
-				<!-- 
-				<input type="text" class="eightythree" onFocus="run('inputext4')"
-					id="inputext4" onBlur="run2('inputext4')" style="color: #777777;">
-				 -->
-			</p>
-			</section>
+					<p class="lftcontent">Street Address </p>
+					{{form.address}}{{form.address.errors}}
+
+					<p class="lftcontent">City </p>
+					{{form.city}}{{form.city.errors}}
+
+					<p class="lftcontent">State</p>
+					{{form.state}}{{form.state.errors}}
+
+					<p class="lftcontent">Zip Code</p>
+					{{form.zipcode}}{{form.zipcode.errors}}
+				</section>
+
+				<p class="budgetdeterminetxt">
+				Your budget determines the maximum dollar value of leads you will receive each month.
+				</p>
+	 
+				<section id="my-categories">
+					<p class="lftcontent lftcontent-monthbudget">Monthly Budget</p>
+					{{form.budget}}{{form.budget.errors}}
+				</section>
 			
-			<p class="budgetdeterminetxt">Your budget determines the maximum
-				dollar value of leads you will receive each month.</p>
-			<section id="my-categories">
-			<p class="lftcontent lftcontent-monthbudget">Monthly Budget</p>
-			<p>
-			{{form.budget}}
-			{{form.budget.errors}}
-			</p>
+				<p class="paddingmethod">
+					<input name="" type="submit" value="Save profile" class="paymentmethod" >
+				</p>
+			</form>
 			</section>
-
-			<p class="paddingmethod">
-				<input name="" type="submit" value="Save profile" class="paymentmethod">
-			</p>
-		</form>
-		</section>
-		<div class="botbg">&nbsp;</div>
+			<div class="botbg">&nbsp;</div>
 		</article>
 	</div>
 </div>
