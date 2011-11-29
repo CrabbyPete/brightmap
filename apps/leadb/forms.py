@@ -154,7 +154,7 @@ BUDGET_CHOICES = [('Budget'   , 'Budget',    forms.TextInput() ),
 
 """
 BUDGET_CHOICES = [ 
-                  ('No Budget', 'No Budget'),
+                  ('No Budget', 'Zero budget (for free trials and sponsorships only)'),
                   ('Budget'   , 'Budget' )
                  ] 
 

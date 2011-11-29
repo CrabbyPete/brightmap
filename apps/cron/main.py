@@ -1,7 +1,7 @@
 import django_header
 
 # Python libraries
-from datetime                       import datetime
+from datetime                       import datetime, date, timedelta
 
 # Django libraries
 from django.contrib.auth.models     import User
@@ -10,9 +10,10 @@ from django.template                import loader, Context
 from django.core.mail               import EmailMultiAlternatives
 
 # Local libraries
-from base.models                    import Event, Profile, Survey, Interest, Deal, Organization
-from base.passw                     import gen
+from base.models                    import ( Event, Profile, Survey, Interest, Deal, 
+                                             Organization, Connection, LeadBuyer    )
 
+from base.passw                     import gen
 from client                         import EventbriteClient
 
 """"
@@ -280,7 +281,22 @@ def database_attendees( evb, event ):
 
     return
 
-
+def check_budget( term ):
+    first_day = date.today().replace(day = 1)
+    last_day  = first_day.replace (month = first_day.month + 1 ) - timedelta( days = 1 )
+    
+    connections = Connection.objects.for_user( term.buyer, [first_day,last_day] )
+    
+    total = sum( connection.term.cost for connection in connections )
+    leadbuyer = LeadBuyer.objects.get( user = term.buyer )
+    if not leadbuyer.budget:
+        return True
+    
+    if total >= leadbuyer.budget:
+        return False
+  
+    return True
+ 
 def make_contact( survey, deal, template ):
     """
     Send an email to those attendees who answered the survey and have a
@@ -297,7 +313,12 @@ def make_contact( survey, deal, template ):
         # Don't spam, limit the number of emails per event
         if survey.mails_for() > MAX_MAIL_SEND:
             continue
-
+   
+        # Determine if the budget is exceeded
+        if not check_budget( term ):
+            continue
+        
+        
         # Determine if you did this or not
         if not survey.event.add_connection( survey, term ):
             continue

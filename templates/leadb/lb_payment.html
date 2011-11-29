@@ -24,7 +24,7 @@
 			</p>
 
 			<form id="profile" name="" method="post" action="{% url lb_payment %}" >
-		
+				{% csrf_token %}
 				<section id="my-border">
 					<p class="lftcontent">Credit Card Number </p>
 					{{form.number}}{{form.number.errors}}
