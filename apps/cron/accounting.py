@@ -11,6 +11,9 @@ from authorize                      import cim
 from authorize.gen_xml              import VALIDATION_TEST, AUTH_ONLY
 from authorize.responses            import AuthorizeError, _cim_response_codes
 
+INVOICE = True 
+
+
 def connections_for( user, first_day, last_day ):
     connections = Connection.objects.for_user(user,[first_day,last_day])
     return connections
@@ -46,6 +49,7 @@ def main(month = None):
 
         total = 0
         itemize = []
+        print profile.user.first_name + ' ' + profile.user.last_name
         
         connections = connections_for( profile.user, first_day, last_day )
         if connections != None:
@@ -58,14 +62,15 @@ def main(month = None):
                             'interest' :connection.survey.interest.interest
                           }
                 itemize.append(details)
-                print details['date'] + ' ' + details['chapter'] + ' ' + details['person'] + ' ' + details['email'] + ' ' + details['interest']
+                print details['date'] + ' ' + details['chapter'] + ' ' + details['person'] + ' ' +\
+                      details['email'] + ' ' + details['interest'] + ' ' + str( connection.term.cost )
             
             print profile.user.first_name + ' ' + profile.user.last_name + ' Total: $' +str(total)
   
             # Create the invoice
            
             
-            if total > 0: 
+            if total > 0 and INVOICE: 
                 title = first_day.strftime("%B %Y")
                 
                 # See if there is an existing invoice for this month
@@ -126,9 +131,9 @@ if __name__ == '__main__':
 
     # Check if options were set
     if opts.d:
-        DEBUG = False
+        INVOICE = False
     else:
-        DEBUG = True
+        INVOICE = True
 
     if opts.p:
         PROMPT = True
