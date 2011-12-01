@@ -283,8 +283,12 @@ def database_attendees( evb, event ):
 
 def check_budget( term ):
     first_day = date.today().replace(day = 1)
-    last_day  = first_day.replace (month = first_day.month + 1 ) - timedelta( days = 1 )
-    
+    month = first_day.month + 1
+    if month == 13:
+        last_day  = first_day.replace (month = 1, year = first_day.year + 1 ) - timedelta( days = 1 )
+    else:
+        last_day  = first_day.replace (month = first_day.month + 1 ) - timedelta( days = 1 )
+        
     connections = Connection.objects.for_user( term.buyer, [first_day,last_day] )
     
     total = sum( connection.term.cost for connection in connections )
