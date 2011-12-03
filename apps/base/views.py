@@ -42,11 +42,11 @@ def welcome( request ):
     try:
         profile = user.get_profile()
     except ObjectDoesNotExist:
-        if user.is_staff or user.is_super_user:
+        if user.is_staff or user.is_superuser:
             profile = Profile( user = user )
             profile.save()
 
-    if user.is_staff or user.is_super_user:
+    if user.is_staff or user.is_superuser:
             return render_to_response('welcome.html', {}, context_instance=RequestContext(request))
     
     if profile.is_leadbuyer:
