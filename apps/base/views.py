@@ -1,8 +1,4 @@
 # Python imports
-import settings
-
-from datetime                       import datetime
-from dateutils                      import relativedelta
 
 # Django imports
 from django.contrib                 import  auth
@@ -18,14 +14,13 @@ from django.views.generic.edit      import  FormView
 
 
 # Local imports
-from models                         import ( Event, Chapter, Profile, Interest, LeadBuyer,  
-                                             Deal, Term, Cancel, Expire, Connection, Letter 
-                                           )
+from models                         import Event, Chapter, Profile, LeadBuyer, Deal
+                                        
 
-from forms                          import ( LoginForm, InterestForm, DealForm, BuyDealForm,
-                                             LeadBuyerForm, ProfileForm, ChapterForm, LetterForm,
-                                             EventbriteForm, EventForm, SurveyForm, ConnectionForm,
-                                             TermForm
+from forms                          import ( LoginForm,     InterestForm,   DealForm,
+                                             LeadBuyerForm, ProfileForm,    ChapterForm, 
+                                             LetterForm,    EventbriteForm, EventForm, 
+                                             SurveyForm,    ConnectionForm, TermForm
                                            )
 
 from social.models                  import LinkedInProfile
@@ -51,14 +46,16 @@ def welcome( request ):
             profile = Profile( user = user )
             profile.save()
 
+    if user.is_staff or user.is_super_user:
+            return render_to_response('welcome.html', {}, context_instance=RequestContext(request))
+    
     if profile.is_leadbuyer:
         if not profile.is_ready:
             return HttpResponseRedirect( reverse('lb_payment') )
         else:
             return HttpResponseRedirect( reverse('lb_dash') )
-
-    return render_to_response('welcome.html', {}, context_instance=RequestContext(request))
-
+        
+        return HttpResponseRedirect( reverse('or_signup') )
 
 @csrf_protect
 def login(request):
