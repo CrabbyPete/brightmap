@@ -55,7 +55,7 @@ def welcome( request ):
         else:
             return HttpResponseRedirect( reverse('lb_dash') )
         
-        return HttpResponseRedirect( reverse('or_signup') )
+    return HttpResponseRedirect( reverse('or_signup') )
 
 @csrf_protect
 def login(request):
