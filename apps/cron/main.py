@@ -28,12 +28,15 @@ logger = logging.getLogger('main.py')
 # Environment variables
 from settings                       import EVENTBRITE, MAX_MAIL_SEND, SEND_EMAIL
 PROMPT     = False
+TODAY      = datetime.today()
+
+
 
 def log(message):
     """
     Time stamp all messages
     """
-    return datetime.today().strftime("%Y-%m-%d %H:%M")+ ',' + message
+    return TODAY.strftime("%Y-%m-%d %H:%M")+ ',' + message
 
 
 def get_attendees( evb, event_id ):
@@ -74,9 +77,10 @@ def check_survey(attendee):
     # If so parse the survey answers and email attendee and sponser
     answers = attendee['answers']
     for answer in answers:
+        """ Do not add leadbuyer automatically
         if 'Check this box' in answer['answer']['question']:
             leadbuyer = True
-
+        """
         # Did they ask for help
         if 'Do you need help' in answer['answer']['question']:
             return answer['answer']['answer_text'].split('|'), leadbuyer
@@ -103,10 +107,8 @@ def get_latest_events( evb, organizer_id ):
         #logger.debug( err )
         return []
 
-    # Compare to todays date and find all events ending after today
-    today = datetime.today()
 
-    # Look through all events and keep all future events
+    # Look through all events and keep all future events after today
     event_ids = []
     for event in events['events']:
         if event['event']['status'] != 'Live':
@@ -124,7 +126,7 @@ def get_latest_events( evb, organizer_id ):
             end_date = start_date
         
         # Only get future events
-        if end_date < today:
+        if end_date < TODAY:
             continue
 
         event_ids.append([ event['event']['title'],
@@ -281,21 +283,23 @@ def database_attendees( evb, event ):
 
     return
 
+
 def check_budget( term ):
-    first_day = date.today().replace(day = 1)
+    leadbuyer = LeadBuyer.objects.get( user = term.buyer )
+    if not leadbuyer.budget:
+        return True
+    
+    first_day = TODAY.replace(day = 1)
     month = first_day.month + 1
     if month == 13:
         last_day  = first_day.replace (month = 1, year = first_day.year + 1 ) - timedelta( days = 1 )
     else:
         last_day  = first_day.replace (month = first_day.month + 1 ) - timedelta( days = 1 )
         
-    connections = Connection.objects.for_user( term.buyer, [first_day,last_day] )
+    connections = Connection.objects.for_buyer( term.buyer, [first_day,last_day] )
     
     total = sum( connection.term.cost for connection in connections )
-    leadbuyer = LeadBuyer.objects.get( user = term.buyer )
-    if not leadbuyer.budget:
-        return True
-    
+ 
     if total >= leadbuyer.budget:
         return False
   
@@ -339,6 +343,11 @@ def make_contact( survey, deal, template ):
         organizer    = survey.event.chapter.organizer
         chapter      = event.chapter
         
+        # Check if they put in a company or junk
+        company      = attendee.get_profile().company
+        if company and company.lower() in ['na','n/a','self','']:
+            company = None
+        
         # Check if the leadbuyer is the organizer and if they have a letter
         if sponser == organizer:
             letter = 'self_referral.tmpl'
@@ -351,7 +360,8 @@ def make_contact( survey, deal, template ):
                      'sponser'     :sponser,
                      'organizer'   :organizer,
                      'chapter'     :chapter,
-                     'event'       :event
+                     'event'       :event,
+                     'company'     :company
                      })
 
         # Render the message and log it

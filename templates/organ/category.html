@@ -1,0 +1,54 @@
+{% extends 'base.html' %} {% block body_block %}
+<!--Body section-->
+<div id="bodysection">
+	<div class="insidesection">
+		<h2 class="comunityorganizer">Lead Categories</h2>
+		<p class="profiletxt">
+			Pick the lead categories for services your members most frequently
+			ask for your recommendations on.<br> You can always change these
+			later.
+		</p>
+		<article class="profile"> <section class="bodybg">
+		<nav class="step"> <nav class="step">
+		<ul>
+			<li><a href="{% url or_signup %}" class="noimg">STEP 1 of 3</a>
+			</li>
+			<li><a href="#" class="steptwothree">STEP 2 of 3</a>
+			</li>
+			<li><a href="{% url or_setup %}" class="step3">STEP 3 of 3</a>
+			</li>
+		</ul>
+		</nav> </nav>
+		<h2 class="paymethod">Standard Lead Categories</h2>
+		<form id="profile" name="" method="post" action="profile.php">
+
+			<section id="my-border" style="padding:20px 0 10px 0;">
+				<div class="chkboxdiv">
+				{{form.standard}}
+				</div>
+			</section>
+			<h2 class="leadcategories">Other Lead Categories</h2>
+
+			<section id="my-categories" style="padding:20px 0 10px 0;">
+				<div class="lftcategorydiv">
+					<div class="chkboxdiv">
+						{{form.other}}
+						{{form.custom}}{{form.custom.label}}
+						{{form.field}}
+					</div>
+				</div>
+			</section>
+
+			<p class="categoory">
+				<input name="" type="submit" value="Next Step: Lead Categories"
+					class="categorybutt">
+			</p>
+		</form>
+
+		</section>
+		<div class="botbg">&nbsp;</div>
+		</article>
+	</div>
+</div>
+<!--Body section-->
+{% endblock %}

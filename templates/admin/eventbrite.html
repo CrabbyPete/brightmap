@@ -1,0 +1,15 @@
+{% extends 'admin/admin.html' %}
+{% load smartif %}
+
+{% block body_block %} 	
+ 	{% if form %}
+	<form action="{% url deal %}" method="post" >
+       {% csrf_token %}
+       	<fieldset>
+ 			{{form}}
+        	<input type="submit" name="submit" />
+    	</fieldset>
+    </form>
+    {% endif %}
+
+{% endblock %}

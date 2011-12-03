@@ -14,15 +14,18 @@ from django.template                import  RequestContext
 from django.views.decorators.csrf   import  csrf_protect
 from django.core.urlresolvers       import  reverse
 from django.core.exceptions         import  ObjectDoesNotExist
+from django.views.generic.edit      import  FormView
 
 
 # Local imports
-from models                         import ( Organization, Event, Chapter, Profile, Interest, LeadBuyer,  
+from models                         import ( Event, Chapter, Profile, Interest, LeadBuyer,  
                                              Deal, Term, Cancel, Expire, Connection, Letter 
                                            )
 
-from forms                          import ( LoginForm, BuyerForm, InterestForm, DealForm, BuyDealForm,
-                                             LeadBuyerForm, ProfileForm, ChapterForm, LetterForm
+from forms                          import ( LoginForm, InterestForm, DealForm, BuyDealForm,
+                                             LeadBuyerForm, ProfileForm, ChapterForm, LetterForm,
+                                             EventbriteForm, EventForm, SurveyForm, ConnectionForm,
+                                             TermForm
                                            )
 
 from social.models                  import LinkedInProfile
@@ -105,6 +108,10 @@ def about(request):
     return render_to_response('about.html', {},
                                context_instance=RequestContext(request))
     
+def terms(request):
+    return render_to_response('terms.html', {},
+                               context_instance=RequestContext(request))
+    
 @csrf_protect
 def logout(request):
     # Log out a user
@@ -113,692 +120,151 @@ def logout(request):
 
 """
     All Admin functions are here
-"""
-@csrf_protect
-def  edit_profile(request):
-    # Edit a users profile
+"""   
+class ChapterView( FormView ):
+    template_name    = 'admin/chapter.html'
+    form_class       = ChapterForm
 
-    def submit_form(form, lead = None):
-        return render_to_response( 'admin/edit_profile.html',
-                                   {'form':form, 'lead':lead } ,
-                                   context_instance=RequestContext(request)
-                                 )
-
-    # Need to know what user this is
-    user    = request.user
-    profile = user.get_profile()
-    default_password ='3dhl4df6ajhhd9ir'
-
-    # GET: Here for the first time, show the currents values
-    if request.method == 'GET':
-
-        # Set up a default password, to see if the user tried to change passwords
-        data = {'email'         :user.email,
-                'password'      :default_password,
-                'pass_confirm'  :default_password,
-                'phone'         :profile.phone,
-                'first_name'    :user.first_name,
-                'last_name'     :user.last_name,
-                'address'       :profile.address,
-                'company'       :profile.company,
-                'title'         :profile.title,
-                'website'       :profile.website,
-                'is_organizer'  :profile.is_organizer,
-                'is_leadbuyer'  :profile.is_leadbuyer,
-                'is_attendee'   :profile.is_attendee,
-                'newsletter'    :profile.newsletter
-                }
-
-        form = ProfileForm(data)
-        if profile.is_leadbuyer:
-            lead = LeadBuyerForm()
-            return submit_form(form,lead)
-        else:
-            return submit_form(form)
-
-    #POST: Get the form data and change the values
-    form = ProfileForm(request.POST)
-    if not form.is_valid():
-        return submit_form(form)
-
-    # Check password input
-    password = form.cleaned_data['password']
-    pass_confirm = form.cleaned_data['pass_confirm']
-    if password != default_password:
-        if password != pass_confirm:
-            form._errors['password'] = ErrorList(["The passwords do not match"])
-            return submit_form(form)
-        else:
-            user.set_password(password)
-
-    phone  = form.cleaned_data['phone']
-    profile.phone = phone.replace('-','')
-
-    # Confirm email
-    user.email           = form.cleaned_data['email']
-    user.first_name      = form.cleaned_data['first_name']
-    user.last_name       = form.cleaned_data['last_name']
-    profile.title        = form.cleaned_data['title']
-    profile.company      = form.cleaned_data['company']
-    profile.website      = form.cleaned_data['website']
-    profile.is_organizer = form.cleaned_data['is_organizer']
-    profile.is_leadbuyer = form.cleaned_data['is_leadbuyer']
-    profile.is_attendee  = form.cleaned_data['is_attendee']
-
-    profile.newsletter   = form.cleaned_data['newsletter']
-    profile.address      = form.cleaned_data['address']
-    """
-    elif address != '':
-        local = geocode(address)
-        if 'address' in local:
-            profile.address = local['address']
-        else:
-            profile.address = address
-    """
-    profile.is_ready     = True
-    try:
-        user.save()
-        profile.save()
-    except:
-        pass
-
-    return HttpResponseRedirect('/')
-
-
-
-@csrf_protect
-def show_chapter(request):
-    # Show Chapter details
-
-    def submit_form(organizations):
-        return render_to_response( 'admin/show_chapter.html',
-                                   {'organizations':organizations},
-                                   context_instance=RequestContext(request)
-                                 )
-
-    # GET: All organizations
-    if 'organizer' in request.GET:
-        return submit_form(Organization.objects.all())
-    
-    if 'organization' in request.GET:
-        name = request.GET['organization']
-        organization = Organization.objects.get( name = name )
-        
-        return submit_form([organization])
-
-    organizations = []
-    for chapter in Chapter.objects.filter(organizer = request.user):
-        organizations.append(chapter.organization)
-
-    return submit_form(organizations)
-
-@csrf_protect
-def edit_chapter( request ):
-    # Edit Chapter details
-
-    def submit_form(form):
-        return render_to_response( 'admin/edit_chapter.html',
-                                   {'form':form},
-                                   context_instance=RequestContext(request)
-                                 )
-
-    # GET: Edit a chapter or create a new one
-    if request.method == 'GET':
+    def get(self, request, *args, **kwargs):
         if 'chapter' in request.GET:
-            chapter = Chapter.objects.get(pk = request.GET['chapter'])
-            form = ChapterForm( instance = chapter )
-            return submit_form(form)
-        else:
-            return submit_form(ChapterForm())
-
-    # POST: Change the requested chapter or create it
-    form = ChapterForm(request.POST)
-    if not form.is_valid():
-        return submit_form(form)
-    """
-    user_key        = form.cleaned_data['user_key']
-    organizer_id    = form.cleaned_data['organizer_id']
-    organization    = form.cleaned_data['organization']
-    organizer       = form.cleaned_data['organizer']
-    """
-    return HttpResponseRedirect('/')
-
-@csrf_protect
-def edit_interest( request ):
-    # Edit Interest
-
-    def submit_form(form):
-        return render_to_response( 'admin/edit_interest.html',
-                                   {'form':form },
-                                   context_instance=RequestContext(request)
-                                 )
-    # GET: All the current interests
-    if request.method == 'GET':
-        interests = Interest.objects.all()
-        interest_str = ''
-        for interest in interests:
-            interest_str += interest.interest+'\r\n'
-
-        form = InterestForm( {'interests':interest_str} )
-        return submit_form(form)
-
-    # POST: Check out each to see if any are new
-    form = InterestForm(request.POST)
-    if not form.is_valid():
-        return submit_form(form)
-
-    interests = form.cleaned_data['interests']
-    interests = interests.split('\r\n')
-    for interest in interests:
-        try:
-            in_interest = Interest.objects.get( interest = interest )
-        except Interest.DoesNotExist:
-            in_interest = Interest( interest = interest )
-            in_interest.save()
-
-    return HttpResponseRedirect('/')
-
-
-def show_event(request):
-    # Show details of a single event
-    def submit_form(event, attendees ):
-        return render_to_response( 'admin/show_event.html',
-                                   { 'event':event, 'attendees':attendees },
-                                   context_instance=RequestContext(request) )
-
-    # GET: All the attendees for a given event
-    if request.method == 'GET' and 'event' in request.GET:
-        event = Event.objects.get(pk = request.GET['event'])
-        attendees   = event.attendees()
-        return submit_form(event, attendees )
-
-def show_events(request):
-    # List the users current events
-    def submit_form(events):
-        return render_to_response( 'admin/show_events.html',
-                                   {'events':events },
-                                   context_instance=RequestContext(request) )
-
-    # GET: All events or events for a specific chapter
-    if request.method == 'GET':
-        if 'chapter' in request.GET:
-
-            # All or specific organizers?
-            if request.GET['chapter'] == 'all':
-                events = Event.objects.all()
+            if self.request.GET['chapter'] == 'new':
+                form = ChapterForm()
             else:
-                chapter = Chapter.objects.get(pk = request.GET['chapter'])
-                events  = chapter.events()
-            return submit_form(events)
-
-
-def edit_deal(request):
-    # Create or edit a Deal
-
-    def submit_form( form ):
-        return render_to_response( 'admin/edit_deal.html',
-                                   {'form': form },
-                                   context_instance=RequestContext(request) )
-    #GET
-    if request.method == 'GET':
-
-        # Edit an existing deal
-        if 'term' in request.GET:
-            term = Term.objects.get(pk = request.GET['term'])
-            data = {
-                    'interest' :term.deal.interest,
-                    'organizer':term.deal.chapter.pk,
-                    'cost':term.cost,
-                    'buyer':term.buyer
-            }
-            form = DealForm(initial = data)
-            return submit_form(form)
-
-        # Create a new deal
-        elif'organizer' in request.GET:
-            form = DealForm( initial={'organizer':request.GET['organizer']} )
-            return submit_form(form)
-
-        # Apply to a new deal
+                chapter = Chapter.objects.get( pk = self.request.GET['chapter'] )
+                form = ChapterForm( instance = chapter )
+            return self.render_to_response( {'form':form, 'chapter':chapter} )
+            
         else:
-            form = DealForm()
-            return submit_form(form)
+            chapters = Chapter.objects.all()
+            return self.render_to_response( {'chapters':chapters} )
 
-    # POST:
-    form = DealForm(request.POST)
-    if not form.is_valid():
-        return submit_form(form)
-    """
-    add_terms = form.cleaned_data['add_terms']
-    interest  = Interest.objects.get(interest = form.cleaned_data['interest'])
-
-    # Check if the deal exist already
-    try:
-        deal = Deal.objects.get( interest = interest,
-                                 organizer = organizer )
-    except Deal.DoesNotExist:
-        deal = Deal( interest = interest,
-                     organizer = organizer )
-
-    deal.save()
-
-    if not add_terms:
-        return HttpResponseRedirect(reverse('show_organizer'))
-
-    # Add terms added
-    # Try and clean the terms form
-    try:
-        if not terms.is_valid():
-            return submit_form(form, terms)
-
-    except ValueError, e:
-        print e
-
-    cost      = int(form.data['cost'])
-
-    # If nothing selected you will not get a terms_0
-    if not u'terms_0' in form.data:
-        terms.errors['terms'] = "A term selection is required"
-        return submit_form(form,terms)
-
-    # Get which term was selected from terms_0
-    term_type = form.data['terms_0']
-    if term_type == 'Cancel':
-            term = Cancel(cost = cost)
-    elif term_type == 'Count':
-        count = int(form.data['terms_3'])
-        term = Count(cost = cost, number = count, remaining = count)
-    else:
-        date = form.data['terms_2']
-        date = parse(date)
-        term = Expire(cost = cost, date = date )
-
-    # See if a buyer was added
-    if 'buyer' in form.data and form.data['buyers'] != None:
-        try:
-            buyer = User.objects.get(email = form.data['buyers'])
-            term.buyer = buyer
-        except:
-            pass
-
-    # Save the term and add it to the deal
-    term.save()
-    deal.terms.add(term)
-
-    deal.save()
-    """
-    return HttpResponseRedirect(reverse('show_organizer'))
-
-def show_deals(request):
-    # Show a list of Deals
-
-    def submit_form(deals):
-        return render_to_response( 'admin/show_deals.html',
-                                   { 'deals':deals },
-                                   context_instance=RequestContext(request)
-                                 )
-
-    if request.method == 'GET':
-        if 'chapter' in request.GET:
-            chapter = Chapter.objects.get( pk = request.GET['chapter'])
-            deals = chapter.deals()
-        else:
-            deals = Deal.objects.all()
-
-        return submit_form(deals)
-
-def show_deal(request):
-    # Show specific details for a Deal
-
-    def submit_form( deal ):
-        return render_to_response( 'admin/show_deal.html',
-                                   {'deal':deal },
-                                   context_instance=RequestContext(request) )
-
-    if request.method == 'GET' and 'deal' in request.GET:
-        deal = Deal.objects.get(pk = request.GET['deal'])
-        return submit_form(deal)
-
-def cancel_term(request):
-    # Cancel Terms of a Deal
-
-    if request.method == 'GET' and 'term' in request.GET:
-        term = Term.objects.get(pk = request.GET['term'])
-        term.canceled = True
-        term.save()
-        return HttpResponseRedirect(reverse('show_deals'))
-
-def show_buyers(request):
-    pass
-
-def show_buyer(request):
-    # Show LeadBuyer details
-
-    def submit_form( buyer ):
-        return render_to_response( 'admin/show_buyer.html',
-                                   {'buyer':buyer },
-                                   context_instance=RequestContext(request) )
-
-    if request.method == 'GET':
-        if 'buyer' in request.GET:
-            if request.GET['buyer'] == 'all':
-                buyers = Profile.objects.filter(is_leadbuyer = True)
-                return render_to_response( 'admin/show_buyers.html',
-                                           {'buyers':buyers},
-                                     context_instance=RequestContext(request) )
-
-
-            else:
-                profile = Profile.objects.get(pk = request.GET['buyer'])
-                try:
-                    buyer  = LeadBuyer.objects.get(user = profile.user)
-                except LeadBuyer.DoesNotExist:
-                    buyer = LeadBuyer( user = request.user)
-                    buyer.save()
-        else:
-            try:
-                buyer  = LeadBuyer.objects.get(user = request.user)
-
-            except LeadBuyer.DoesNotExist:
-                buyer = LeadBuyer( user = request.user)
-                buyer.save()
-
-        return submit_form(buyer)
-
-
-    if request.method == 'POST':
-            return HttpResponseRedirect('/')
-
-@csrf_protect
-def edit_buyer(request):
-    # Edit LeadBuyer details
-
-    def submit_form(form):
-        return render_to_response( 'admin/edit_buyer.html',
-                                   {'form':form },
-                                   context_instance=RequestContext(request) )
-    # GET
-    if request.method == 'GET':
-        if 'buyer' in request.GET:
-            user = User.objects.get(pk = request.GET['buyer'])
-            buyer = user.get_profile
-        else:
-            user = request.user
-            buyer = user.get_profile()
-
-        # Check if they have a LinkedIn profile
-        try:
-            linkedin = LinkedInProfile.objects.get(user = user)
-        except LinkedInProfile.DoesNotExist:
-            data = {
-                    'phone':        buyer.phone,
-                    'title':        buyer.title,
-                    'company':      buyer.company,
-                    'address':      buyer.address,
-                    'website':      buyer.website
-                    }
-        else:
-            data = {
-                    'phone':        buyer.phone,
-                    'title':        linkedin.title,
-                    'company':      linkedin.company,
-                    'address':      buyer.address,
-                    'website':      buyer.website
-                    }
-
-        form = BuyerForm(data)
-        return submit_form(form)
-
-    # POST
-    form = BuyerForm(request.POST)
-    if not form.is_valid():
-        return submit_form(form)
-
-    # Get the email address and double check it to make sure its unique
-    email = form.cleaned_data['email']
-    if email != u'':
-        qry = User.objects.filter(email = email)
-        if qry.count() >= 1:
-            form.errors['email'] = "This email is in use"
-            return submit_form(form)
-
-    # Create the user
-    try:
-        password = 'new_user'
-        user  = User.objects.create_user(username=email, email = email, password=password)
-    except Exception,e:
-        print e
-        form._errors['email'] = ErrorList(['This email has already been used'])
-        return submit_form(form)
-
-    user.first_name = form.cleaned_data['first_name']
-    user.last_name = form.cleaned_data['last_name']
-
-    user.save()
-
-    profile  = Profile(user = user)
-    profile.is_leadbuyer = True
-
-    profile.phone   = form.cleaned_data['phone']
-    profile.address = form.cleaned_data['address']
-    profile.company = form.cleaned_data['company']
-    profile.website = form.cleaned_data['website']
-    profile.save()
-
-    return HttpResponseRedirect('/')
-
-def add_buyer(request):
-    # Add a LeadBuyer
-
-    def submit_form( form ):
-        return render_to_response( 'admin/add_buyer.html',
-                                   {'form':form },
-                                   context_instance=RequestContext(request) )
-
-    if request.method == 'GET':
-        if 'term' in request.GET:
-            data = {'term':  request.GET['term'] }
-            form = BuyerForm(data)
-            return submit_form(form)
-
-    if request.method == 'POST':
-        form = BuyerForm(request.POST)
-        if not form.is_valid():
-            return submit_form(form)
-
-        term  = Term.objects.get(pk = form.cleaned_data['term'])
-        buyer = User.objects.get(email = form.cleaned_data['buyers'])
-        term.buyer = buyer
-        term.save()
-
+ 
+    def form_valid(self, form):
         return HttpResponseRedirect('/')
 
-def show_survey(request):
-    # Show what surveys were answered
-
-    def submit_form( surveys ):
-        return render_to_response( 'admin/show_survey.html',
-                                   {'surveys':surveys },
-                                    context_instance=RequestContext(request) )
-    if 'event' in request.GET:
-        event = Event.objects.get( pk = request.GET['event'] )
-
-        surveys = []
-        for survey in event.surveys():
-            if survey.interest == None:
-                continue
-
-            connects = survey.connections()
-            if open and connects.count() > 0:
-                continue
-            surveys.append( survey )
-        return submit_form( surveys )
-
-    return HttpResponseRedirect('/')
-
-def show_connection(request):
-    # Show details of a Connections
-
-    def submit_form( connections ):
-        return render_to_response( 'admin/show_connection.html',
-                                   {'connections':connections },
-                                    context_instance=RequestContext(request) )
-
-    if request.method == 'GET':
-        if 'connection' in request.GET:
-            # All or specific organizers?
-            if request.GET['connection'] == 'all':
-                connections = Connection.objects.filter()
-                return submit_form(connections)
+class EventbriteView( FormView ):
+    template_name   = 'admin/eventbrite.html'
+    form_class      = EventbriteForm
+    
+    def get(self, request, *args, **kwargs):
+        if 'chapter' in request.GET:
+            chapter = Chapter.objects.get( pk = self.request.GET['chapter'] )
+            eventbrite = chapter.get_eventbrite()
+            if len(eventbrite) > 0:
+                form = EventbriteForm( instance = eventbrite[0] )
             else:
-                connections = Connection.objects.get(pk=request.GET['connection'])
-                return submit_form([connections])
+                form = EventbriteForm({'chapter':chapter})
+            return self.render_to_response( {'form':form, 'chapter':chapter} )
+            
+  
+    def form_valid(self, form ):
+        return HttpResponseRedirect('/')
+    
+class DealView( FormView ):
+    template_name   = 'admin/deal.html'
+    form_class      = DealForm
+    
+    def get(self, request, *args, **kwargs):
+        if 'deal' in request.GET:
+            deal = Deal.objects.get(pk = request.GET['deal'])
+            form = DealForm( instance = deal )
+            return self.render_to_response( {'form': form} )
+        
+        if 'chapter' in request.GET:
+            chapter = Chapter.objects.get(pk = request.GET['chapter'])
+            deals = chapter.deals()
+   
+        elif 'leadbuyer' in request.GET:
+            leadbuyer = LeadBuyer.objects.get(pk = request.GET['leadbuyer'])
+            deals = leadbuyer.deals()
+            
+        return self.render_to_response( {'deals':deals} )
+            
+    def form_valid(self, form ):
+        return HttpResponseRedirect('/')
 
-        elif 'chapter' in request.GET:
-            connections = []
-            events = Event.objects.filter(chapter = request.GET['chapter'])
-            for event in events:
-                for c in event.connections():
-                    connections.append(c)
-            return submit_form(connections)
-
-        elif 'user' in request.GET:
-            user  = User.objects.get(pk = request.GET['user'])
-            connections = Connection.objects.for_user(user)
-            return submit_form(connections)
-
-    return HttpResponseRedirect('/')
-
-# Edit/Upload an Email template
-@csrf_protect
-def edit_letter(request):
-    # Edit the current Chapter Letter
-
-    def submit_form(form):
-        return render_to_response( 'admin/edit_letter.html',
-                                   {'form':form },
-                                   context_instance=RequestContext(request) )
-    if request.method == 'GET':
-        return submit_form(LetterForm())
-
-    form = LetterForm( request.POST, request.FILES )
-    if not form.is_valid():
-        return submit_form(form)
-
-    # Who owns this file
-    organizer = form.cleaned_data['organizer']
-
-    # Upload the file
-    # Note: make sure the file name is unique
-    fil = request.FILES['letter']
-    file_to_open = settings.MEDIA_ROOT+'//letters//'+ organizer.organization + '.tmp'
-    fd = open(file_to_open, 'wb+')
-    if file.multiple_chunks():
-        for chunk in file.chunks():
-            fd.write(chunk)
-    else:
-        fd.write(fil.read())
-    fd.close()
-
-    # Save a record in the database
-    letter = Letter( organizer = organizer, letter = file_to_open )
-
-    letter.save()
-    return HttpResponseRedirect('/')
-
-@csrf_protect
-def show_available_deals(request):
-    """
-    Report number of interests for each event
-    """
-    def submit_form( form, interest = None, report = None ):
-        return render_to_response( 'admin/show_available_deals.html',
-                                    { 'form':form,
-                                      'interest': interest,
-                                      'report':report
-                                    },
-                                    context_instance=RequestContext(request)
-                                 )
-
-    # GET
-    if request.method == 'GET':
-        form = InterestForm()
-        return submit_form(form)
-
-    # POST Return a dictionary of events and interests
-    form = InterestForm(request.POST)
-    if not form.is_valid():
-            return submit_form(form)
-
-    interest = form.cleaned_data['interests']
-    interest = Interest.objects.get( interest = interest )
-    report = interest.events( open = True )
-    return submit_form( form, interest, report )
-
-
-def buy_deal(request):
-
-    def submit_form(form):
-        return render_to_response( 'admin/buy_deal.html',
-                                   {'form':form },
-                                   context_instance=RequestContext(request) )
-    # GET
-    if request.method == 'GET':
-        if 'event' in request.GET and 'interest' in request.GET:
-            event = Event.objects.get(pk = request.GET['event'])
-            chapter = event.chapter
-            interest = Interest.objects.get(interest = request.GET['interest'])
-
-        data = { 'chapter':chapter,
-                 'interest':interest.interest
-               }
-        form = BuyDealForm(data)
-        return submit_form(form)
-
-    # POST
-    if request.method == 'POST':
-        form = BuyDealForm(request.POST)
-        if not form.is_valid():
-            return submit_form(form)
-
-        chapter   = form.cleaned_data['chapter']
-        interest  = form.cleaned_data['interest']
-        deal_type = form.cleaned_data['deal_type']
-
-        # Check if there are any existing deals
-        interest = Interest.objects.get(interest = interest)
-        chapter  = Chapter.objects.get(name = chapter)
-        try:
-            deal = Deal.objects.get( chapter = chapter, interest = interest )
-
-        # If not create one
-        except Deal.DoesNotExist:
-            deal = Deal( chapter = chapter, interest = interest )
-            deal.save()
-
-        # Check the type of deal
-        if deal_type == 'Trial':
-            one_month = datetime.now() + relativedelta(months=+1)
-            expire = Expire( deal = deal,
-                             date = one_month,
-                             cost = 0,
-                             status = 'pending',
-                             buyer = request.user
-                            )
-            expire.save()
+class TermView( FormView ):
+    template_name   = 'admin/term.html'
+    form_class      = TermForm
+    
+    def get(self, request, *args, **kwargs):
+        if 'leadbuyer' in request.GET:
+            leadbuyer = LeadBuyer.objects.get(pk = request.GET['leadbuyer'])
+            terms = leadbuyer.deals()
+            
+        return self.render_to_response( {'terms':terms} )
+            
+    def form_valid(self, form ):
+        return HttpResponseRedirect('/')
+        
+class LeadBuyerView( FormView ):
+    template_name   = 'admin/leadbuyer.html'
+    form_class      = LeadBuyerForm
+    
+    def get(self, request, *args, **kwargs):
+        if 'leadbuyer' in request.GET:
+            leadbuyer = LeadBuyer.objects.get(pk = request.GET['leadbuyer'])
+            form = LeadBuyerForm( instance = leadbuyer )
+            return self.render_to_response( {'form': form, 'leadbuyer':leadbuyer} )
         else:
-            if deal_type == 'Exclusive':
-                cost = 50.00
-                exclusive = True
-            elif deal_type ==  'Nonexclusive':
-                cost = 20.00
-                exclusive = False
+            leadbuyers = LeadBuyer.objects.all()
+            return self.render_to_response( {'leadbuyers': leadbuyers} )
+ 
+    
+    def form_valid(self, form):
+        return HttpResponseRedirect('/')
 
-            cancel = Cancel( deal = deal,
-                             cost = cost,
-                             exclusive = exclusive,
-                             buyer = request.user
-                            )
-            cancel.save()
-    return HttpResponseRedirect('/')
+
+class EventView( FormView ):
+    template_name   = 'admin/event.html'
+    form_class      = EventForm
+    
+    def get(self, request, *args, **kwargs):
+        if 'event' in request.GET:
+            event = Event.objects.get(pk = request.GET['event'])
+            form = EventForm(instance = event )
+            return self.render_to_response( {'form':form, 'event': event} )
+        
+        if 'chapter' in request.GET:
+            chapter = Chapter.objects.get(pk = request.GET['chapter'])
+            events = chapter.events()
+            return self.render_to_response( {'events': events} )
+
+    
+    def form_valid(self, form):
+        return HttpResponseRedirect('/')
+    
+    
+class SurveyView( FormView ):
+    template_name   = 'admin/survey.html'
+    form_class      = SurveyForm
+    
+    def get(self, request, *args, **kwargs):
+        if 'event' in request.GET:
+            event = Event.objects.get(pk = request.GET['event'])
+            surveys = event.surveys( lead = True )
+            return self.render_to_response( {'surveys': surveys} )
+    
+    def form_valid(self, form):
+        return HttpResponseRedirect('/')
+
+
+class ConnectionView( FormView ):
+    template_name   = 'admin/connection.html'
+    form_class      = ConnectionForm
+    
+    def get(self, request, *args, **kwargs):
+        if 'event' in request.GET:
+            event = Event.objects.get(pk = request.GET['event'])
+            connections = event.connections()
+  
+        elif 'leadbuyer' in request.GET:
+            leadbuyer = LeadBuyer.objects.get(pk = request.GET['leadbuyer'])
+            connections = leadbuyer.connections()
+        
+        return self.render_to_response( {'connections': connections} )
+            
+    
+    def form_valid(self, form):
+        return HttpResponseRedirect('/')
 

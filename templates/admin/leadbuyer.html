@@ -1,0 +1,29 @@
+{% extends "admin/admin.html" %}
+
+{% block body_block %}
+	{% if leadbuyers %}
+	<table id = 'leadbuyer'>
+ 	{% for leadbuyer in leadbuyers %}
+        <tr>
+            <td><a href='{%url leadbuyer%}?leadbuyer={{leadbuyer.pk}}'>{{leadbuyer.user.email}}</td>
+            <td>{{leadbuyer.user.first_name}}</td>
+            <td>{{leadbuyer.user.last_name}}</td>
+        </tr>
+    {% endfor %}
+    </table>
+    {% endif %}
+    
+    {% if form %}
+    <form action="{% url leadbuyer %}" method="post" >
+       {% csrf_token %}
+       	<fieldset>
+ 			{{form}}
+        	<input type="submit" name="submit" />
+    	</fieldset>
+    </form>
+    <menu>
+   		<li><a href='{% url connection %}?leadbuyer={{leadbuyer.pk}}'>Connections</a></li>
+        <li><a href='{% url term       %}?leadbuyer={{leadbuyer.pk}}'>Deals</a></li>
+    </menu>
+    {% endif %}
+{% endblock %}

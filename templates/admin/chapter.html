@@ -1,0 +1,29 @@
+{% extends 'admin/admin.html' %}
+{% load smartif %}
+
+{% block body_block %}
+	{% if chapters %}
+		{% for chapter in chapters %}
+    		<a href='{% url chapter %}?chapter={{chapter.pk}}'>{{ chapter.name }}</a><br/>
+ 		{% endfor %}
+ 		</br>
+ 		<a href='{% url chapter %}?chapter=new'}>Create New Chapter</a>
+ 	{% endif %}
+ 	
+ 	{% if form %}
+	<form action="{% url chapter %}" method="post" >
+       {% csrf_token %}
+       	<fieldset>
+ 			{{form}}
+        	<input type="submit" name="submit" />
+    	</fieldset>
+    </form>
+    <menu>
+        <li><a href='{% url eventbrite %}?chapter={{chapter.pk}}'>Eventbrite Info</a></li>
+        <li><a href='{% url deal       %}?chapter={{chapter.pk}}'>Deals</a></li>
+        <li><a href='{% url event      %}?chapter={{chapter.pk}}'>Events</a></li>
+        
+    </menu>
+    {% endif %}
+
+{% endblock %}

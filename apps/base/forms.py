@@ -6,7 +6,10 @@ from django.forms                           import ModelForm
 
 #from radio                                  import ChoiceWithOtherField
 from radio2                                 import ChoiceWithOtherField
-from models                                 import Profile, LeadBuyer, Interest, Chapter, Letter
+from models                                 import ( Profile, LeadBuyer, Interest, Chapter, Letter,
+                                                     Eventbrite, Deal, Event, Survey, Term, Connection,
+                                                     Cancel, Expire
+                                                   )
 
 class LoginForm(forms.Form):
     username        = forms.EmailField  ( max_length = 45,
@@ -78,6 +81,9 @@ class SignUpForm(forms.Form):
                                             widget = forms.CheckboxInput(attrs={})
                                         )
 
+
+
+
 class InterestForm(forms.Form):
     interests        = forms.ChoiceField( choices=(),
                                           label = 'Interest',
@@ -87,52 +93,7 @@ class InterestForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(InterestForm, self).__init__(*args, **kwargs)
         self.fields['interests'].choices = [(i.interest,i.interest) for i in Interest.objects.all()]
-
-
-
-class DealForm(forms.Form):
-    
-    
-
-    organizer       = forms.IntegerField( required = False,
-                                          widget=forms.HiddenInput() )
-
-    interest        = forms.ChoiceField( choices=(),
-                                         widget=forms.Select() )
-
-    exclusive       = forms.BooleanField( required = False,
-                                          widget=forms.CheckboxInput(attrs={})
-                                        )
-
-    cost            = forms.CharField( max_length = 10 )
-
-    w1  = forms.RadioSelect()
-    w2  = forms.DateInput()
-    w3  = forms.TextInput()
-    w4  = forms.TextInput()
-    
-    terms           = ChoiceWithOtherField( choices =  
-                                            [('Cancel','Until Cancel', w1  ),
-                                             ('Expire','Until Date',   w2  ),
-                                             ('Count' ,'Until Count',  w3  ),
-                                             ('Budget','Under Budget', w4  ),
-                                            ]
-                                          )
-
-    buyers          = forms.ChoiceField( required = False,
-                                         choices=(),
-                                         label = 'Add Buyer',
-                                         widget=forms.Select(attrs={})
-                                       )
-
-    def __init__(self, *args, **kwargs):
-        super(DealForm, self).__init__(*args, **kwargs)
-        self.fields['interest'].choices = [(i.interest,i.interest) for i in Interest.objects.all()]
-        self.fields['buyers'].choices = [('', 'None')]+[(i.user.email ,i.user.first_name + ' '+ i.user.last_name )
-                                           for i in Profile.objects.filter(is_leadbuyer  = True)]
-
-
-
+"""
 class BuyerForm(forms.Form):
     email           = forms.EmailField  ( required = True,
                                             label = 'Email Address:',
@@ -221,8 +182,9 @@ class BuyerForm(forms.Form):
                                           required = False,
                                           widget = forms.CheckboxInput(attrs={'class':'supf'})
                                          )
+"""
 
-
+"""
 class BuyersForm( forms.Form):
     buyers        = forms.ChoiceField( required = False,
                                        choices=(),
@@ -233,7 +195,7 @@ class BuyersForm( forms.Form):
         super(BuyersForm, self).__init__(*args, **kwargs)
         self.fields['buyers'].choices = [('', 'None')]+[(i.user.email ,i.user.first_name + ' '+ i.user.last_name )
                                            for i in Profile.objects.filter(is_leadbuyer  = True)]
-
+"""
 class ProfileForm( SignUpForm ):
 
     password        = forms.CharField   ( max_length = 45,
@@ -301,18 +263,46 @@ class BuyDealForm(forms.Form):
                                             widget=forms.RadioSelect(attrs={})
                                        )
 
+class DealForm( ModelForm ):
+    class Meta:
+        model = Deal
+         
 class LeadBuyerForm(ModelForm):
     class Meta:
         model = LeadBuyer
-        exclude = ('user','letter')
-
-
+ 
 class ChapterForm(ModelForm):
     class Meta:
         model = Chapter
-        exclude = ('letter')
-
+    
+class EventbriteForm(ModelForm):
+    class Meta:
+        model = Eventbrite
+        
 class LetterForm(ModelForm):
     class Meta:
         model = Letter
+        
+class EventForm(ModelForm):
+    class Meta:
+        model = Event
+               
+class SurveyForm(ModelForm):
+    class Meta:
+        model = Survey
+        
+class ConnectionForm(ModelForm):
+    class Meta:
+        model = Connection
+               
+class TermForm(ModelForm):
+    class Meta:
+        model = Term
 
+class CancelForm(ModelForm):
+    class Meta:
+        model = Cancel
+        
+class ExpireForm(ModelForm):
+    class Meta:
+        model = Expire

@@ -370,8 +370,22 @@ class Bill( TemplateView ):
             bills = dict(bills = bills, total = total, title = title )
         return bills
     
-    
+
+
 regex_money = '^\$?([1-9]{1}[0-9]{0,2}(\,[0-9]{3})*(\.[0-9]{0,2})?|[1-9]{1}[0-9]{0,}(\.[0-9]{0,2})?|0(\.[0-9]{0,2})?|(\.[0-9]{1,2})?)$'
+#'"APT","APARTMENT","BLDG","BUILDING","DEPT","DEPARTMENT","FL","FLOOR","HNGR","HANGER","LOT","PIER","RM","ROOM","TRLR","TRAILER","UNIT","SUITE","STE"'
+regex_suba  = "(APT|APARTMENT|BLDG|BUILDING|DEPT|DEPARTMENT|FL|FLOOR|HNGR|HANGER|LOT|PIER|RM|ROOM|TRLR|TRAILER|UNIT|SUITE|STE)"
+
+
+def parseAddress(address):
+    subs = re.compile(regex_suba, re.I)
+    found = subs.search(address)
+    if found:
+        address = re.split(found.group(0),address)
+        return address[0]
+    return None
+
+
 
 class Payment( FormView ):
     template_name = 'leadb/lb_payment.html'
@@ -410,7 +424,7 @@ class Payment( FormView ):
             form._errors['expire_year'] = ErrorList(["Date is in the past"])
             return self.form_invalid(form)
         
-        #pattern = r"^(?n:(?<address1>(\d{1,5}(\ 1\/[234])?(\x20[A-Z]([a-z])+)+ )|(P\.O\.\ Box\ \d{1,5}))\s{1,2}(?i:(?<address2>(((APT|APARTMENT|BLDG|BUILDING|DEPT|DEPARTMENT|FL|FLOOR|HNGR|HANGER|LOT|PIER|RM|ROOM|S(LIP|PC|T(E|OP))|TRLR|TRAILER|UNIT)\x20\w{1,5})|(BSMT|BASEMENT|FRNT|FRONT|LBBY|LOBBY|LOWR|LOWER|OFC|OFFICE|PH|REAR|SIDE|UPPR|UPPER)\.?)\s{1,2})?)(?<city>[A-Z]([a-z])+(\.?)(\x20[A-Z]([a-z])+){0,2})\, \x20(?<state>A[LKSZRAP]|C[AOT]|D[EC]|F[LM]|G[AU]|HI|I[ADL N]|K[SY]|LA|M[ADEHINOPST]|N[CDEHJMVY]|O[HKR]|P[ARW]|RI|S[CD] |T[NX]|UT|V[AIT]|W[AIVY]|[A-Z]([a-z])+(\.?)(\x20[A-Z]([a-z])+){0,2})\x20(?<zipcode>(?!0{5})\d{5}(-\d {4})?))$"
+
         # Get the card, expiration date, address and budget
         card_number = form.cleaned_data[u'number']
         address     = form.cleaned_data['address']
@@ -428,11 +442,7 @@ class Payment( FormView ):
                 lb.budget = budget[1]
                
             
-        # Initialize the API class
-        cim_api = cim.Api( unicode(settings.AUTHORIZE['API_LOG_IN_ID']),
-                           unicode(settings.AUTHORIZE['TRANSACTION_ID']) 
-                         )
-    
+
         # Prepare the required parameters 
         billing = dict( bill_first_name = user.first_name,
                         bill_last_name  = user.last_name,
@@ -440,11 +450,14 @@ class Payment( FormView ):
                         bill_phone      = profile.phone
                       )
     
-        # Use Google to verify the address string
-        #pattern = r"^(?n:(?<address1>(\d{1,5}(\ 1\/[234])?(\x20[A-Z]([a-z])+)+ )|(P\.O\.\ Box\ \d{1,5}))\s{1,2}(?i:(?<address2>(((APT|APARTMENT|BLDG|BUILDING|DEPT|DEPARTMENT|FL|FLOOR|HNGR|HANGER|LOT|PIER|RM|ROOM|S(LIP|PC|T(E|OP))|TRLR|TRAILER|UNIT)\x20\w{1,5})|(BSMT|BASEMENT|FRNT|FRONT|LBBY|LOBBY|LOWR|LOWER|OFC|OFFICE|PH|REAR|SIDE|UPPR|UPPER)\.?)\s{1,2})?)(?<city>[A-Z]([a-z])+(\.?)(\x20[A-Z]([a-z])+){0,2})\, \x20(?<state>A[LKSZRAP]|C[AOT]|D[EC]|F[LM]|G[AU]|HI|I[ADL N]|K[SY]|LA|M[ADEHINOPST]|N[CDEHJMVY]|O[HKR]|P[ARW]|RI|S[CD] |T[NX]|UT|V[AIT]|W[AIVY]|[A-Z]([a-z])+(\.?)(\x20[A-Z]([a-z])+){0,2})\x20(?<zipcode>(?!0{5})\d{5}(-\d {4})?))$"
-
+        # Look for any sub addresses like Apt, Building .. and dump them
+        sub_address = parseAddress( address)
+        if sub_address and sub_address != address:
+            address = sub_address
+            
         address += ", " + city + " " + state
         
+        # Use Google to verify the address string
         if address:
             try:
                 local = geocode(address)
@@ -471,6 +484,12 @@ class Payment( FormView ):
                   )
     
         kw.update(billing)
+        
+        # Initialize the API class
+        cim_api = cim.Api( unicode(settings.AUTHORIZE['API_LOG_IN_ID']),
+                           unicode(settings.AUTHORIZE['TRANSACTION_ID']) 
+                         )
+    
         try:
             response = cim_api.create_profile( **kw )
  

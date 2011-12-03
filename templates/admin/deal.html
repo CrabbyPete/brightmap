@@ -1,0 +1,26 @@
+{% extends 'admin/admin.html' %}
+{% load smartif %}
+
+{% block body_block %}
+	{% if deals %}
+		{% for deal in deals %}
+    		<a href='{% url deal %}?deal={{deal.pk}}'>{{ deal }}</a><br/>
+ 		{% endfor %}
+ 		</br>
+ 		<a href='{% url deal %}?deal=new'}>Create New Chapter</a>
+ 	{% endif %}
+ 	
+ 	{% if form %}
+	<form action="{% url deal %}" method="post" >
+       {% csrf_token %}
+       	<fieldset>
+ 			{{form}}
+        	<input type="submit" name="submit" />
+    	</fieldset>
+    </form>
+    <menu>
+        <li><a href='{% url terms %}?deal={{deal.pk}}'>Terms</a></li>
+    </menu>
+    {% endif %}
+
+{% endblock %}

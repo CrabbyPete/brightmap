@@ -1,9 +1,0 @@
-{% extends "admin/admin.html" %}
-
-{% block body_block %}
-    <div id="bodyc">
-        {% for deal in deals %}
-             <a href='{% url show_deal %}?deal={{deal.pk}}'>{{ deal.interest }} </a> {{deal.organizer.organization}}<br/>
-        {% endfor %}
-	</div>
-{% endblock %}

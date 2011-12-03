@@ -1,0 +1,14 @@
+{% extends "admin/admin.html" %}
+
+{% block body_block %}
+	<table id = 'events'>
+ 	{% for survey in surveys %}
+        <tr>
+            <td><a href='{%url survey %}?survey={{survey.pk}}'>{{survey.attendee.email}}</a></td>
+            <td>{{survey.attendee.first_name}}</td>
+            <td>{{survey.attendee.last_name}}</td>
+            <td>{{survey.interest}}</td>
+        </tr>
+    {% endfor %}
+    </table>
+{% endblock %}

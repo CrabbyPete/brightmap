@@ -169,7 +169,13 @@ class PaymentForm(forms.Form):
                                          widget = forms.Select(attrs={'class':"selectbox1"})
                                        )
     
+    
     address         = forms.CharField   ( max_length = 100,
+                                          widget = forms.TextInput(attrs={'id':"inputext1"})
+                                        )
+    
+    address2         = forms.CharField  ( required = False,
+                                          max_length = 100,
                                           widget = forms.TextInput(attrs={'id':"inputext1"})
                                         )
     
@@ -177,7 +183,7 @@ class PaymentForm(forms.Form):
                                           widget = forms.TextInput(attrs={'id':"inputext1"})
                                         )
     
-    state           = forms.CharField   ( max_length = 40,
+    state           = forms.CharField   ( max_length = 2,
                                           widget = forms.TextInput(attrs={'class':"stateabbr"})  
                                         )
 
@@ -191,4 +197,4 @@ class PaymentForm(forms.Form):
   
     def __init__(self,*args, **kwargs):
         super(PaymentForm, self).__init__(*args, **kwargs)
-        self.fields['expire_year'].choices =  [(yr,yr) for yr in xrange(date.today().year,date.today().year + 15)]
+        self.fields['expire_year'].choices =  [(yr,yr) for yr in xrange(date.today().year,date.today().year + 5)]

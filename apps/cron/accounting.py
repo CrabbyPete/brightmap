@@ -14,11 +14,6 @@ from authorize.responses            import AuthorizeError, _cim_response_codes
 INVOICE = True 
 
 
-def connections_for( user, first_day, last_day ):
-    connections = Connection.objects.for_user(user,[first_day,last_day])
-    return connections
-
-
 def send_email(user, invoice, details = None):
     return
 
@@ -51,7 +46,7 @@ def main(month = None):
         itemize = []
         print profile.user.first_name + ' ' + profile.user.last_name
         
-        connections = connections_for( profile.user, first_day, last_day )
+        connections = Connection.objects.for_buyer(profile.user,[first_day,last_day])
         if connections != None:
             for connection in connections:
                 total += connection.term.cost
@@ -68,8 +63,6 @@ def main(month = None):
             print profile.user.first_name + ' ' + profile.user.last_name + ' Total: $' +str(total)
   
             # Create the invoice
-           
-            
             if total > 0 and INVOICE: 
                 title = first_day.strftime("%B %Y")
                 
@@ -130,6 +123,7 @@ if __name__ == '__main__':
     opts,args = op.parse_args()
 
     # Check if options were set
+
     if opts.d:
         INVOICE = False
     else:

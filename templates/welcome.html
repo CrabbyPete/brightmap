@@ -5,9 +5,8 @@
     	<div id="welcom">
     		Welcome {{user}}<br/>
 			{% if user.is_staff %}
-			<li><a href = '{% url show_chapter %}?organizer=all' >Show Organizers</a></li>
-    		<li><a href = '{% url show_buyer%}?buyer=all' >Show LeadBuyers</a></li>
-    		<li><a href = '{% url show_connection%}?connection=all' >Show Connections</a></li>
+			<li><a href = '{% url chapter %}' >Chapters</a></li>
+			<li><a href = '{% url leadbuyer %}'>LeadBuyers</a>
 			{% endif %}
 			<li><a href='{% url logout %}'>Log Out</a></li>
     	</div>

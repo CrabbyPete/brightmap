@@ -1,19 +1,90 @@
-{% extends "base.html" %}
-{% load smartif %}
-
+{% extends 'base.html' %} 
 {% block body_block %}
-	 <form action="{% url or_signup %}" method="post" >
-       {% csrf_token %}
-       	<fieldset>
- 			{{form}}
-        	<input type="image" name="submit" src=/media/img/btn-submit.gif />
-    	</fieldset>
-    </form>
-	
+
+<!--Body section-->
+<div id="bodysection">
+	<div class="insidesection">
+		<h2 class="comunityorganizer">Community Organizer Profile</h2>
+		<p class="profiletxt">
+			You will be given a chance to confirm all lead-buyers (service
+			providers) to whom you are sending introductions.<br> You will
+			receive an invoice at the end of the month detailing which
+			introductions were made, how much each lead-buyer was charged, and
+			your commission payment.
+		</p>
+		<article class="profile"> 
+		<section class="bodybg">
+		<nav class="step">
+		<ul>
+			<li><a href="#" class="stepone">STEP 1 of 3</a>
+			</li>
+			<li><a href="{% url or_category %}">STEP 2 of 3</a>
+			</li>
+			<li><a href="{% url or_setup %}" class="step3">STEP 3 of 3</a>
+			</li>
+		</ul>
+		</nav>
+		<h2 class="paymethod">Organizer Details</h2>
+		<form id="profile" name="" method="post" action="{% url or_signup %}">
+			{% csrf_token %}
+
+			<section id="my-border">
+			<p class="lftcontent">First Name <span>*</span></p>
+			{{form.first_name}}{{form.first_name.errors}}
+
+			<p class="lftcontent">Last Name <span>*</span></p>
+			{{form.last_name}}{{form.last_name.errors}}
+
+			<p class="lftcontent">Email <span>*</span></p>
+			{{form.email}}{{form.email.errors}}
+
+
+			<p class="lftcontent">Password <span>*</span></p>
+			{{form.password}}{{form.password.errors}}
+
+			<p class="lftcontent">Confirm Password <span>*</span></p>
+			{{form.pass_confirm}}{{form.pass_confirm.errors}}
+
+			<p class="lftcontent">Organization Name <span>*</span></p>
+			{{form.organization}}{{form.organization.errors}}
+			
+			
+			<p class="lftcontent">Organization Chapter<span class="optional">Optional</span></p>
+			{{form.chapter}}{{form.chapter.errors}}
+
+			</section>
+			<h2 class="paydetails">Payment Details</h2>
+			<p class="paymentdetailstxt">
+				This is where we send your monthly commission payments to.
+			</p>
+			
+			<section id="my-categories">
+				<p class="lftcontent">PayPal ID</p>
+				{{form.pay_pal}}{{form.pay_pal.errors}}
+			</section>
+			
+			<h2 class="confirmterms">Confirm Terms and Conditions</h2>
+
+			<section id="my-details">
+
+				<p class="chkbox1">
+					{{form.agree}}{{form.agree.errors}}
+					<span>I hereby agree to the BrightMap <a href="{% url terms %}">Terms and Conditions</a>.</span>
+				</p>
+				<div class="spacer"></div>
+			</section>
+
+			<p class="fieldmakestxt">Fields marked with <span>*</span> are mandatory</p>
+			<p class="nextstep">
+				<input name="" type="submit" value="Next Step: Lead Categories"
+					class="nxtstepbutt">
+			</p>
+		</form>
+
+		</section>
+		<div class="botbg">&nbsp;</div>
+		</article>
+	</div>
+</div>
+<!--Body section-->
 {% endblock %}
-
-
-
-
-
-

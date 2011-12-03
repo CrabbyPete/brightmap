@@ -84,9 +84,9 @@ class Chapter( models.Model ):
     organization  = models.ForeignKey( Organization )
     organizer     = models.ForeignKey( User )
 
-    logo          = models.URLField(            default = None, null = True )
-    letter        = models.ForeignKey('Letter', default = None, null = True )
-    website       = models.URLField(            default = None, null = True )
+    logo          = models.URLField(            default = None, blank = True, null = True )
+    letter        = models.ForeignKey('Letter', default = None, blank = True, null = True )
+    website       = models.URLField(            default = None, blank = True, null = True )
 
     def deals( self ):
         # Get all the deals for this chapter
@@ -127,9 +127,9 @@ class Eventbrite( models.Model ):
     Information needed to access Eventbrite API
     """
     chapter       = models.ForeignKey( Chapter )
-    user_key      = models.CharField( default = None, max_length = 45 )
-    organizer_id  = models.CharField( default = None, max_length = 45 )
-    bot_email     = models.EmailField( default = None, null = True )
+    user_key      = models.CharField(  default = None, max_length = 45 )
+    organizer_id  = models.CharField(  default = None, max_length = 45 )
+    bot_email     = models.EmailField( default = None, blank = True, null = True )
 
     def __unicode__(self):
         return self.chapter.name
@@ -194,6 +194,10 @@ class InterestManager( models.Manager ):
         return interests
 
 
+INTEREST_STATUS = ((0,'standard' ),
+                   (1,'extend'   ),
+                   (2,'custom'   ),
+                  )
 class Interest(models.Model):
     """
     List of unique interests
@@ -430,7 +434,7 @@ class Letter( models.Model ):
     name        = models.CharField(max_length = 255, default = None, null = True )
 
     def __unicode__(self):
-        return self.letter
+        return self.name
 
 
 class EventManager(models.Manager):
@@ -457,11 +461,13 @@ class Event(models.Model):
     objects      = EventManager()
 
 
-    def surveys(self):
-        return self.survey_set.all()
-
-
-
+    def surveys(self, lead = False ):
+        if not lead:
+            return self.survey_set.all()
+        else:
+            return self.survey_set.exclude( interest = None )
+        
+    """
     def attendees(self, attendee = None):
         # Return attendess for this event. If attendee is None return all
 
@@ -480,18 +486,15 @@ class Event(models.Model):
                 attendees[survey.attendee] += 1
 
         return attendees
-
+    """
+    
     def interests(self, open = False ):
         """
         Return the interests for this event, and the number of each
         If attendee return interests for the attendee otherwise return all
         """
         interests = {}
-        for survey in self.survey_set.all():
-
-            # Ignore None
-            if survey.interest == None:
-                continue
+        for survey in self.survey_set.exclude( interest = None ):
 
             # Just return open deals
             if open:
@@ -592,9 +595,10 @@ class ConnectionManager(models.Manager):
     """
     Model Manager for Connection class
     """
-    def for_user(self, user, date_range = None ):
-        # Get Connections for a particular user
-
+    def for_buyer(self, user, date_range = None ):
+        """
+        Only return buyer connections
+        """
         profile = user.get_profile()
         connections = []
 
@@ -602,6 +606,32 @@ class ConnectionManager(models.Manager):
             date_range[0] = datetime.combine(date_range[0], time() )
         if isinstance(date_range[1], date):
             date_range[1] = datetime.combine(date_range[1], time() )
+            
+
+        if profile.is_leadbuyer:
+            terms = Term.objects.filter(buyer = user)
+            for term in terms:
+
+                for c in self.filter(term = term):
+                    if date_range == None:
+                        connections.append(c)
+                    else: 
+                        if c.date >= date_range[0] and\
+                           c.date <= date_range[1]     :
+                            connections.append(c)
+            return connections
+        
+    def for_user(self, user, date_range = None ):
+        """
+        Get connetions whether the user is a buyer or attendee
+        """
+        profile = user.get_profile()
+        connections = []
+        if date_range:
+            if isinstance(date_range[0], date):
+                date_range[0] = datetime.combine(date_range[0], time() )
+            if isinstance(date_range[1], date):
+                date_range[1] = datetime.combine(date_range[1], time() )
             
 
         if profile.is_leadbuyer:
@@ -646,9 +676,6 @@ class Connection(models.Model):
 
     def is_connected(self, user ):
         #Returns whether a user is part of this connection
-
-        if self.attendee == user:
-            return True
         terms = Term.objects.filter( buyer = user )
         if terms.count() > 0:
             return True

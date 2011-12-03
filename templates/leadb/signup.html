@@ -59,7 +59,7 @@
                         <p>{{form.website}}</p>
                         {{form.website.errors}}
 
-                        <p class="lftcontent">Phone</p>
+                        <p class="lftcontent">Phone <span>*</span></p>
                         <p>{{form.phone}}</p>
                         {{form.phone.errors}}
 
@@ -77,7 +77,7 @@
 
                     <p class="confirmtermstxt">Confirm Terms and Conditions</p>
                     <p class="chkbox">{{form.agree}}{{form.agree.errors}}
-                        <span>I hereby agree to the BrightMap <a href="#">Terms and Conditions</a> for lead buyers.</span>
+                        <span>I hereby agree to the BrightMap <a href="{% url terms %}">Terms and Conditions</a> for lead buyers.</span>
                     </p>
                     <p class="fieldmakestxt">Fields marked with <span>*</span> are mandatory</p>
                     <p class="monthlybudget"><input name="" type="submit" value="Save profile" class="submitbutt"></p>
