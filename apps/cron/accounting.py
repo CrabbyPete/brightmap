@@ -1,21 +1,18 @@
 # Import Python librariess
 import                              django_header
-from datetime                       import datetime, date, timedelta
+from datetime                       import date, timedelta
 
 # Import local library
-from base.models                    import Profile, Connection, Authorize, Invoice
-from settings                       import AUTHORIZE
+from base.models                    import Profile, Connection, Invoice
+#from settings                       import AUTHORIZE
 
+"""
 # Import for authorize
 from authorize                      import cim
 from authorize.gen_xml              import VALIDATION_TEST, AUTH_ONLY
 from authorize.responses            import AuthorizeError, _cim_response_codes
+"""
 
-INVOICE = True 
-
-
-def send_email(user, invoice, details = None):
-    return
 
 def main(month = None):
     """
@@ -33,11 +30,12 @@ def main(month = None):
     print "Invoicing for the month of: " + first_day.strftime("%B %Y")
     
     # Initialize the API class
+    """
     cim_api = cim.Api( unicode(AUTHORIZE['API_LOG_IN_ID']),
                        unicode(AUTHORIZE['TRANSACTION_ID']) 
                       )
     
-
+    """
     # Get all the leadbuyers
     profiles = Profile.objects.filter( is_leadbuyer = True )
     for profile in profiles:
@@ -63,7 +61,7 @@ def main(month = None):
             print profile.user.first_name + ' ' + profile.user.last_name + ' Total: $' +str(total)
   
             # Create the invoice
-            if total > 0 and INVOICE: 
+            if total > 0: 
                 title = first_day.strftime("%B %Y")
                 
                 # See if there is an existing invoice for this month
@@ -83,9 +81,11 @@ def main(month = None):
                 else:
                     invoice.cost = total
                 
+                invoice.status = 'pending'
                 invoice.save()
             
                 # Try and bill to the credit card
+                """
                 try:  
                     authorize = Authorize.objects.get( user = profile.user )
                 except Authorize.DoesNotExist:
@@ -105,11 +105,11 @@ def main(month = None):
    
                 if result == 'OK':
                     invoice.status = 'paid'
-                    
-                    send_email(profile.user, invoice )
                 else:
                     invoice.status = 'rejected'
+            
                 invoice.save()
+                """
                 
 
 import optparse
@@ -124,10 +124,6 @@ if __name__ == '__main__':
 
     # Check if options were set
 
-    if opts.d:
-        INVOICE = False
-    else:
-        INVOICE = True
 
     if opts.p:
         PROMPT = True

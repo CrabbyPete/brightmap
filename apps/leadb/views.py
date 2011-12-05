@@ -33,7 +33,6 @@ from base.forms                     import LoginForm
 from social.models                  import LinkedInProfile
 
 from forms                          import DEAL_CHOICES, BuyerForm, ApplyForm, PaymentForm
-from geo                            import geocode
 
 def mail_organizer( user, deal, term, deal_type ):
     # Render the letter
@@ -49,7 +48,7 @@ def mail_organizer( user, deal, term, deal_type ):
     message = template.render(c)
 
     subject = "New BrightMap LeadBuyer Request: %s"%(deal.interest)
-    recipients = [ organizer.email ]
+    recipients = [ organizer.email, term.buyer.email ]
 
     msg = EmailMultiAlternatives( subject,
                                   message,
@@ -278,7 +277,7 @@ class Apply( FormView ):
             cancel.save()
             mail_organizer( self.request.user, deal, cancel, deal_type )
 
-        return HttpResponseRedirect(reverse('lb_dash'))
+        return HttpResponseRedirect(reverse('lb_apply'))
 
 class Dash( TemplateView ):
     """
@@ -373,19 +372,29 @@ class Bill( TemplateView ):
 
 
 regex_money = '^\$?([1-9]{1}[0-9]{0,2}(\,[0-9]{3})*(\.[0-9]{0,2})?|[1-9]{1}[0-9]{0,}(\.[0-9]{0,2})?|0(\.[0-9]{0,2})?|(\.[0-9]{1,2})?)$'
-#'"APT","APARTMENT","BLDG","BUILDING","DEPT","DEPARTMENT","FL","FLOOR","HNGR","HANGER","LOT","PIER","RM","ROOM","TRLR","TRAILER","UNIT","SUITE","STE"'
-regex_suba  = "(APT|APARTMENT|BLDG|BUILDING|DEPT|DEPARTMENT|FL|FLOOR|HNGR|HANGER|LOT|PIER|RM|ROOM|TRLR|TRAILER|UNIT|SUITE|STE)"
+regex_suba  = "(APT|APARTMENT|BLDG|BUILDING|DEPT|DEPARTMENT|FL|FLOOR|HNGR|HANGER|LOT|PIER|RM|ROOM|TRLR|TRAILER|UNIT|SUITE|STE|BOX)"
+regex_pob   = "((P\.O\. BOX)|(P\.O BOX)|(PO BOX)|(POBOX)|(P O BOX))"
 
-
-def parseAddress(address):
-    subs = re.compile(regex_suba, re.I)
-    found = subs.search(address)
+def parse_address(address):
+    """
+    Authorize.net address verification does not care about sub address and po boxs should be
+    # PO Box format eg 123 PO Box
+    """
+    po   = re.compile(regex_pob,  re.I)
+    found = po.search(address)
     if found:
-        address = re.split(found.group(0),address)
-        return address[0]
-    return None
-
-
+        where = address.find(found.group(0))
+        a2 = address[where:]
+        n = re.sub("\D", "", a2)
+        a2 = a2.replace(n,"")
+        a2 = n+' '+a2
+        return a2
+    else:
+        subs = re.compile(regex_suba, re.I)
+        found = subs.search(address)
+        if found:
+            where = address.find(found.group(0))
+            return address[0:where]
 
 class Payment( FormView ):
     template_name = 'leadb/lb_payment.html'
@@ -430,6 +439,7 @@ class Payment( FormView ):
         address     = form.cleaned_data['address']
         city        = form.cleaned_data['city']
         state       = form.cleaned_data['state']
+        zipcode     = form.cleaned_data['zipcode']
         budget      = form.cleaned_data['budget']
         
         # Check if they checked a budget put in a valid $ value. Budget is a tuple ('Budget',value)
@@ -442,7 +452,6 @@ class Payment( FormView ):
                 lb.budget = budget[1]
                
             
-
         # Prepare the required parameters 
         billing = dict( bill_first_name = user.first_name,
                         bill_last_name  = user.last_name,
@@ -451,28 +460,18 @@ class Payment( FormView ):
                       )
     
         # Look for any sub addresses like Apt, Building .. and dump them
-        sub_address = parseAddress( address)
+        sub_address = parse_address( address )
         if sub_address and sub_address != address:
             address = sub_address
-            
-        address += ", " + city + " " + state
-        
-        # Use Google to verify the address string
-        if address:
-            try:
-                local = geocode(address)
-            except Exception, e:
-                form._errors['address'] = ErrorList(["Not a valid address"])
-                return self.form_invalid(form)
-
-            billing['bill_address'] = local.get('street',None)
-            billing['bill_city']    = local.get('city',None)
-            billing['bill_state']   = local.get('state',None)
-            billing['bill_zip']     = local.get('zipcode',None)
-            billing['bill_country'] = local.get('country',None)
+  
+        billing.update('bill_address', address)
+        billing.update('bill_city', city)
+        billing.update('bill_state',state)
+        billing.update('bill_zip', zipcode)
+ 
         
         # Save the address
-        profile.address = local['address']
+        profile.address = address+' '+city+' '+state+' '+zipcode
  
         # Create a Authorize.net CIM profile
         kw = dict ( card_number     = card_number,
@@ -493,15 +492,13 @@ class Payment( FormView ):
         try:
             response = cim_api.create_profile( **kw )
  
-        except AuthorizeError, e:
-            form._errors['card_number'] = ErrorList([e])
+        except Exception:
+            form._errors['card_number'] = ErrorList( ['Credit Card Authorization Failed'] )
             return self.form_invalid(form)
-
-        except Exception, e:
-            pass
- 
+        
         # Check to see it if its OK
         result = response.messages.result_code.text_
+        
         if result != 'Ok':
             form._errors['number'] = ErrorList( [response.messages.message.text.text_] )
             return self.form_invalid(form)

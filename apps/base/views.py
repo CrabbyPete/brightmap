@@ -14,13 +14,16 @@ from django.views.generic.edit      import  FormView
 
 
 # Local imports
-from models                         import Event, Chapter, Profile, LeadBuyer, Deal
+from models                         import ( Event, Chapter, Profile, LeadBuyer, 
+                                             Deal,  Survey,  Invoice, Connection 
+                                           )
                                         
 
-from forms                          import ( LoginForm,     InterestForm,   DealForm,
-                                             LeadBuyerForm, ProfileForm,    ChapterForm, 
-                                             LetterForm,    EventbriteForm, EventForm, 
-                                             SurveyForm,    ConnectionForm, TermForm
+from forms                          import ( LoginForm,       InterestForm,   DealForm,
+                                             LeadBuyerForm,   ProfileForm,    ChapterForm, 
+                                             LetterForm,      EventbriteForm, EventForm, 
+                                             SurveyForm,      ConnectionForm, TermForm,
+                                             UserProfileForm, UserForm,       InvoiceForm
                                            )
 
 from social.models                  import LinkedInProfile
@@ -117,7 +120,26 @@ def logout(request):
 
 """
     All Admin functions are here
-"""   
+""" 
+class ProfileView( FormView ):
+    template_name    = 'admin/profile.html'
+    form_class       = UserProfileForm
+ 
+    def get(self, request, *args, **kwargs):
+        if 'user' in request.GET:
+            user = User.objects.get(pk = request.GET['user'])
+            profile = Profile.objects.get( user = user )
+            
+            uform = UserForm(instance = user)
+            pform = UserProfileForm( instance = profile )
+            
+            return self.render_to_response( {'uform':uform, 'pform':pform} )
+        
+        return HttpResponseRedirect('/')   
+   
+    def form_valid(self, form):
+        return HttpResponseRedirect('/')         
+  
 class ChapterView( FormView ):
     template_name    = 'admin/chapter.html'
     form_class       = ChapterForm
@@ -165,7 +187,7 @@ class DealView( FormView ):
         if 'deal' in request.GET:
             deal = Deal.objects.get(pk = request.GET['deal'])
             form = DealForm( instance = deal )
-            return self.render_to_response( {'form': form} )
+            return self.render_to_response( {'form': form, 'deal':deal} )
         
         if 'chapter' in request.GET:
             chapter = Chapter.objects.get(pk = request.GET['chapter'])
@@ -187,9 +209,15 @@ class TermView( FormView ):
     def get(self, request, *args, **kwargs):
         if 'leadbuyer' in request.GET:
             leadbuyer = LeadBuyer.objects.get(pk = request.GET['leadbuyer'])
-            terms = leadbuyer.deals()
+            term = leadbuyer.deals()
+            return self.render_to_response( {'term':term} )
+        
+        if 'deal' in request.GET:
+            deal = Deal.objects.get(pk = request.GET['deal'])
+            terms = deal.terms()
+            return self.render_to_response( {'terms':terms} )
             
-        return self.render_to_response( {'terms':terms} )
+        return HttpResponseRedirect('/')
             
     def form_valid(self, form ):
         return HttpResponseRedirect('/')
@@ -241,6 +269,11 @@ class SurveyView( FormView ):
             event = Event.objects.get(pk = request.GET['event'])
             surveys = event.surveys( lead = True )
             return self.render_to_response( {'surveys': surveys} )
+        
+        if 'survey' in request.GET:
+            survey = Survey.objects.get(pk = request.GET['survey'])
+            form = SurveyForm( instance = survey)
+            return self.render_to_response( {'form':form, 'survey': survey} )
     
     def form_valid(self, form):
         return HttpResponseRedirect('/')
@@ -251,6 +284,11 @@ class ConnectionView( FormView ):
     form_class      = ConnectionForm
     
     def get(self, request, *args, **kwargs):
+        if 'connection' in request.GET:
+            connection = Connection.objects.get(pk = request.GET['connection'])
+            form = ConnectionForm( instance = connection)
+            return self.render_to_response( {'form':form, 'connection': connection} )
+        
         if 'event' in request.GET:
             event = Event.objects.get(pk = request.GET['event'])
             connections = event.connections()
@@ -265,3 +303,20 @@ class ConnectionView( FormView ):
     def form_valid(self, form):
         return HttpResponseRedirect('/')
 
+class InvoiceView ( FormView):
+    template_name   = 'admin/invoice.html'
+    form_class      = InvoiceForm
+    
+    def get(self, request, *args, **kwargs):
+        if 'invoice' in request.GET:
+            invoice = Invoice.objects.get(pk = request.GET['invoice'])
+            form = InvoiceForm(instance = invoice)
+            connections = invoice.connections()
+            return self.render_to_response( {'form':form, 'connections':connections} )
+        
+        
+        invoices = Invoice.objects.all()
+        return self.render_to_response( {'invoices':invoices} )
+            
+    def form_valid(self, form ):
+        return HttpResponseRedirect('/')

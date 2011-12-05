@@ -1,0 +1,10 @@
+{% extends "admin/admin.html" %}
+
+{% block body_block %}
+	<form action="{% url profile %}" method="post" >
+       {% csrf_token %}
+ 		{{uform}}
+ 		{{pform}}
+        <input type="submit" name="submit" />
+    </form>
+{% endblock %}

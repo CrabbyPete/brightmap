@@ -6,7 +6,9 @@ from views                      import ( ChapterView,
                                          EventView,
                                          SurveyView,
                                          ConnectionView,
-                                         TermView
+                                         TermView,
+                                         ProfileView,
+                                         InvoiceView
                                        )
 
 
@@ -27,4 +29,6 @@ urlpatterns = patterns('base.views',
     url(r'^survey/$',                SurveyView.as_view(),      name='survey'               ),
     url(r'^connection/$',            ConnectionView.as_view(),  name='connection'           ),
     url(r'^term/$',                  TermView.as_view(),        name='term'                 ),
+    url(r'^profile/$',               ProfileView.as_view(),     name='profile'              ),
+    url(r'^invoice/$',               InvoiceView.as_view(),     name='invoice'              )
 )

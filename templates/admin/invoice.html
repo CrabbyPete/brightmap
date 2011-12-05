@@ -1,0 +1,43 @@
+{% extends "admin/admin.html" %}
+
+{% block body_block %}
+	{% if invoices %}
+	<table id = 'invoices'>
+ 	{% for invoice in invoices %}
+        <tr>
+            <td><a href='{%url invoice%}?invoice={{invoice.pk}}'>{{invoice.user.first_name}}{{invoice.user.last_name}}</a></td>
+            <td>{{ invoice.title }}</td>
+            <td>{{invoice.issued|date:"d M Y" }}</td>
+            <td>{{invoice.cost}}</td>
+            <td>{{invoice.status}}</td>
+        </tr>
+    {% endfor %}
+    </table>
+	{% endif %}
+	
+	{% if form %}
+    	<form action="{% url invoice %}" method="post" >
+       	{% csrf_token %}
+       		<fieldset>
+ 				{{form}}
+        		<input type="submit" name="submit", value="Issue Invoice" />
+    		</fieldset>
+    	</form>
+ 	
+ 		<table>
+    	{% for connection in connections %}
+    		<tr>
+    		<td> <a href='{% url connection %}?connection={{connection.pk}}''</a>{{connection.pk}}</td>
+            <td>{{connection.survey.interest}}</td>
+        	<td><a href='{%url profile %}?user={{connection.survey.attendee.pk}}'>{{connection.survey.attendee.first_name}} {{connection.survey.attendee.last_name}}</a></td>
+        	<td>{{connection.term.buyer.first_name}} {{connection.term.buyer.last_name}}</td>
+        	<td>{{connection.date}}</td>
+        	<td>{{connection.status}}</td>
+        	<td>{{connection.term.cost}}</td>
+        	<td>{{connection.survey.event.describe}}</td>
+        	</tr>
+    	{% endfor %}
+    	</table>
+    </form>
+    {% endif %}
+{% endblock %}

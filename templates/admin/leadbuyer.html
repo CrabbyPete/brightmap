@@ -24,6 +24,7 @@
     <menu>
    		<li><a href='{% url connection %}?leadbuyer={{leadbuyer.pk}}'>Connections</a></li>
         <li><a href='{% url term       %}?leadbuyer={{leadbuyer.pk}}'>Deals</a></li>
+        <li><a href='{% url profile    %}?user={{leadbuyer.user.pk}}'>Profile</a></li>
     </menu>
     {% endif %}
 {% endblock %}

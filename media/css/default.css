@@ -47,6 +47,7 @@ fieldset {
 
 input, textarea, select {
 	font: normal 1em "Trebuchet MS", Arial, Helvetica, sans-serif;
+	width: 300px;
 }
 
 

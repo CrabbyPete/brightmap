@@ -7,6 +7,16 @@ form {
 	margin:0 auto;
 }
 
+form#ignore {
+	width:1024px;
+	margin:0;
+}
+
+input#ignore {
+	width:20px;
+}
+
+
 label {
 	display:block;
 	margin-top:20px;

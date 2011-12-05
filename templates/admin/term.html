@@ -6,7 +6,7 @@
         <tr>
             <td><a href='{%url term %}?term={{term.pk}}'>{{term.deal.interest.interest}}</a></td>
             <td>{{term.deal.chapter.name}}</td>
-            <td>{{term.buyer.first_name}} {{term.buyer.last_name}}</td>
+            <td><a href='{%url profile %}?user={{term.buyer.pk}}'>{{term.buyer.first_name}} {{term.buyer.last_name}}</td>
             <td>{{term.cost}}</td>
             <td>{{term.exclusive}}</td>
             <td>{{term.status}}</td>
