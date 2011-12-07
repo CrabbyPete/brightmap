@@ -147,7 +147,7 @@ class ProfileForm( SignUpForm ):
 
 
 
-
+"""
 DEAL_CHOICES = (('Exclusive','Exclusive ($50.00 per Introduction)'),
                 ('Nonexclusive','Nonexclusive ($20.00 per Introduction'),
                 ('Trial' ,'Trial (free for 1 month)')
@@ -173,7 +173,7 @@ class BuyDealForm(forms.Form):
                                             widget=forms.RadioSelect(attrs={})
                                        )
 
-
+"""
 class UserForm( ModelForm ):
     class Meta:
         model = User
@@ -195,6 +195,7 @@ class DealForm( ModelForm ):
 class LeadBuyerForm( ModelForm ):
     class Meta:
         model = LeadBuyer
+        exclude = ('user',)
  
 class ChapterForm(ModelForm):
     class Meta:
@@ -236,3 +237,4 @@ class ExpireForm(ModelForm):
 class InvoiceForm(ModelForm):
     class Meta:
         model = Invoice
+        exclude = ('user',)

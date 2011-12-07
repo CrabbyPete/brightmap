@@ -48,7 +48,7 @@ class Invoice( models.Model ):
     title       = models.CharField( max_length = 255, blank = True, null = True )
 
     cost        = models.DecimalField( max_digits = 10, decimal_places = 2, default = 0.00 )
-    issued      = models.DateTimeField( auto_now = True )
+    issued      = models.DateTimeField( auto_now_add = True )
 
     first_day   = models.DateField()
     last_day    = models.DateField()
@@ -56,7 +56,7 @@ class Invoice( models.Model ):
     status      = models.CharField( max_length = 20, default ='issued' )
  
     def connections(self):
-        return Connection.objects.for_user(self.user,[self.first_day, self.last_day])
+        return Connection.objects.for_buyer(self.user,[self.first_day, self.last_day])
     
     def bill(self):
         return self.issued.strftime('%B %Y')
@@ -612,6 +612,7 @@ class ConnectionManager(models.Manager):
             terms = Term.objects.filter(buyer = user)
             for term in terms:
 
+                cs = self.filter(term = term)
                 for c in self.filter(term = term):
                     if date_range == None:
                         connections.append(c)
@@ -637,7 +638,7 @@ class ConnectionManager(models.Manager):
         if profile.is_leadbuyer:
             terms = Term.objects.filter(buyer = user)
             for term in terms:
-
+                
                 for c in self.filter(term = term):
                     if date_range == None:
                         connections.append(c)
@@ -665,7 +666,7 @@ class Connection(models.Model):
     """
     survey      = models.ForeignKey( Survey )
     term        = models.ForeignKey( Term )
-    date        = models.DateTimeField( auto_now = True )
+    date        = models.DateTimeField( auto_now_add = True )
     status      = models.CharField( max_length = 20, default ='sent' )
 
     objects     = ConnectionManager()

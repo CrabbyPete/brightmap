@@ -4,9 +4,10 @@
 	<table id = 'terms'>
  	{% for term in terms %}
         <tr>
-            <td><a href='{%url term %}?term={{term.pk}}'>{{term.deal.interest.interest}}</a></td>
+            <td><a href='{%url term %}?term={{term.pk}}'>{{term.pk}}</a></td>
+            <td>{{term.deal.interest.interest}}
             <td>{{term.deal.chapter.name}}</td>
-            <td><a href='{%url profile %}?user={{term.buyer.pk}}'>{{term.buyer.first_name}} {{term.buyer.last_name}}</td>
+            <td><a href='{%url profile %}?user={{term.buyer.pk}}'>{{term.buyer.first_name}}&nbsp;{{term.buyer.last_name}}</td>
             <td>{{term.cost}}</td>
             <td>{{term.exclusive}}</td>
             <td>{{term.status}}</td>
@@ -14,4 +15,13 @@
         </tr>
     {% endfor %}
     </table>
+    {% if form %}
+	<form action="{% url term %}?term={{term.pk}}" method="post" >
+       {% csrf_token %}
+       	<fieldset>
+ 			{{form}}
+        	<input type="submit" name="submit" />
+    	</fieldset>
+    </form>
+    {% endif %}
 {% endblock %}

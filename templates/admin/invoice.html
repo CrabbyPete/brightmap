@@ -16,7 +16,7 @@
 	{% endif %}
 	
 	{% if form %}
-    	<form action="{% url invoice %}" method="post" >
+    	<form action="{% url invoice %}?invoice={{invoice.pk}}" method="post" >
        	{% csrf_token %}
        		<fieldset>
  				{{form}}

@@ -81,18 +81,18 @@ def geocode(addr):
 
         # 0: Unknown address
         if accuracy > 0:
-        	results['longitude'] = address_details["ExtendedData"]["LatLonBox"]["east"]
-        	results['latitude']  = address_details["ExtendedData"]["LatLonBox"]["north"]
+            results['longitude'] = address_details["ExtendedData"]["LatLonBox"]["east"]
+            results['latitude']  = address_details["ExtendedData"]["LatLonBox"]["north"]
 
         # 1: Country level accuracy.
         if accuracy >= 1 and accuracy < 9:
             if 'Country' in address_details["AddressDetails"]:
                 country  = address_details["AddressDetails"]["Country"]
                 results['country'] = country["CountryName"]
-
-         # 2: Region (state, province, prefecture, etc.) level accuracy.
+        
+        # 2: Region (state, province, prefecture, etc.) level accuracy.
         if accuracy >= 2:
-       	    results['state']= country["AdministrativeArea"]["AdministrativeAreaName"]
+            results['state']= country["AdministrativeArea"]["AdministrativeAreaName"]
 
             # 3: Sub-region (county, municipality, etc.) level accuracy.
             if accuracy >= 3:
@@ -107,7 +107,7 @@ def geocode(addr):
                     city = county["Locality"]
                     results['city'] = city["LocalityName"]
                     
-                	# 5 Post code (zip code) level accuracy.
+                    # 5 Post code (zip code) level accuracy.
                     if accuracy >= 5:
                         if "DependentLocality" in city:
                             city = city["DependentLocality"]
@@ -121,9 +121,9 @@ def geocode(addr):
                             if accuracy >=7:
                                 pass
                                
-                	           # 8 Address level accuracy.
+                                # 8 Address level accuracy.
                                 if accuracy >= 8:
-                                   pass
+                                    pass
 
         return results
 

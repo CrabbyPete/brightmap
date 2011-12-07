@@ -3,16 +3,81 @@ import                              django_header
 from datetime                       import date, timedelta
 
 # Import local library
-from base.models                    import Profile, Connection, Invoice
-#from settings                       import AUTHORIZE
+from base.models                    import Profile, Connection, Invoice, Authorize
+from settings                       import AUTHORIZE
 
-"""
 # Import for authorize
 from authorize                      import cim
 from authorize.gen_xml              import VALIDATION_TEST, AUTH_ONLY
 from authorize.responses            import AuthorizeError, _cim_response_codes
-"""
 
+
+def invoice_user( user, first_day, last_day ):
+    
+    cost = 0
+
+    for connection in Connection.objects.for_buyer( user,[first_day,last_day] ):
+        if connection.status == 'sent':
+            cost += connection.term.cost
+    
+    if not cost:
+        return None
+ 
+    title = first_day.strftime("%B %Y")
+                
+    # See if there is an existing invoice for this month
+    try:
+        invoice = Invoice.objects.get( user      = user,
+                                       title     = title,
+                                       first_day = first_day,
+                                       last_day  = last_day  )
+    except Invoice.DoesNotExist:
+        # Create an invoice 
+        invoice = Invoice( user      = user, 
+                           title     = title,
+                           first_day = first_day, 
+                           last_day  = last_day 
+                         )
+    
+    invoice.cost = cost
+    invoice.status = 'pending'
+    invoice.save()
+    return invoice 
+            
+
+
+CIM_API  = cim.Api( unicode(AUTHORIZE['API_LOG_IN_ID'] ),
+                    unicode(AUTHORIZE['TRANSACTION_ID']) 
+                  )
+    
+
+def bill_user( user, invoice ):
+    try:  
+        authorize = Authorize.objects.get( user = user )
+    except Authorize.DoesNotExist:
+        return
+    
+    try:
+        response = CIM_API.create_profile_transaction(  amount = invoice.cost,
+                                                        customer_profile_id = authorize.customer_id,
+                                                        customer_payment_profile_id = authorize.profile_id,
+                                                        profile_type = AUTH_ONLY
+                                                     )
+    except AuthorizeError:
+        return 
+                
+    else:
+        # Check to see it if its OK
+        result = response.messages.result_code.text_.upper()
+   
+        if result == 'OK':
+            invoice.status = 'paid'
+        else:
+            invoice.status = 'rejected'
+            
+        invoice.save()
+    return
+            
 
 def main(month = None):
     """
@@ -29,87 +94,16 @@ def main(month = None):
   
     print "Invoicing for the month of: " + first_day.strftime("%B %Y")
     
-    # Initialize the API class
-    """
-    cim_api = cim.Api( unicode(AUTHORIZE['API_LOG_IN_ID']),
-                       unicode(AUTHORIZE['TRANSACTION_ID']) 
-                      )
-    
-    """
+ 
     # Get all the leadbuyers
     profiles = Profile.objects.filter( is_leadbuyer = True )
     for profile in profiles:
+        invoice = invoice_user( profile.user, first_day, last_day )
+        if invoice :
+            print profile.user.first_name + ' ' + profile.user.last_name + " = " + str( invoice.cost )
+            #bill_user( profile.user, invoice )
 
-        total = 0
-        itemize = []
-        print profile.user.first_name + ' ' + profile.user.last_name
-        
-        connections = Connection.objects.for_buyer(profile.user,[first_day,last_day])
-        if connections != None:
-            for connection in connections:
-                total += connection.term.cost
-                details = { 'date'     :connection.date.strftime("%Y-%m-%d"),
-                            'chapter'  :connection.survey.event.chapter.name,
-                            'person'   :connection.survey.attendee.first_name + ' '  + connection.survey.attendee.last_name,
-                            'email'    :connection.survey.attendee.email,
-                            'interest' :connection.survey.interest.interest
-                          }
-                itemize.append(details)
-                print details['date'] + ' ' + details['chapter'] + ' ' + details['person'] + ' ' +\
-                      details['email'] + ' ' + details['interest'] + ' ' + str( connection.term.cost )
-            
-            print profile.user.first_name + ' ' + profile.user.last_name + ' Total: $' +str(total)
-  
-            # Create the invoice
-            if total > 0: 
-                title = first_day.strftime("%B %Y")
-                
-                # See if there is an existing invoice for this month
-                try:
-                    invoice = Invoice.objects.get( user      = profile.user,
-                                                   title     = title,
-                                                   first_day = first_day,
-                                                   last_day  = last_day  )
-                except Invoice.DoesNotExist:
-                    # Create an invoice 
-                    invoice = Invoice( user      = profile.user, 
-                                       title     = title,
-                                       cost      = total, 
-                                       first_day = first_day, 
-                                       last_day  = last_day 
-                                     )
-                else:
-                    invoice.cost = total
-                
-                invoice.status = 'pending'
-                invoice.save()
-            
-                # Try and bill to the credit card
-                """
-                try:  
-                    authorize = Authorize.objects.get( user = profile.user )
-                except Authorize.DoesNotExist:
-                    continue
-                try:
-                    response = cim_api.create_profile_transaction( amount = invoice,
-                                                                   customer_profile_id = authorize.customer_id,
-                                                                   customer_payment_profile_id = authorize.profile_id,
-                                                                   profile_type = AUTH_ONLY
-                                                                  )
-                except AuthorizeError, e:
-                    continue
-                
-                else:
-                    # Check to see it if its OK
-                    result = response.messages.result_code.text_.upper()
-   
-                if result == 'OK':
-                    invoice.status = 'paid'
-                else:
-                    invoice.status = 'rejected'
-            
-                invoice.save()
-                """
+ 
                 
 
 import optparse

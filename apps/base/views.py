@@ -15,7 +15,8 @@ from django.views.generic.edit      import  FormView
 
 # Local imports
 from models                         import ( Event, Chapter, Profile, LeadBuyer, 
-                                             Deal,  Survey,  Invoice, Connection 
+                                             Deal,  Survey,  Invoice, Connection,
+                                             Term 
                                            )
                                         
 
@@ -207,15 +208,23 @@ class TermView( FormView ):
     form_class      = TermForm
     
     def get(self, request, *args, **kwargs):
-        if 'leadbuyer' in request.GET:
-            leadbuyer = LeadBuyer.objects.get(pk = request.GET['leadbuyer'])
-            term = leadbuyer.deals()
-            return self.render_to_response( {'term':term} )
-        
         if 'deal' in request.GET:
             deal = Deal.objects.get(pk = request.GET['deal'])
             terms = deal.terms()
             return self.render_to_response( {'terms':terms} )
+        
+        
+        
+        if 'leadbuyer' in request.GET:
+            leadbuyer = LeadBuyer.objects.get(pk = request.GET['leadbuyer'])
+            terms = leadbuyer.deals()
+            return self.render_to_response( {'terms':terms} )
+    
+        if 'term' in request.GET:
+            term = Term.objects.get(pk = request.GET['term'])
+        
+        form = TermForm (instance = term )
+        return self.render_to_response( {'form':form, 'term':term} )
             
         return HttpResponseRedirect('/')
             
@@ -301,7 +310,11 @@ class ConnectionView( FormView ):
             
     
     def form_valid(self, form):
-        return HttpResponseRedirect('/')
+        connection = Connection.objects.get(pk = self.request.GET['connection'] )
+        status = form.cleaned_data['status']
+        connection.status = status
+        connection.save()        
+        return HttpResponseRedirect(reverse('invoice'))
 
 class InvoiceView ( FormView):
     template_name   = 'admin/invoice.html'
@@ -312,11 +325,17 @@ class InvoiceView ( FormView):
             invoice = Invoice.objects.get(pk = request.GET['invoice'])
             form = InvoiceForm(instance = invoice)
             connections = invoice.connections()
-            return self.render_to_response( {'form':form, 'connections':connections} )
+            return self.render_to_response( {'form':form, 'invoice':invoice, 'connections':connections} )
         
         
         invoices = Invoice.objects.all()
         return self.render_to_response( {'invoices':invoices} )
             
     def form_valid(self, form ):
+        status  = form.cleaned_data['status']
+        invoice = Invoice.objects.get( pk = form.cleaned_data['invoice'] )
+        invoice.status = status
+        invoice.save()
+        
+        
         return HttpResponseRedirect('/')

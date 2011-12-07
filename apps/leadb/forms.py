@@ -137,8 +137,10 @@ class ApplyForm(forms.Form):
  
     def __init__(self, *args, **kwargs):
         super(ApplyForm, self).__init__(*args, **kwargs)
-        self.fields['interest'].choices = [(i.interest,i.interest) for i in Interest.objects.filter(status='standard')]
-        self.fields['chapter'].choices = [(i.name,i.name) for i in Chapter.objects.all()]
+        self.fields['interest'].choices = [(i.interest,i.interest) 
+                                           for i in Interest.objects.filter(status='standard').order_by('interest')
+                                          ]
+        self.fields['chapter'].choices = [(i.name,i.name) for i in Chapter.objects.all().order_by('name')]
 
 
 
@@ -192,7 +194,11 @@ class PaymentForm(forms.Form):
                                         )
     
     
-    budget          = ChoiceWithOtherField ( choices = BUDGET_CHOICES )
+    #budget          = ChoiceWithOtherField ( choices = BUDGET_CHOICES )
+    budget          =  forms.CharField  ( max_length = 45,
+                                           widget = forms.TextInput
+                                        )
+
 
   
     def __init__(self,*args, **kwargs):

@@ -76,8 +76,10 @@
                     </section>
 
                     <p class="confirmtermstxt">Confirm Terms and Conditions</p>
-                    <p class="chkbox">{{form.agree}}{{form.agree.errors}}
+                    <p class="chkbox">
+                    	{{form.agree}}
                         <span>I hereby agree to the BrightMap <a href="{% url terms %}">Terms and Conditions</a> for lead buyers.</span>
+                    	{{form.agree.errors}}
                     </p>
                     <p class="fieldmakestxt">Fields marked with <span>*</span> are mandatory</p>
                     <p class="monthlybudget"><input name="" type="submit" value="Save profile" class="submitbutt"></p>

@@ -21,7 +21,7 @@ from django.core.mail               import  EmailMultiAlternatives
 
 #Authorize imports
 from authorize                      import cim
-from authorize.gen_xml              import VALIDATION_LIVE, CREDIT_CARD
+from authorize.gen_xml              import VALIDATION_LIVE, VALIDATION_TEST, CREDIT_CARD
 from authorize.responses            import AuthorizeError #, _cim_response_codes
 
 #Local imports
@@ -399,7 +399,41 @@ def parse_address(address):
 class Payment( FormView ):
     template_name = 'leadb/lb_payment.html'
     form_class    = PaymentForm
-
+    
+    def get_initial(self):
+        """
+        Fill in as much of the Payment form as possible
+        """
+        
+        # Only do this on a GET
+        if not self.request.method == 'GET':
+            return {}
+        
+        user    = self.request.user
+        profile = user.get_profile()
+        
+        # Find what budget they currently have
+        try:
+            lb = LeadBuyer.objects.get(user = self.request.user)
+        except LeadBuyer.DoesNotExist:
+            budget = '$500.00'
+        else:
+            if lb.budget:
+                budget = lb.budget
+            else: 
+                budget ='$500.00'
+        
+        # Parse the address
+        if profile.address:
+            billing = profile.address.split('$')
+            return dict ( address = billing[0],
+                          city    = billing[1],
+                          state   = billing[2],
+                          zipcode = billing[3],
+                          budget  = budget
+                        )
+        else:
+            return dict ( budget = budget )
 
     def form_valid(self, form):
         """
@@ -444,12 +478,11 @@ class Payment( FormView ):
         
         # Check if they checked a budget put in a valid $ value. Budget is a tuple ('Budget',value)
         money = re.compile('^\$?([1-9]{1}[0-9]{0,2}(\,[0-9]{3})*(\.[0-9]{0,2})?|[1-9]{1}[0-9]{0,}(\.[0-9]{0,2})?|0(\.[0-9]{0,2})?|(\.[0-9]{1,2})?)$')
-        if budget[0] == 'Budget':
-            if not money.match(budget[1]) or budget[1] == '':
-                form._errors['budget'] = ErrorList(["Not a valid dollar amount"])
-                return self.form_invalid(form)
-            else:
-                lb.budget = budget[1]
+        money = money.match(budget)
+        if not money or budget == '':
+            form._errors['budget'] = ErrorList(["Not a valid dollar amount"])
+            return self.form_invalid(form)
+        lb.budget = money.groups()[0]
                
             
         # Prepare the required parameters 
@@ -464,14 +497,14 @@ class Payment( FormView ):
         if sub_address and sub_address != address:
             address = sub_address
   
-        billing.update('bill_address', address)
-        billing.update('bill_city', city)
-        billing.update('bill_state',state)
-        billing.update('bill_zip', zipcode)
+        billing.update( bill_address = address )
+        billing.update( bill_city    = city    )
+        billing.update( bill_state   = state   )
+        billing.update( bill_zip     = zipcode )
  
         
         # Save the address
-        profile.address = address+' '+city+' '+state+' '+zipcode
+        profile.address = address+'$'+city+'$'+state+'$'+zipcode
  
         # Create a Authorize.net CIM profile
         kw = dict ( card_number     = card_number,
@@ -479,7 +512,7 @@ class Payment( FormView ):
                     customer_id     = unicode( authorize.customer_id ),          
                     profile_type    = CREDIT_CARD,
                     email           = user.email,
-                    validation_mode = VALIDATION_LIVE
+                    validation_mode = VALIDATION_TEST
                   )
     
         kw.update(billing)
