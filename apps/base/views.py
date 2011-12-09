@@ -29,6 +29,9 @@ from forms                          import ( LoginForm,       InterestForm,   De
 
 from social.models                  import LinkedInProfile
 
+
+from cron.accounting                import invoice_user, bill_user
+
 def homepage( request ):
     # Homepage
     if request.user.is_authenticated():
@@ -323,19 +326,22 @@ class InvoiceView ( FormView):
     def get(self, request, *args, **kwargs):
         if 'invoice' in request.GET:
             invoice = Invoice.objects.get(pk = request.GET['invoice'])
+            invoice = invoice_user ( invoice.user )
+
             form = InvoiceForm(instance = invoice)
             connections = invoice.connections()
             return self.render_to_response( {'form':form, 'invoice':invoice, 'connections':connections} )
         
-        
         invoices = Invoice.objects.all()
         return self.render_to_response( {'invoices':invoices} )
+        
+ 
             
     def form_valid(self, form ):
-        status  = form.cleaned_data['status']
-        invoice = Invoice.objects.get( pk = form.cleaned_data['invoice'] )
-        invoice.status = status
+        invoice = self.request.GET['invoice']
+        invoice = Invoice.objects.get( pk = invoice )
+        # bill_user ( invoice)
         invoice.save()
         
         
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(reverse('invoice'))

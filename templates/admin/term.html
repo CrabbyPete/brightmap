@@ -9,7 +9,17 @@
             <td>{{term.deal.chapter.name}}</td>
             <td><a href='{%url profile %}?user={{term.buyer.pk}}'>{{term.buyer.first_name}}&nbsp;{{term.buyer.last_name}}</td>
             <td>{{term.cost}}</td>
-            <td>{{term.exclusive}}</td>
+            {% if term.exclusive} %} 
+            	<td>Exclusive</td>
+            {% else %}
+            	{% if term.expire %}
+            		<td>Trail</td>
+            	{% else %}
+            		<td>Standard</td>
+            	{% endif %}
+            {% endif %}
+            
+            
             <td>{{term.status}}</td>
             <td>{{term.modified}}</td>
         </tr>

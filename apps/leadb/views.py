@@ -97,6 +97,7 @@ class  SignUp( FormView ):
                     'first_name':   user.first_name,
                     'last_name':    user.last_name,
                     'email':        user.email,
+                    'email_verify': user.email,
                     'password':     self.default_password,
                     'pass_confirm': self.default_password,
                     'phone':        profile.phone,
@@ -404,13 +405,9 @@ class Payment( FormView ):
         """
         Fill in as much of the Payment form as possible
         """
-        
         # Only do this on a GET
         if not self.request.method == 'GET':
             return {}
-        
-        user    = self.request.user
-        profile = user.get_profile()
         
         # Find what budget they currently have
         try:
@@ -424,6 +421,7 @@ class Payment( FormView ):
                 budget ='$500.00'
         
         # Parse the address
+        profile = self.request.user.get_profile()
         if profile.address:
             billing = profile.address.split('$')
             return dict ( address = billing[0],

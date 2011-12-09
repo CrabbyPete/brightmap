@@ -2,7 +2,7 @@
 import  logging
 logger = logging.getLogger('organizer')
 
-from datetime                       import datetime
+from datetime                       import datetime, timedelta
 
 # Django imports
 from django.views.generic.edit      import  FormView
@@ -124,7 +124,7 @@ class SignUp( FormView ):
         return HttpResponseRedirect( reverse('or_category')+'?chapter='+str(chapter.id) )
 
 class Category( FormView ):
-    template_name = 'organ/category.html'
+    template_name = 'organ/or_category.html'
     form_class    = CategoryForm
     
     """
@@ -168,35 +168,37 @@ class Category( FormView ):
         return HttpResponseRedirect( reverse('or_setup') )
 
 def setup( request ):
-    return render_to_response('organ/setup.html', {}, context_instance=RequestContext(request) )
+    return render_to_response('organ/or_setup.html', {}, context_instance=RequestContext(request) )
 
 def union(a, b):
     """ return the union of two lists """
     return list(set(a) | set(b))
 
+
 def dashboard( request ):
     user = request.user
 
     chapters = Chapter.objects.filter( organizer = user )
+    if len( chapters ) > 1:
+        pass
     
-    # Get the range of days for this month
-    month = datetime.today()
-    first = month.replace( day = 1 )
-    last  = first.replace( month = first.month + 1 ) - datetime.timedelta (days = 1)
+    chapter = chapters[0]
     
-    dates = (first, last)
-
-    interests = []
-    report = {}
+    active   = []
+    pending  = []
+    canceled = []
     
-    for chapter in chapters:
-        interests =  union( interests, chapter.interests() )
-        
-    for interest in interests:
-        for chapter in chapters:
-            for event in Event.objects.filter( chapter = chapter, date__range = dates ):
-                connections =  event.connections( interest = interest )
-    
-    return render_to_response('organ/dashboard.html', {}, context_instance=RequestContext(request) )
+    for deal in chapter.deals():
+        for term in deal.terms():
+            if term.status == 'approved':
+                active.append(term)
+            
+            elif term.status == 'pending':
+                pending.append(term)
+            
+            elif term.status == 'canceled':
+                canceled.append(term)
+            
+    return render_to_response('organ/or_dash.html', {'active':active, 'pending':pending, 'canceled':canceled }, context_instance=RequestContext(request) )
 
     

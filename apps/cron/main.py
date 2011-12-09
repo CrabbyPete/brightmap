@@ -95,7 +95,7 @@ def get_latest_events( evb, organizer_id ):
     """
     try:
         events = evb.organizer_list_events({'id':organizer_id})
-    except Exception, e:
+    except Exception:
         print log( 'Eventbrite Error: Events for ' + organizer_id )
         logger.debug('Eventbrite Error: Events for ' + organizer_id )
         return []
@@ -298,7 +298,7 @@ def check_budget( term ):
         
     connections = Connection.objects.for_buyer( term.buyer, [first_day,last_day] )
     
-    total = sum( connection.term.cost for connection in connections )
+    total = sum( connection.term.cost for connection in connections if connection.status == 'sent' )
  
     if total >= leadbuyer.budget:
         return False

@@ -215,7 +215,7 @@ h2.number{
 	font:bold 18px/33px "Futura Md BT", Arial, Helvetica, sans-serif;
 	color:#FCB43D;
 	background-color:inherit;
-	background:url(/media/img/number-rounfbg.gif) no-repeat 0 21px;
+	/*background:url(/media/img/number-rounfbg.gif) no-repeat 0 21px;*/
 	margin:0 0 14px 17px;
 	padding:21px 0 0 0;
 }

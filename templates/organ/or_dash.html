@@ -1,0 +1,249 @@
+{% extends 'base.html' %} 
+{% block body_block %}
+<!--Body section-->
+<div id="bodysection">
+	<div class="insidesection">
+		<section class="leadbuyer">
+			<p class="profileupdate">
+			<span>Profile Updated</span>
+			</p>
+			<h2 class="leadbuyer">Event Organizer Dashboard</h2>
+		</section>
+		<nav class="leadbuyer">
+		<ul>
+			<li><a href="{% url or_signup %}" class="upprofile">Update Profile</a>
+			</li>
+			<li><a href="{% url or_category %}" class="leadcategoris">Add/Update Lead
+					Categories</a>
+			</li>
+			<li><a href="#" class="leadsource">Add/Update Lead Source</a>
+			</li>
+			<!--  
+			<li><a href="#" class="eventhistory">My Event History</a>
+			</li>
+			 -->
+		</ul>
+		</nav>
+
+		<article class="chaptermanage">
+		<div class="topmanagebg"></div>
+		<div class="manage">
+			{% if chapters %}
+			<section id="my-chapter">
+	
+			<form id="profile" name="" method="post" action="profile.php">
+				<label>Select Chapter to Manage:</label> <select name=""><option>ULS
+						New York</option>
+				</select>
+			</form>
+			</section>
+			{% endif %}
+		</div>
+
+		<div class="botmanagebg"></div>
+		</article>
+
+		<h2 class="leadbuyer">Lead Buyers</h2>
+
+		<article class="leastrecived">
+		<div class="leadbuyertopdiv">&nbsp;</div>
+		<section class="leadbuyerrept">
+
+		<table class="ins">
+			<caption class="latestrecived">Active Lead Buyers</caption>
+
+			<tr>
+				<td style="background-color: #F5F6F6;">
+					<table class="ins">
+						<tr>
+							<th class="interest">Lead-Buyer</th>
+							<th class="interest">Service</th>
+							<th class="interest ">TERMS</th>
+							<th class="interest">Rate</th>
+							<th class="interest">Leads<br/>
+							<span>(this month)</span>
+							</th>
+							<th class="interest">Commission<br />
+							<span>(this month)</span>
+							</th>
+
+							<th class="interest">ACTION</th>
+						</tr>
+						{% for term in active %}
+						<tr>
+							<td class="recivedcontent">{{term.buyer.first_name}}&nbsp;{{term.buyer.last_name}}</td>
+							<td class="recivedcontent">{{term.deal.interest.interest}}</td>
+							<td class="recivedcontent">{% if term.expire %}Trial
+							                           {% else %}
+							                           {% if term.cost == 0 %}Sponsor{% else %}Standard{% endif %}
+							                           {% endif %}</td>
+							<td class="recivedcontent">{{term.cost}}</td>
+							<td class="recivedcontent">{{term.monthly_connections|length}}</td>
+							<td class="recivedcontent">{{term.monthly_total}}</td>
+							<td class="recivedcontent"><a href="#">Cancel</a></td>
+						</tr>
+						{% endfor %}
+	
+					</table>
+				</td>
+			</tr>
+
+		</table>
+
+		</section>
+		<div class="leadbuyerbotdiv">&nbsp;</div>
+		</article>
+
+
+		<article class="leastrecived">
+		<div class="leadbuyertopdiv">&nbsp;</div>
+		<section class="leadbuyerrept">
+
+		<table class="ins">
+			<caption class="latestrecived">Pending Lead Buyer
+				Applications</caption>
+
+			<tr>
+				<td style="background-color: #F5F6F6;">
+					<table class="ins">
+						<tr>
+							<th class="interest">Lead-Buyer</th>
+							<th class="interest">Service</th>
+							<th class="interest ">TERMS</th>
+							<th class="interest">Rate</th>
+							<th class="blankfill"></th>
+							<th class="interest">Action</th>
+						</tr>
+						{% for term in pending %}
+						<tr>
+							<td class="recivedcontent">{{term.buyer.first_name}}&nbsp;{{term.buyer.last_name}}</td>
+							<td class="recivedcontent">{{term.deal.interest.interest}}</td>
+							<td class="recivedcontent">{% if term.expire %}Trial
+							                           {% else %}
+							                           {% if term.cost == 0 %}Sponsor{% else %}Standard{% endif %}
+							                           {% endif %}
+							</td>
+							<td class="recivedcontent">{{term.cost}}</td>
+							<td class="insideblankfill"></td>
+							<td class="recivedcontent">
+								<ul class="pendingaction">
+									<li><a href="#">Accept</a>
+									</li>
+									<li class="noimg"><a href="#">Reject</a>
+									</li>
+								</ul></td>
+						</tr>
+						{% endfor %}
+					</table>
+				</td>
+			</tr>
+
+		</table>
+
+		</section>
+		<div class="leadbuyerbotdiv">&nbsp;</div>
+		</article>
+
+		<article class="leastrecived">
+		<div class="leadbuyertopdiv">&nbsp;</div>
+		<section class="leadbuyerrept">
+
+		<table class="ins">
+			<caption class="latestrecived">Cancelled Lead Buyers</caption>
+
+			<tr>
+				<td style="background-color: #F5F6F6;">
+					<table class="ins">
+						<tr>
+							<th class="interest">Lead-Buyer</th>
+							<th class="interest">Service</th>
+							<th class="interest ">TERMS</th>
+							<th class="interest">Rate</th>
+							<th class="interest">Leads<br/>
+							<span>(last 30 days)</span>
+							</th>
+							<th class="interest">Commission<br/>
+							<span>(last 30 days)</span>
+							</th>
+							<th class="canleadbuyer"></th>
+
+
+						</tr>
+						{% for term in canceled %}
+						<tr>
+							<td class="recivedcontent">{{term.buyer.first_name}}&nbsp;{{term.buyer.last_name}}</td>
+							<td class="recivedcontent">{{term.deal.interest.interest}}</td>
+							<td class="recivedcontent">{% if term.expire %}Trial
+							                           {% else %}
+							                           {% if term.cost == 0 %}Sponsor{% else %}Standard{% endif %}
+							                           {% endif %}
+							</td>
+							<td class="recivedcontent">{{term.cost}}</td>
+							<td class="recivedcontent">{{term.monthly_connections|length}}</td>
+							<td class="recivedcontent">{{term.monthly_total}}</td>
+							<td class="canleadbuyerinside"></td>
+
+						</tr>
+						{% endfor %}
+					</table>
+				</td>
+			</tr>
+
+		</table>
+
+		</section>
+		<div class="leadbuyerbotdiv">&nbsp;</div>
+		</article>
+		<article class="leastrecived" style="margin-bottom:0px;">
+		<div class="leadbuyertopdiv">&nbsp;</div>
+		<section class="leadbuyerrept">
+		<h2 class="latestrecived">Past Invoices</h2>
+
+		<table class="invoice">
+			<tr>
+				<td><a href="#">August 2011</a>
+				</td>
+				<td><a href="#">August 2011</a>
+				</td>
+				<td><a href="#">August 2011</a>
+				</td>
+				<td><a href="#">August 2011</a>
+				</td>
+			</tr>
+			<tr>
+				<td><a href="#">July 2011</a>
+				</td>
+				<td><a href="#">July 2011</a>
+				</td>
+				<td><a href="#">July 2011</a>
+				</td>
+				<td><a href="#">July 2011</a>
+				</td>
+			</tr>
+			<tr>
+				<td><a href="#" class="bordernone">June 2011</a>
+				</td>
+				<td><a href="#" class="bordernone">June 2011</a>
+				</td>
+				<td><a href="#" class="bordernone">June 2011</a>
+				</td>
+				<td><a href="#" class="bordernone">June 2011</a>
+				</td>
+			</tr>
+		</table>
+
+		</section>
+		<div class="leadbuyerbotdiv">&nbsp;</div>
+		</article>
+		<nav class="backnxt">
+		<a href="#">Back</a>
+		<span>|</span>
+		<a href="#">Next</a></nav>
+
+	</div>
+
+
+
+</div>
+<!--Body section-->
+{% endblock %}

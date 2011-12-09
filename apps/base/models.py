@@ -307,14 +307,31 @@ class Term( models.Model ):
         return self.buyer.email +'-' +\
                self.deal.chapter.name +':' + self.deal.interest.interest
 
-    def connections(self):
-        connections = Connection.objects.filter(term = self)
-        return connections
+    def connections( self, dates = None ):
+        if dates:
+            return Connection.objects.filter( term = self, date__range = dates )
+        else:
+            return Connection.objects.filter( term = self )
 
-    def total(self):
-        connections = self.connections()
+    def total( self, dates = None ):
+        connections = self.connections( dates )
         price = self.cost * len(connections)
         return price
+
+    
+    def this_month(self):
+        first = datetime.today().replace(day = 1)
+        if first.month == 12:
+            last = first.replace(day = 31)
+        else:
+            last  = first.replace (month = first.month + 1 ) - timedelta( days = 1 )
+        return (first,last)
+    
+    def monthly_connections( self ):
+        return self.connections( self.this_month() )
+
+    def monthly_total(self):
+        return self.total( self.this_month() )
 
     def canceled(self):
         self.status = 'canceled'
@@ -467,7 +484,7 @@ class Event(models.Model):
         else:
             return self.survey_set.exclude( interest = None )
         
-    """
+
     def attendees(self, attendee = None):
         # Return attendess for this event. If attendee is None return all
 
@@ -485,8 +502,9 @@ class Event(models.Model):
             else:
                 attendees[survey.attendee] += 1
 
+        # Return a dictionary of attendees and number of Interests
         return attendees
-    """
+
     
     def interests(self, open = False ):
         """
@@ -610,16 +628,10 @@ class ConnectionManager(models.Manager):
 
         if profile.is_leadbuyer:
             terms = Term.objects.filter(buyer = user)
+            connections = []
             for term in terms:
-
-                cs = self.filter(term = term)
-                for c in self.filter(term = term):
-                    if date_range == None:
-                        connections.append(c)
-                    else: 
-                        if c.date >= date_range[0] and\
-                           c.date <= date_range[1]     :
-                            connections.append(c)
+                connection = self.filter(term = term, date__range = (date_range[0], date_range[1]))
+                connections.extend(connection)
             return connections
         
     def for_user(self, user, date_range = None ):
@@ -687,5 +699,3 @@ class Connection(models.Model):
         return self.survey.attendee.email + '-' +\
                self.term.buyer.email + ':' +\
                self.survey.event.describe
-
-

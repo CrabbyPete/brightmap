@@ -12,14 +12,31 @@ from authorize.gen_xml              import VALIDATION_TEST, AUTH_ONLY
 from authorize.responses            import AuthorizeError, _cim_response_codes
 
 
-def invoice_user( user, first_day, last_day ):
+def days_of_month (month = None):
     
-    cost = 0
+    first_day = date.today().replace(day = 1)
+    if  month:
+        first_day = first_day.replace( month = int(month) )
+    else:
+        # Bill for last month
+        first_day = first_day.replace( month = first_day.month - 1 )
+    
+    if month == 12:
+        last_day = first_day.replace ( day = 31 )
+    else:
+        last_day = first_day.replace (month = first_day.month + 1 ) - timedelta( days = 1 )
+    
+    return first_day, last_day
 
-    for connection in Connection.objects.for_buyer( user,[first_day,last_day] ):
-        if connection.status == 'sent':
-            cost += connection.term.cost
+
+def invoice_user( user, first_day = None, last_day = None ):
     
+    if not first_day:
+        first_day,last_day = days_of_month()
+        
+    connections = Connection.objects.for_buyer( user,[first_day,last_day] )
+    cost = sum( connection.term.cost for connection in connections if connection.status == 'sent' )
+ 
     if not cost:
         return None
  
@@ -45,26 +62,26 @@ def invoice_user( user, first_day, last_day ):
     return invoice 
             
 
-
-CIM_API  = cim.Api( unicode(AUTHORIZE['API_LOG_IN_ID'] ),
-                    unicode(AUTHORIZE['TRANSACTION_ID']) 
-                  )
+def bill_user( invoice ):
+    cim_api  = cim.Api( unicode(AUTHORIZE['API_LOG_IN_ID'] ),
+                        unicode(AUTHORIZE['TRANSACTION_ID']) 
+                      )
     
-
-def bill_user( user, invoice ):
     try:  
-        authorize = Authorize.objects.get( user = user )
+        authorize = Authorize.objects.get( user = invoice.user )
     except Authorize.DoesNotExist:
         return
     
     try:
-        response = CIM_API.create_profile_transaction(  amount = invoice.cost,
+        response = cim_api.create_profile_transaction(  amount = invoice.cost,
                                                         customer_profile_id = authorize.customer_id,
                                                         customer_payment_profile_id = authorize.profile_id,
                                                         profile_type = AUTH_ONLY
                                                      )
     except AuthorizeError:
-        return 
+        invoice.status = 'unauthorized'
+        invoice.save()
+        return invoice
                 
     else:
         # Check to see it if its OK
@@ -76,22 +93,16 @@ def bill_user( user, invoice ):
             invoice.status = 'rejected'
             
         invoice.save()
-    return
+    return invoice
             
 
 def main(month = None):
     """
     Main program to do accounting for all lead buyers and organizers
     """
-    first_day = date.today().replace(day = 1)
-    if  month:
-        first_day = first_day.replace( month = int(month) )
-    else:
-        # Bill for last month
-        first_day = first_day.replace( month = first_day.month - 1 )
-    
-    last_day  = first_day.replace (month = first_day.month + 1 ) - timedelta( days = 1 )
-  
+ 
+    # Get the first and last day of the month
+    first_day,last_day = days_of_month( month )
     print "Invoicing for the month of: " + first_day.strftime("%B %Y")
     
  
@@ -101,11 +112,9 @@ def main(month = None):
         invoice = invoice_user( profile.user, first_day, last_day )
         if invoice :
             print profile.user.first_name + ' ' + profile.user.last_name + " = " + str( invoice.cost )
-            #bill_user( profile.user, invoice )
+            #bill_user( invoice )
 
  
-                
-
 import optparse
 if __name__ == '__main__':
     op = optparse.OptionParser( usage="usage: %prog " +" [options]" )
@@ -117,8 +126,6 @@ if __name__ == '__main__':
     opts,args = op.parse_args()
 
     # Check if options were set
-
-
     if opts.p:
         PROMPT = True
     else:
@@ -129,4 +136,4 @@ if __name__ == '__main__':
     else:
         month = None
     
-    main( month )
+    main()
