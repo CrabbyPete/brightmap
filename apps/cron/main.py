@@ -1,5 +1,5 @@
 import django_header
-import memcached
+
 
 # Python libraries
 from datetime                       import datetime, timedelta
