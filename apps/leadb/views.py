@@ -26,7 +26,7 @@ from authorize.responses            import AuthorizeError #, _cim_response_codes
 
 #Local imports
 from base.models                    import ( LeadBuyer, Chapter, Expire, Cancel, Connection, Authorize,
-                                             Deal, Term, Interest, Profile, Invoice
+                                             Deal, Term, Interest, Profile, Invoice, TERM_STATUS
                                             )
 from base.forms                     import LoginForm
 
@@ -423,15 +423,17 @@ class Payment( FormView ):
         # Parse the address
         profile = self.request.user.get_profile()
         if profile.address:
-            billing = profile.address.split('$')
-            return dict ( address = billing[0],
-                          city    = billing[1],
-                          state   = billing[2],
-                          zipcode = billing[3],
-                          budget  = budget
-                        )
-        else:
-            return dict ( budget = budget )
+            if '^' in profile.address:
+                billing = profile.address.split('^')
+                
+                return dict ( address = billing[0],
+                              city    = billing[1],
+                              state   = billing[2],
+                              zipcode = billing[3],
+                              budget  = budget
+                            )
+        
+        return dict ( budget = budget )
 
     def form_valid(self, form):
         """
@@ -502,7 +504,7 @@ class Payment( FormView ):
  
         
         # Save the address
-        profile.address = address+'$'+city+'$'+state+'$'+zipcode
+        profile.address = address+'^'+city+'^'+state+'^'+zipcode
  
         # Create a Authorize.net CIM profile
         kw = dict ( card_number     = card_number,
@@ -547,6 +549,20 @@ class Payment( FormView ):
  
         return HttpResponseRedirect(reverse('lb_apply'))
 
+
+@login_required
+def term_state( request ):
+
+    if request.method == 'GET' and 'term' in request.GET:
+        term = Term.objects.get(pk = request.GET['term'])
+        if term.owner() == request.user and 'status' in request.GET:
+            status = request.GET['status']
+            if status in TERM_STATUS:
+                term.status = request.GET['status']
+                term.save()
+    return HttpResponseRedirect(reverse('lb_dash'))
+
+
 @login_required
 def cancel_term(request):
     # Cancel Terms of a Deal
@@ -556,12 +572,3 @@ def cancel_term(request):
         term.save()
     return HttpResponseRedirect(reverse('lb_dash'))
 
-@login_required
-def renew_term(request):
-    # Renew a deal that was canceled
-    if request.method == 'GET' and 'term' in request.GET:
-        term = Term.objects.get(pk = request.GET['term'])
-        term.status = 'pending'
-        term.save()
-        # Send email to organizer
-    return HttpResponseRedirect(reverse('lb_dash'))

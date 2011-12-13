@@ -2,6 +2,10 @@
 import                              django_header
 from datetime                       import date, timedelta
 
+# Django imports
+from django.template                import loader, Context
+from django.core.mail               import EmailMultiAlternatives
+
 # Import local library
 from base.models                    import Profile, Connection, Invoice, Authorize
 from settings                       import AUTHORIZE
@@ -17,10 +21,7 @@ def days_of_month (month = None):
     first_day = date.today().replace(day = 1)
     if  month:
         first_day = first_day.replace( month = int(month) )
-    else:
-        # Bill for last month
-        first_day = first_day.replace( month = first_day.month - 1 )
-    
+
     if month == 12:
         last_day = first_day.replace ( day = 31 )
     else:
@@ -94,8 +95,40 @@ def bill_user( invoice ):
             
         invoice.save()
     return invoice
-            
+     
+     
+def notify( invoice ):
+    # Set up the context
+    c = Context({'invoice' :invoice })
 
+    # Render the message and log it
+    template = loader.get_template('letters/invoice.tmpl')
+    message = template.render(c)
+
+    subject = 'BrightMap Invoice: '+invoice.name
+
+    to_email = [ '%s %s <%s>'% ( invoice.user.first_name, invoice.user.last_name, invoice.user.email ) ]
+ 
+    bcc = [ 'bcc@brightmap.com' ]
+    from_email = '<invoice@brightmap.com>'
+
+    #TESTING BELOW REMOVE LATER
+    to_email = ['Pete Douma <pete.douma@gmail.com>']
+
+    # Send the email
+    msg = EmailMultiAlternatives( subject    = subject,
+                                  body       = message,
+                                  from_email = from_email,
+                                  to         = to_email,
+                                  bcc        = bcc
+                                )
+
+    try:
+        msg.send( fail_silently = False )
+    except:
+        pass
+ 
+       
 def main(month = None):
     """
     Main program to do accounting for all lead buyers and organizers

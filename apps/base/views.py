@@ -1,4 +1,6 @@
 # Python imports
+import logging
+logger = logging.getLogger(__name__)
 
 # Django imports
 from django.contrib                 import  auth
@@ -11,26 +13,35 @@ from django.views.decorators.csrf   import  csrf_protect
 from django.core.urlresolvers       import  reverse
 from django.core.exceptions         import  ObjectDoesNotExist
 from django.views.generic.edit      import  FormView
+from django.template                import  loader, Context
+from django.core.mail               import  EmailMultiAlternatives
 
 
 # Local imports
 from models                         import ( Event, Chapter, Profile, LeadBuyer, 
                                              Deal,  Survey,  Invoice, Connection,
-                                             Term 
+                                             Term,  Authorize 
                                            )
                                         
 
-from forms                          import ( LoginForm,       InterestForm,   DealForm,
-                                             LeadBuyerForm,   ProfileForm,    ChapterForm, 
-                                             LetterForm,      EventbriteForm, EventForm, 
-                                             SurveyForm,      ConnectionForm, TermForm,
-                                             UserProfileForm, UserForm,       InvoiceForm
+from forms                          import ( LoginForm,       DealForm,
+                                             LeadBuyerForm,   ChapterForm, 
+                                             EventbriteForm,  EventForm, 
+                                             SurveyForm,      ConnectionForm, 
+                                             UserProfileForm, UserForm,       
+                                             TermForm,        InvoiceForm
                                            )
 
-from social.models                  import LinkedInProfile
 
+from settings                       import AUTHORIZE
 
-from cron.accounting                import invoice_user, bill_user
+# Import for authorize
+from authorize                      import cim
+from authorize.gen_xml              import VALIDATION_TEST, AUTH_ONLY
+from authorize.responses            import AuthorizeError, _cim_response_codes
+
+from cron.accounting                import invoice_user
+
 
 def homepage( request ):
     # Homepage
@@ -319,6 +330,71 @@ class ConnectionView( FormView ):
         connection.save()        
         return HttpResponseRedirect(reverse('invoice'))
 
+
+def bill_user( invoice ):
+    cim_api  = cim.Api( unicode(AUTHORIZE['API_LOG_IN_ID'] ),
+                        unicode(AUTHORIZE['TRANSACTION_ID']) 
+                      )
+    
+    try:  
+        authorize = Authorize.objects.get( user = invoice.user )
+    except Authorize.DoesNotExist:
+        return
+    
+    try:
+        response = cim_api.create_profile_transaction(  amount = invoice.cost,
+                                                        customer_profile_id = authorize.customer_id,
+                                                        customer_payment_profile_id = authorize.profile_id,
+                                                        profile_type = AUTH_ONLY
+                                                     )
+    except AuthorizeError:
+        invoice.status = 'unauthorized'
+        invoice.save()
+        return invoice
+                
+    else:
+        # Check to see it if its OK
+        result = response.messages.result_code.text_.upper()
+   
+        if result == 'OK':
+            invoice.status = 'paid'
+        else:
+            invoice.status = 'rejected'
+            
+        invoice.save()
+    return invoice
+
+def notice_of_invoice( invoice ):
+    # Set up the context
+    c = Context({'invoice' :invoice })
+
+    # Render the message and log it
+    template = loader.get_template('letters/invoice.tmpl')
+    message = template.render(c)
+
+    subject = 'BrightMap Invoice: '+invoice.title
+
+    bcc = [ 'bcc@brightmap.com' ]
+    from_email = '<invoice@brightmap.com>'
+
+    #TESTING BELOW REMOVE LATER
+    to_email = [ '%s %s <%s>'% ( invoice.user.first_name, invoice.user.last_name, invoice.user.email ) ]
+    to_email = ['Pete Douma <pete.douma@gmail.com>']
+
+    # Send the email
+    msg = EmailMultiAlternatives( subject    = subject,
+                                  body       = message,
+                                  from_email = from_email,
+                                  to         = to_email,
+                                  bcc        = bcc
+                                )
+
+    try:
+        msg.send( fail_silently = False )
+    except Exception, e:
+        logger.error('Exception %s mailing invoice'%(e,))
+ 
+
 class InvoiceView ( FormView):
     template_name   = 'admin/invoice.html'
     form_class      = InvoiceForm
@@ -326,7 +402,9 @@ class InvoiceView ( FormView):
     def get(self, request, *args, **kwargs):
         if 'invoice' in request.GET:
             invoice = Invoice.objects.get(pk = request.GET['invoice'])
-            invoice = invoice_user ( invoice.user )
+           
+            # Update to the latest invoice
+            invoice = invoice_user ( invoice.user, invoice.first_day, invoice.last_day )
 
             form = InvoiceForm(instance = invoice)
             connections = invoice.connections()
@@ -338,9 +416,9 @@ class InvoiceView ( FormView):
  
             
     def form_valid(self, form ):
-        invoice = self.request.GET['invoice']
-        invoice = Invoice.objects.get( pk = invoice )
-        # bill_user ( invoice)
+        invoice = Invoice.objects.get( pk = self.request.GET['invoice'] )
+        #invoice = bill_user ( invoice )
+        notice_of_invoice( invoice )
         invoice.save()
         
         

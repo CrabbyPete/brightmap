@@ -1,7 +1,8 @@
 import django_header
+import memcached
 
 # Python libraries
-from datetime                       import datetime, date, timedelta
+from datetime                       import datetime, timedelta
 
 # Django libraries
 from django.contrib.auth.models     import User
@@ -11,10 +12,11 @@ from django.core.mail               import EmailMultiAlternatives
 
 # Local libraries
 from base.models                    import ( Event, Profile, Survey, Interest, Deal, 
-                                             Organization, Connection, LeadBuyer    )
+                                             Organization, Connection, LeadBuyer, Invoice    )
 
 from base.passw                     import gen
 from client                         import EventbriteClient
+
 
 """"
 from meetup                         import MeetUpAPI
@@ -29,7 +31,6 @@ logger = logging.getLogger('main.py')
 from settings                       import EVENTBRITE, MAX_MAIL_SEND, SEND_EMAIL
 PROMPT     = False
 TODAY      = datetime.today()
-
 
 
 def log(message):
@@ -284,20 +285,31 @@ def database_attendees( evb, event ):
     return
 
 
+def days_of_month (month = None):
+    """
+    Return the first and last day of the month
+    """
+    first_day = TODAY.replace(day = 1)
+    if  month:
+        first_day = first_day.replace( month = int(month) )
+ 
+    if first_day.month == 12:
+        last_day = first_day.replace ( day = 31 )
+    else:
+        last_day = first_day.replace (month = first_day.month + 1 ) - timedelta( days = 1 )
+    
+    return (first_day, last_day)
+
+
 def check_budget( term ):
+    """
+    Check if the LeadBuy has gone over budget
+    """
     leadbuyer = LeadBuyer.objects.get( user = term.buyer )
     if not leadbuyer.budget:
         return True
-    
-    first_day = TODAY.replace(day = 1)
-    month = first_day.month + 1
-    if month == 13:
-        last_day  = first_day.replace (month = 1, year = first_day.year + 1 ) - timedelta( days = 1 )
-    else:
-        last_day  = first_day.replace (month = first_day.month + 1 ) - timedelta( days = 1 )
-        
-    connections = Connection.objects.for_buyer( term.buyer, [first_day,last_day] )
-    
+           
+    connections = Connection.objects.for_buyer( term.buyer, days_of_month() )
     total = sum( connection.term.cost for connection in connections if connection.status == 'sent' )
  
     if total >= leadbuyer.budget:
@@ -496,12 +508,51 @@ def main():
                             # Connect attendees and mail contacts
                             make_contact( survey, deal, template )
 
+
+def accounting():
+    """
+    Update all the invoices for the month
+    """
+    print "Invoicing for the month of: " + TODAY.strftime("%B %Y")
+    for profile in Profile.objects.filter( is_leadbuyer = True ):
+        
+        days = days_of_month()
+        user = profile.user
+        
+        connections = Connection.objects.for_buyer( user, days )
+        cost = sum( connection.term.cost for connection in connections if connection.status == 'sent' )
+ 
+        if not cost:
+            continue
+ 
+        title = days[0].strftime("%B %Y")
+                
+        # See if there is an existing invoice for this month
+        try:
+            invoice = Invoice.objects.get( user      = user,
+                                           title     = title,
+                                           first_day = days[0],
+                                           last_day  = days[1]  )
+        except Invoice.DoesNotExist:
+            # Create an invoice 
+            invoice = Invoice( user      = user, 
+                               title     = title,
+                               first_day = days[0], 
+                               last_day  = days[1] 
+                             )
+    
+        invoice.cost = cost
+        invoice.status = 'pending'
+        invoice.save()
+        print profile.user.first_name + ' ' + profile.user.last_name + " = " + str( invoice.cost )
+
 import optparse
 if __name__ == '__main__':
     op = optparse.OptionParser( usage="usage: %prog " +" [options]" )
     # Add options for debugging
     op.add_option('-d', action="store_true", help = 'Debug no emails sent')
     op.add_option('-p', action="store_true", help = 'Prompt to send')
+    op.add_option('-a', action="store_true", help = 'Run Accounting')
 
     opts,args = op.parse_args()
 
@@ -515,4 +566,6 @@ if __name__ == '__main__':
         PROMPT = True
     else:
         PROMPT = False
+    
     main()
+    accounting()

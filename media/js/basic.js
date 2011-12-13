@@ -15,7 +15,7 @@ jQuery(function ($) {
 	// Load dialog on page load
 
 	// Load dialog on click
-	$('#itlink').click( function (e) { 
+	$(".itlink").click( function (e) { 
 		  								e.preventDefault(); 
 		  								$('a.canceldealq').attr('href',this.href)
 		  								$("#itlinkcontent").modal(); 

@@ -263,12 +263,7 @@ class Deal(models.Model):
     def __unicode__(self):
         return self.chapter.name +':' + self.interest.interest
 
-TERM_STATUS = ((0,'canceled' ),
-               (1,'pending'  ),
-               (2,'approved' ),
-               (3,'rejected' ),
-               (4,'sponsored')
-               )
+TERM_STATUS = ('canceled', 'pending', 'approved', 'rejected', 'sponsored')
 
 class Term( models.Model ):
     """
@@ -307,6 +302,9 @@ class Term( models.Model ):
         return self.buyer.email +'-' +\
                self.deal.chapter.name +':' + self.deal.interest.interest
 
+    def owner(self):
+        return self.deal.chapter.organizer
+        
     def connections( self, dates = None ):
         if dates:
             return Connection.objects.filter( term = self, date__range = dates )
@@ -613,65 +611,30 @@ class ConnectionManager(models.Manager):
     """
     Model Manager for Connection class
     """
-    def for_buyer(self, user, date_range = None ):
+    def for_buyer(self, user, dates = None ):
         """
         Only return buyer connections
         """
-        profile = user.get_profile()
-        connections = []
-
-        if isinstance(date_range[0], date):
-            date_range[0] = datetime.combine(date_range[0], time() )
-        if isinstance(date_range[1], date):
-            date_range[1] = datetime.combine(date_range[1], time() )
-            
-
-        if profile.is_leadbuyer:
-            terms = Term.objects.filter(buyer = user)
-            connections = []
-            for term in terms:
-                connection = self.filter(term = term, date__range = (date_range[0], date_range[1]))
-                connections.extend(connection)
-            return connections
+        # Only for lead buyers
+        if  not user.get_profile().is_leadbuyer:
+            return []
         
-    def for_user(self, user, date_range = None ):
-        """
-        Get connetions whether the user is a buyer or attendee
-        """
-        profile = user.get_profile()
+        # Dates is a set, but if date instance, change to datetime instance
+        if isinstance(dates[0], date) and isinstance(dates[1], date):
+            dates = ( datetime.combine( dates[0], time() ),  datetime.combine( dates[1], time() ) )
+        
+        # Get all the connections
         connections = []
-        if date_range:
-            if isinstance(date_range[0], date):
-                date_range[0] = datetime.combine(date_range[0], time() )
-            if isinstance(date_range[1], date):
-                date_range[1] = datetime.combine(date_range[1], time() )
-            
-
-        if profile.is_leadbuyer:
-            terms = Term.objects.filter(buyer = user)
-            for term in terms:
-                
-                for c in self.filter(term = term):
-                    if date_range == None:
-                        connections.append(c)
-                    else: 
-                        if c.date >= date_range[0] and\
-                           c.date <  date_range[1]     :
-                            connections.append(c)
-
-        if profile.is_attendee:
-            surveys = Survey.objects.filter( attendee = user )
-            for survey in surveys:
-                for c in self.filter( survey = survey ):
-                    connections.append(c)
-
+        for term in Term.objects.filter(buyer = user):
+            if dates:
+                connection = self.filter( term = term, date__range = dates )
+            else:
+                connection = self.filter( term = term )
+            connections.extend(connection)
+        
         return connections
-
-    def for_event(self, event ):
-        # Get all Connections for an event
-
-        self.filter(event.survey)
-
+        
+ 
 class Connection(models.Model):
     """
     Describes a connection for an Event, Deal, and attendee

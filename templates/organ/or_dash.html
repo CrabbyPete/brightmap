@@ -1,4 +1,13 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
+
+{% block javascript %}
+<!--popup script start-->
+<link type='text/css' href='/media/css/basic.css' rel='stylesheet' media='screen' />
+<script type="text/javascript" src="/media/js/jquery.simplemodal.js"></script>
+<script type="text/javascript" src="/media/js/basic.js"></script>
+<!--popup script end-->
+{% endblock %} 
+  
 {% block body_block %}
 <!--Body section-->
 <div id="bodysection">
@@ -31,7 +40,7 @@
 			{% if chapters %}
 			<section id="my-chapter">
 	
-			<form id="profile" name="" method="post" action="profile.php">
+			<form id="profile" name="" method="post" action="#">
 				<label>Select Chapter to Manage:</label> <select name=""><option>ULS
 						New York</option>
 				</select>
@@ -80,7 +89,9 @@
 							<td class="recivedcontent">{{term.cost}}</td>
 							<td class="recivedcontent">{{term.monthly_connections|length}}</td>
 							<td class="recivedcontent">{{term.monthly_total}}</td>
-							<td class="recivedcontent"><a href="#">Cancel</a></td>
+							<td class="recivedcontent">
+								<a href="{% url or_status%}?term={{term.pk}}&status=canceled" class="itlink">Cancel</a>
+							</td>
 						</tr>
 						{% endfor %}
 	
@@ -127,9 +138,9 @@
 							<td class="insideblankfill"></td>
 							<td class="recivedcontent">
 								<ul class="pendingaction">
-									<li><a href="#">Accept</a>
+									<li><a href="{%url or_status%}?term={{term.pk}}&status=approved">Accept</a>
 									</li>
-									<li class="noimg"><a href="#">Reject</a>
+									<li class="noimg"><a href="{%url or_status%}?term={{term.pk}}&status=rejected">Reject</a>
 									</li>
 								</ul></td>
 						</tr>
@@ -192,6 +203,8 @@
 		</table>
 
 		</section>
+		
+		{% if invoices %}
 		<div class="leadbuyerbotdiv">&nbsp;</div>
 		</article>
 		<article class="leastrecived" style="margin-bottom:0px;">
@@ -239,11 +252,27 @@
 		<a href="#">Back</a>
 		<span>|</span>
 		<a href="#">Next</a></nav>
+		{% endif %}
 
 	</div>
-
-
-
 </div>
+
+<!--thickbox-->
+<div style="display: none;">
+	<div id="itlinkcontent">
+		<h2 class="popupheading1">Are you sure you want to cancel this deal?</h2>
+		<p class="canceldeal">
+			<a class="canceldealq">Yes, cancel deal</a> 
+			<a href="" class="nokeepdeal">No, keep deal</a>
+		</p>
+	</div>
+</div>
+<!--thickbox-->
+
+<!-- preload the images -->
+<div style='display: none'>
+	<img src='/media/img/x.png' alt='' />
+</div>
+
 <!--Body section-->
 {% endblock %}

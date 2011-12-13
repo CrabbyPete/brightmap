@@ -2,8 +2,6 @@
 import  logging
 logger = logging.getLogger('organizer')
 
-from datetime                       import datetime, timedelta
-
 # Django imports
 from django.views.generic.edit      import  FormView
 from django.contrib                 import  auth
@@ -13,11 +11,14 @@ from django.core.urlresolvers       import  reverse
 from django.http                    import  HttpResponseRedirect
 from django.shortcuts               import  render_to_response
 from django.template                import  RequestContext
+from django.contrib.auth.decorators import  login_required
 
 #Local imports
-from base.models                    import Profile, Organization, Chapter, Interest, Deal, Event
+from base.models                    import ( Profile, Organization, Chapter, 
+                                             Interest, Deal,        Event, 
+                                             Term, TERM_STATUS
+                                            )
 from forms                          import OrganizerForm, CategoryForm
-
 
 
 class SignUp( FormView ):
@@ -167,14 +168,12 @@ class Category( FormView ):
         
         return HttpResponseRedirect( reverse('or_setup') )
 
+@login_required
 def setup( request ):
     return render_to_response('organ/or_setup.html', {}, context_instance=RequestContext(request) )
 
-def union(a, b):
-    """ return the union of two lists """
-    return list(set(a) | set(b))
 
-
+@login_required
 def dashboard( request ):
     user = request.user
 
@@ -201,4 +200,24 @@ def dashboard( request ):
             
     return render_to_response('organ/or_dash.html', {'active':active, 'pending':pending, 'canceled':canceled }, context_instance=RequestContext(request) )
 
+
+@login_required
+def status( request ):
+    if request.method == 'GET' and 'term' in request.GET:
+        term = Term.objects.get(pk = request.GET['term'])
+        if term.owner() == request.user and 'status' in request.GET:
+            status = request.GET['status']
+            if status in TERM_STATUS:
+                term.status = request.GET['status']
+                term.save()
+    return HttpResponseRedirect(reverse('or_dash'))
+
     
+def cancel(request):
+    # Cancel Terms of a Deal
+    if request.method == 'GET' and 'term' in request.GET:
+        term = Term.objects.get(pk = request.GET['term'])
+        term.status = 'canceled'
+        term.save()
+    return HttpResponseRedirect(reverse('or_dash'))
+
