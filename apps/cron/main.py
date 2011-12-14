@@ -432,7 +432,7 @@ def print_event(event):
     """
     delta = event.date - datetime.today()
     date  = event.date.strftime("%Y-%m-%d %H:%M")
-    print log('Event - ' +  event.describe + ' ' + date + ' ' + str(delta.days) )
+    print log('Chapter: '+ event.chapter.name  + ' Event: ' +  event.describe + ' ' + date + ' ' + str(delta.days) )
 
 
 def print_connection( attendee, sponser, interest ):

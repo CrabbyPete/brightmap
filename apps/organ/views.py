@@ -21,7 +21,7 @@ from base.models                    import ( Profile, Organization, Chapter,
 from forms                          import OrganizerForm, CategoryForm
 
 
-class SignUp( FormView ):
+class SignUpView( FormView ):
     template_name = 'organ/signup.html'
     form_class    = OrganizerForm
     password      ='2434&)%*%%^$#@' 
@@ -124,7 +124,7 @@ class SignUp( FormView ):
 
         return HttpResponseRedirect( reverse('or_category')+'?chapter='+str(chapter.id) )
 
-class Category( FormView ):
+class CategoryView( FormView ):
     template_name = 'organ/or_category.html'
     form_class    = CategoryForm
     

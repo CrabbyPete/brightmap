@@ -1,0 +1,155 @@
+{% extends 'base.html' %} {% load smartif %} {% block javascript %}
+<!--popup script start-->
+<link type='text/css' href='/media/css/basic.css' rel='stylesheet'
+	media='screen' />
+<script type="text/javascript" src="/media/js/jquery.simplemodal.js"></script>
+<script type="text/javascript" src="/media/js/basic.js"></script>
+<!--popup script end-->
+{% endblock %} {% block body_block %}
+<!--Body section-->
+<div id="bodysection">
+	<div class="insidesection">
+
+		<article class="techdrinkup">
+		<div class="techdrinkuptopdiv"></div>
+		<section class="techdrinkupreptbg">
+		<table class="techtable">
+			<caption class="latestrecived">{{chapter.name}}</caption>
+			<tr>
+				<td class="techdrinkrow">Organization</td>
+				<td class="techdrinkRightrow">{{chapter.name}}</td>
+			</tr>
+			<tr>
+				<td class="techdrinkrow">Chapter</td>
+				<td class="techdrinkRightrow">{{chapter.name}}</td>
+			</tr>
+			<tr>
+				<td class="techdrinkrow">Organizer</td>
+				<td class="techdrinkRightrow">{{chapter.organizer.first_name}} &nbsp;
+				                              {{chapter.organizer.last_name}}
+				</td>
+			</tr>
+			<tr>
+				<td class="techdrinkrow">Website</td>
+				<td class="techdrinkRightrow"><strong><a
+						href="{{chapter.website}}" target="_blank">{{chapter.organizer.get_profile.website}}</a>
+				</strong>
+				</td>
+			</tr>
+			<tr>
+				<td class="techdrinkrow">Email</td>
+				<td class="techdrinkRightrow"><strong><a
+						href="mailto:{{chapter.organizer.email}}">{{chapter.organizer.email}}</a>
+				</strong>
+				</td>
+			</tr>
+			<tr>
+				<td class="techdrinkrow">Phone</td>
+				<td class="techdrinkRightrow">{{chapter.organizer.get_profile.phone}}</td>
+			</tr>
+			<tr>
+				<td class="techdrinkrow">Lead Sources</td>
+				<td class="techdrinkRightrow">Eventbrite</td>
+			</tr>
+		</table>
+
+		</section>
+		<div class="techdrinkupbotdiv"></div>
+		</article>
+
+
+		<article class="techdrinkup techdrinkup1">
+		<div class="techdrinkuptopdiv"></div>
+		<section class="techdrinkupreptbg">
+		<table class="techdealtable">
+			<caption class="latestrecived">{{chapter.name}} - Deal Detail</caption>
+			<tr>
+				<td class="tehLeft">Status</td>
+				<td class="tehMiddle">{{term.status}}</td>
+				<td class="tehRight"><a href="#">Cancel Deal</a>
+				</td>
+			</tr>
+			<tr>
+				<td class="tehLeft">Terms</td>
+				<td class="tehMiddle">Exclusive</td>
+				<td class="tehRight tehRight1">&nbsp;</td>
+			</tr>
+			<tr>
+				<td class="tehLeft">Lead Price</td>
+				<td class="tehMiddle"><strong>{{term.cost}} / Lead</strong>
+				</td>
+				<td class="tehRight tehRight1">&nbsp;</td>
+			</tr>
+		</table>
+
+		<p class="dealdetaltxt">
+			&lt;lead buyer first name&gt; will receive introductions to attendees
+			of &lt;organization name&gt; events that request an introduction to
+			your <br> preferred &lt;interest&gt; provider. The exact number
+			of leads he/she receives will depend on how many leads are generated
+			through<br> &lt;organization&gt;, the monthly budget
+			&lt;lead-buyer name&gt; has set, and the other event communities he
+			is receiving leads from. Any<br> individual lead will go to
+			&lt;lead buyer first name&gt; exclusively, not to any other
+			&lt;interest> providers. &lt;lead buyer first name&gt; will be<br>
+			billed $50 for each introduction sent through BrightMap. Your
+			commission will be $25 (50%) of each lead.
+		</p>
+
+		</section>
+		<div class="techdrinkupbotdiv"></div>
+
+		</article>
+
+		<p class="backdahbordbutt">
+			<a href="#">Back to Dashboard</a>
+		</p>
+
+		<article class="leastrecived">
+		<div class="leadbuyertopdiv">&nbsp;</div>
+		<section class="leadbuyerrept">
+
+		<table class="ins">
+			<caption class="latestrecived">TechDrinkup - Lead History</caption>
+
+			<tr>
+				<td style="background-color: #F5F6F6;">
+					<table class="ins">
+						<tr>
+							<th class="interest">Date Sent</th>
+							<th class="interest">Lead Company</th>
+							<th class="interest ">Lead Name</th>
+							<th class="interest">Lead Email</th>
+							<th class="interest">Terms</th>
+							<th class="interest">Price</th>
+						</tr>
+						{% for connection in connections %}
+						<tr>
+							<td class="recivedcontent">{{connection.date}}</td>
+							<td class="recivedcontent">{{connection.survey.attendee.get_profile.company}}</td>
+							<td class="recivedcontent">{{connection.survey.attendee.first_name}}&nbsp;
+													   {{connection.survey.attendee.last_name}}
+							</td>
+							<td class="recivedcontent"><a
+								href="mailto:sam.jones@gmail.com">{{connection.survey.attendee.email}}</a>
+							</td>
+							<td class="recivedcontent">{{connection.status}}</td>
+							<td class="recivedcontent">{{connection.term.cost}}</td>
+						</tr>
+						{% endfor %}
+					</table>
+				</td>
+			</tr>
+
+		</table>
+
+		</section>
+		<div class="leadbuyerbotdiv">&nbsp;</div>
+		</article>
+
+	</div>
+
+
+</div>
+<!--Body section-->
+{% endblock %}

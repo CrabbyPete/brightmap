@@ -8,13 +8,14 @@ from datetime                       import datetime
 from dateutils                      import relativedelta
 
 # Django imports
-from django.views.generic.base      import  TemplateView
+from django.views.generic.base      import  TemplateView, View
 from django.views.generic.edit      import  FormView
-from django.template                import  loader, Context
+from django.template                import  loader, Context, RequestContext
 from django.contrib                 import  auth
 from django.contrib.auth.models     import  User
 from django.contrib.auth.decorators import  login_required
 from django.http                    import  HttpResponseRedirect
+from django.shortcuts               import  render_to_response
 from django.forms.util              import  ErrorList
 from django.core.urlresolvers       import  reverse
 from django.core.mail               import  EmailMultiAlternatives
@@ -64,7 +65,7 @@ def mail_organizer( user, deal, term, deal_type ):
             logger.error(err)
 
 
-class  SignUp( FormView ):
+class  SignUpView( FormView ):
     initial          = {}
     template_name    = 'leadb/signup.html'
     form_class       = BuyerForm
@@ -194,7 +195,7 @@ class  SignUp( FormView ):
 # Initialize the TYPE List form form.DEAL_CHOICES
 DEAL_TYPES = [c[0] for c in DEAL_CHOICES]
 
-class Apply( FormView ):
+class ApplyView( FormView ):
     """
     Apply to buy a deal
     """
@@ -280,7 +281,7 @@ class Apply( FormView ):
 
         return HttpResponseRedirect(reverse('lb_apply'))
 
-class Dash( TemplateView ):
+class DashView( TemplateView ):
     """
     Show the buyers dash board
     """
@@ -294,7 +295,7 @@ class Dash( TemplateView ):
         total     = 0.0
         for term in terms:
             args = dict ( interest    = term.deal.interest.interest,
-                          chapter     = term.deal.chapter.name,
+                          chapter     = term.deal.chapter,
                           date        = term.modified,
                           connections = len(term.connections()),
                           cost        = term.cost,
@@ -343,7 +344,7 @@ class Dash( TemplateView ):
         return kwargs
     
     
-class Bill( TemplateView ):
+class BillView( TemplateView ):
     template_name = 'leadb/lb_bills.html'
     
     def get_context_data(self):
@@ -397,7 +398,18 @@ def parse_address(address):
             where = address.find(found.group(0))
             return address[0:where]
 
-class Payment( FormView ):
+
+class ChapterView( View ):
+    def get(self, request, *arg, **kwargs ):
+        chapter     = Chapter.objects.get( pk = request.GET['chapter'] )
+        term        = Term.objects.get( pk = request.GET['term'])
+        connections = term.connections()
+        return render_to_response( 'leadb/lb_organizer.html', 
+                                   { 'chapter':chapter, 'term':term, 'connections':connections }, 
+                                   context_instance=RequestContext(request) 
+                                  )
+
+class PaymentView( FormView ):
     template_name = 'leadb/lb_payment.html'
     form_class    = PaymentForm
     

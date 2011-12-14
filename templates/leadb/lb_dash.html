@@ -54,7 +54,11 @@
 						{% for term in terms %}
 						<tr>
 							<td class="recivedcontent">{{term.interest}}</td>
-							<td class="recivedcontent">{{term.chapter}}</td>
+							<td class="recivedcontent">
+								<a href="{% url lb_chapter%}?chapter={{term.chapter.pk}}&term={{term.pk}}">
+								{{term.chapter.name}}
+								</a>
+							</td>
 							<td class="recivedcontent">{{term.status}}</td>
 							<td class="recivedcontent">{{term.date|date:"d M Y"}}</td>
 							<td class="recivedcontent">{{term.connections}}</td>
