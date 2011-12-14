@@ -20,4 +20,8 @@ admin.site.register(Connection)
 
 admin.site.register(LeadBuyer)
 
-admin.site.register(Authorize)
+
+class AuthorizeAdmin(admin.ModelAdmin):
+    ordering = ['user__last_name']
+    
+admin.site.register(Authorize, AuthorizeAdmin)

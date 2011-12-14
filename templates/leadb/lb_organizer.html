@@ -32,7 +32,7 @@
 			<tr>
 				<td class="techdrinkrow">Website</td>
 				<td class="techdrinkRightrow"><strong><a
-						href="{{chapter.website}}" target="_blank">{{chapter.organizer.get_profile.website}}</a>
+						href="{{chapter.organizer.get_profile.website}}" target="_blank">{{chapter.organizer.get_profile.website}}</a>
 				</strong>
 				</td>
 			</tr>
@@ -66,12 +66,20 @@
 			<tr>
 				<td class="tehLeft">Status</td>
 				<td class="tehMiddle">{{term.status}}</td>
-				<td class="tehRight"><a href="#">Cancel Deal</a>
+				<td class="tehRight">
+					<a href="{% url lb_cancel%}?term={{term.pk}}" class="itlink">Cancel Deal</a>
 				</td>
 			</tr>
 			<tr>
 				<td class="tehLeft">Terms</td>
-				<td class="tehMiddle">Exclusive</td>
+				<td class="tehMiddle">
+					{% if term.exclusive %}Exclusive
+					{%else%}
+						{% if term.expire %}Trial
+						{%else%}Standard
+						{%endif%}
+					{%endif%}
+				</td>
 				<td class="tehRight tehRight1">&nbsp;</td>
 			</tr>
 			<tr>
@@ -83,17 +91,13 @@
 		</table>
 
 		<p class="dealdetaltxt">
-			&lt;lead buyer first name&gt; will receive introductions to attendees
-			of &lt;organization name&gt; events that request an introduction to
-			your <br> preferred &lt;interest&gt; provider. The exact number
+			{{user.first_name}} {{user.last_name}} will receive introductions to attendees
+			of {{chapter.name}} events that request an introduction to
+			your <br> preferred {{term.deal.interest.interest}} provider. The exact number
 			of leads he/she receives will depend on how many leads are generated
-			through<br> &lt;organization&gt;, the monthly budget
-			&lt;lead-buyer name&gt; has set, and the other event communities he
-			is receiving leads from. Any<br> individual lead will go to
-			&lt;lead buyer first name&gt; exclusively, not to any other
-			&lt;interest> providers. &lt;lead buyer first name&gt; will be<br>
-			billed $50 for each introduction sent through BrightMap. Your
-			commission will be $25 (50%) of each lead.
+			through<br> {{chapter.name}}, the monthly budget
+			{{user.first_name}} has set, and the other event communities he
+			is receiving leads from. 
 		</p>
 
 		</section>
@@ -102,7 +106,7 @@
 		</article>
 
 		<p class="backdahbordbutt">
-			<a href="#">Back to Dashboard</a>
+			<a href="{%url lb_dash%}">Back to Dashboard</a>
 		</p>
 
 		<article class="leastrecived">
@@ -110,7 +114,7 @@
 		<section class="leadbuyerrept">
 
 		<table class="ins">
-			<caption class="latestrecived">TechDrinkup - Lead History</caption>
+			<caption class="latestrecived">{{chapter.name}} - Lead History</caption>
 
 			<tr>
 				<td style="background-color: #F5F6F6;">
@@ -120,7 +124,7 @@
 							<th class="interest">Lead Company</th>
 							<th class="interest ">Lead Name</th>
 							<th class="interest">Lead Email</th>
-							<th class="interest">Terms</th>
+							<th class="interest">Billing Status</th>
 							<th class="interest">Price</th>
 						</tr>
 						{% for connection in connections %}

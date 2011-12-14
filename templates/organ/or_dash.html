@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load fortyfive %}
 
 {% block javascript %}
 <!--popup script start-->
@@ -25,7 +26,7 @@
 			<li><a href="{% url or_category %}" class="leadcategoris">Add/Update Lead
 					Categories</a>
 			</li>
-			<li><a href="#" class="leadsource">Add/Update Lead Source</a>
+			<li><a href="{% url or_setup %}" class="leadsource">Add/Update Lead Source</a>
 			</li>
 			<!--  
 			<li><a href="#" class="eventhistory">My Event History</a>
@@ -35,9 +36,10 @@
 		</nav>
 
 		<article class="chaptermanage">
+		{% if chapters %}
 		<div class="topmanagebg"></div>
 		<div class="manage">
-			{% if chapters %}
+			
 			<section id="my-chapter">
 	
 			<form id="profile" name="" method="post" action="#">
@@ -46,9 +48,10 @@
 				</select>
 			</form>
 			</section>
-			{% endif %}
+			
 		</div>
-
+		{% endif %}
+		
 		<div class="botmanagebg"></div>
 		</article>
 
@@ -88,7 +91,7 @@
 							                           {% endif %}</td>
 							<td class="recivedcontent">{{term.cost}}</td>
 							<td class="recivedcontent">{{term.monthly_connections|length}}</td>
-							<td class="recivedcontent">{{term.monthly_total}}</td>
+							<td class="recivedcontent">{{term.monthly_total|fortyfive}}</td>
 							<td class="recivedcontent">
 								<a href="{% url or_status%}?term={{term.pk}}&status=canceled" class="itlink">Cancel</a>
 							</td>
@@ -140,7 +143,8 @@
 								<ul class="pendingaction">
 									<li><a href="{%url or_status%}?term={{term.pk}}&status=approved">Accept</a>
 									</li>
-									<li class="noimg"><a href="{%url or_status%}?term={{term.pk}}&status=rejected">Reject</a>
+									<li class="noimg">
+										<a href="{%url or_status%}?term={{term.pk}}&status=rejected" class="itlink">Cancel</a>
 									</li>
 								</ul></td>
 						</tr>
@@ -176,7 +180,7 @@
 							<th class="interest">Commission<br/>
 							<span>(last 30 days)</span>
 							</th>
-							<th class="canleadbuyer"></th>
+							<th class="interest">Canceled</th>
 
 
 						</tr>
@@ -192,7 +196,7 @@
 							<td class="recivedcontent">{{term.cost}}</td>
 							<td class="recivedcontent">{{term.monthly_connections|length}}</td>
 							<td class="recivedcontent">{{term.monthly_total}}</td>
-							<td class="canleadbuyerinside"></td>
+							<td class="recivedcontent">{{term.modified|date:"d M Y"}}
 
 						</tr>
 						{% endfor %}

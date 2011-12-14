@@ -41,7 +41,8 @@ class Authorize( models.Model ):
     customer_id     = models.CharField( max_length = 255 )
     profile_id      = models.CharField( max_length = 255 )
     payment_profile = models.CharField( max_length = 255 )
- 
+    def __unicode__(self):
+        return self.user.last_name+','+self.user.first_name
 
 class Invoice( models.Model ):
     user        = models.ForeignKey( User )
@@ -164,7 +165,7 @@ class LeadBuyer( models.Model ):
         return Term.objects.filter(buyer = self.user)
 
     def connections(self):
-        return Connection.objects.for_user(self.user)
+        return Connection.objects.for_buyer(self.user)
 
     def __unicode__(self):
         return self.user.email
@@ -620,8 +621,9 @@ class ConnectionManager(models.Manager):
             return []
         
         # Dates is a set, but if date instance, change to datetime instance
-        if isinstance(dates[0], date) and isinstance(dates[1], date):
-            dates = ( datetime.combine( dates[0], time() ),  datetime.combine( dates[1], time() ) )
+        if dates:
+            if isinstance(dates[0], date) and isinstance(dates[1], date):
+                dates = ( datetime.combine( dates[0], time() ),  datetime.combine( dates[1], time() ) )
         
         # Get all the connections
         connections = []

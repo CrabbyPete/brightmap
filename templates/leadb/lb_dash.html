@@ -16,9 +16,11 @@
 	<div class="insidesection">
 		<section class="leadbuyer">
 
+		{% if state %}
 		<p class="profileupdate">
-			<span>Profile Updated</span>
+			<span>{{state}}</span>
 		</p>
+		{% endif %}
 		<h2 class="leadbuyer">Lead-Buyer Dashboard</h2>
 		</section>
 		<nav class="leadbuyer">
@@ -65,9 +67,13 @@
 							<td class="recivedcontent">{{term.cost}}</td>
 							<td class="recivedcontent">{{term.total}}</td>
 							<td class="recivedcontent interestright">
+							{% if term.status == 'Canceled' %}
+								Canceled
+							{%else%}
 								<a href="{% url lb_cancel%}?term={{term.pk}}" class="itlink">Cancel</a>
+							{%endif%}
 							</td>
-							</td>
+		
 						</tr>
 						{% endfor %}
 					</table></td>

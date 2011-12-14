@@ -20,6 +20,7 @@ from django.forms.util              import  ErrorList
 from django.core.urlresolvers       import  reverse
 from django.core.mail               import  EmailMultiAlternatives
 
+
 #Authorize imports
 from authorize                      import cim
 from authorize.gen_xml              import VALIDATION_LIVE, VALIDATION_TEST, CREDIT_CARD
@@ -164,6 +165,7 @@ class  SignUpView( FormView ):
                     user.set_password(password)
                     user.save()
             
+        # Update profile details
         profile.is_leadbuyer = True
         profile.is_agreed    = True
       
@@ -189,7 +191,11 @@ class  SignUpView( FormView ):
         if user is not None and user.is_active:
             auth.login(self.request, user)
 
-        return HttpResponseRedirect ( reverse('lb_payment') )
+        # If you already have payment details go to dashboard
+        if profile.is_ready:
+            return HttpResponseRedirect ( reverse('lb_dash')+"?state=profile" )
+        else:
+            return HttpResponseRedirect ( reverse('lb_payment') )
 
 
 # Initialize the TYPE List form form.DEAL_CHOICES
@@ -279,7 +285,7 @@ class ApplyView( FormView ):
             cancel.save()
             mail_organizer( self.request.user, deal, cancel, deal_type )
 
-        return HttpResponseRedirect(reverse('lb_apply'))
+        return HttpResponseRedirect(reverse('lb_dash')+"?state=apply")
 
 class DashView( TemplateView ):
     """
@@ -288,9 +294,19 @@ class DashView( TemplateView ):
     template_name = 'leadb/lb_dash.html'
     
     def get_context_data(self, **kwargs):
+        
+        state = None
+        if 'state' in self.request.GET:
+            if self.request.GET['state'] == 'profile':
+                state = 'Profile Updated'
+            elif self.request.GET['state'] == 'payment':
+                state = 'Payment Info Updated'
+            elif self.request.GET['state'] == 'apply':
+                state = 'Deal Pending'
+        
         buyer = self.request.user
         terms = Term.objects.filter(buyer = buyer)
-
+          
         term_list = []
         total     = 0.0
         for term in terms:
@@ -325,7 +341,7 @@ class DashView( TemplateView ):
         # Convert total to a string
         total = '%10.2f'%total
         total = dict(total = total)
-        kwargs = dict( terms = term_list, total = total ) # {terms:terms, total:total, invoices:invoices }
+        kwargs = dict( terms = term_list, total = total, state = state ) # {terms:terms, total:total, invoices:invoices }
         
         # Now get Invoices and put them in an 4 wide  array
         invoices = []
@@ -556,10 +572,14 @@ class PaymentView( FormView ):
         lb.save()
          
         # Save profile changes and indicate the credit card is ready
+        was_ready = profile.is_ready
         profile.is_ready = True
         profile.save()
- 
-        return HttpResponseRedirect(reverse('lb_apply'))
+        
+        if not was_ready:
+            return HttpResponseRedirect(reverse('lb_apply'))
+        else:
+            return HttpResponseRedirect(reverse('lb_dash')+"?state='payment")
 
 
 @login_required

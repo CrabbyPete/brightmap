@@ -93,12 +93,11 @@ class BuyerForm(forms.Form):
     
     
 
-DEAL_CHOICES = [('Sponsored','Sponsored (free)'),
-                ('Exclusive','Exclusive ($50.00 per Introduction)'),
-                ('Nonexclusive','Nonexclusive ($20.00 per Introduction'),
-                ('Trial' ,'Trial (free for 1 month)')
+DEAL_CHOICES = [
+                ('Nonexclusive','Standard ($20.00 per Introduction'),
+                ('Trial' ,'Trial (free for 1 month)'),
+                ('Sponsored','Sponsored (free)')
                ]
-
 
 
 """
@@ -129,7 +128,7 @@ class ApplyForm(forms.Form):
                                         max_length = 100,
                                         widget = forms.TextInput()
                                       )
-  
+ 
     deal_type        = forms.ChoiceField( required = True,
                                           choices=DEAL_CHOICES,
                                           widget=forms.RadioSelect(attrs={'class':"termscode"})
