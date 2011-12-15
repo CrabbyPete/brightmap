@@ -66,7 +66,7 @@ nav.topmenu ul{
 	padding:0;
 	margin:0;
 	float:left;
-	width:420px;
+	width:620px;
 	
 }
 nav.topmenu ul li{
@@ -82,6 +82,7 @@ nav.topmenu ul li a{
 	background-color:inherit;
 	display:block;
 	font-weight:bold;
+	width:230px;
 }
 nav.topmenu ul li a span{
 	background:url(/media/img/rightround-normal.jpg) no-repeat 100% 0;

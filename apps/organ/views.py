@@ -1,4 +1,5 @@
 # Python imports
+from datetime                       import date
 import  logging
 logger = logging.getLogger('organizer')
 
@@ -199,8 +200,11 @@ def dashboard( request ):
             
             elif term.status == 'canceled':
                 canceled.append(term)
-            
-    return render_to_response('organ/or_dash.html', {'active':active, 'pending':pending, 'canceled':canceled }, context_instance=RequestContext(request) )
+    today = date.today()      
+    return render_to_response( 'organ/or_dash.html', 
+                               {'today':today, 'active':active, 'pending':pending, 'canceled':canceled }, 
+                               context_instance=RequestContext(request) 
+                             )
 
 
 @login_required

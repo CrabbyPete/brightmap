@@ -32,7 +32,7 @@
 				<!--tabpanel -->
 				<ul>
 					{% if user.get_profile.is_leadbuyer %}
-					<li><a href="{% url lb_dash %}"><span>Lead-Buyer Dashboard</span></a></li>
+					<li><a href="{% url lb_dash %}"><span>Service Provider Dashboard</span></a></li>
 					{% endif %}
 					{% if user.get_profile.is_organizer %}
 					<li><a href="{% url or_dash %}"><span>Event Organizer Dashboard</span></a></li>

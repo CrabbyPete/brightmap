@@ -22,7 +22,7 @@
 		</nav>
 		<h2 class="paymethod">Standard Lead Categories</h2>
 		<form id="profile" name="" method="post" action="{% url or_category %}">
-
+			{% csrf_token %}
 			<section id="my-border" style="padding:20px 0 10px 0;">
 			{{form.standard.errors}}
 			<div class="chkboxdiv">

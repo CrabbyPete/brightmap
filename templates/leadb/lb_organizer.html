@@ -88,18 +88,25 @@
 				</td>
 				<td class="tehRight tehRight1">&nbsp;</td>
 			</tr>
+			<tr>
+				<td class="tehLeft">Service</td>
+				<td class="tehMiddle"><strong>{{term.deal.interest.interest}} / Lead</strong>
+				</td>
+				<td class="tehRight tehRight1">&nbsp;</td>
+			</tr>
 		</table>
-
+		
+		<!-- Removed 
 		<p class="dealdetaltxt">
 			{{user.first_name}} {{user.last_name}} will receive introductions to attendees
 			of {{chapter.name}} events that request an introduction to
-			your <br> preferred {{term.deal.interest.interest}} provider. The exact number
+			your preferred {{term.deal.interest.interest}} provider. The exact number
 			of leads he/she receives will depend on how many leads are generated
-			through<br> {{chapter.name}}, the monthly budget
+			through {{chapter.name}}, the monthly budget
 			{{user.first_name}} has set, and the other event communities he
 			is receiving leads from. 
 		</p>
-
+		-->
 		</section>
 		<div class="techdrinkupbotdiv"></div>
 
@@ -137,7 +144,12 @@
 							<td class="recivedcontent"><a
 								href="mailto:sam.jones@gmail.com">{{connection.survey.attendee.email}}</a>
 							</td>
-							<td class="recivedcontent">{{connection.status}}</td>
+							<td class="recivedcontent">{% if connection.status == 'sent' %}
+													   billed 
+													   {% else %}
+							                           {{connection.status}}
+							                           {% endif %}
+							</td>
 							<td class="recivedcontent">{{connection.term.cost}}</td>
 						</tr>
 						{% endfor %}

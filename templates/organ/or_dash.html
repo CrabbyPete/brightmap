@@ -17,7 +17,7 @@
 			<p class="profileupdate">
 			<span>Profile Updated</span>
 			</p>
-			<h2 class="leadbuyer">Event Organizer Dashboard</h2>
+			<h2 class="leadbuyer">Event Organizer Dashboard  {{today|date:"E Y"}}</h2>
 		</section>
 		<nav class="leadbuyer">
 		<ul>
@@ -144,7 +144,7 @@
 									<li><a href="{%url or_status%}?term={{term.pk}}&status=approved">Accept</a>
 									</li>
 									<li class="noimg">
-										<a href="{%url or_status%}?term={{term.pk}}&status=rejected" class="itlink">Cancel</a>
+										<a href="{%url or_status%}?term={{term.pk}}&status=rejected" class="itlink">Reject</a>
 									</li>
 								</ul></td>
 						</tr>
