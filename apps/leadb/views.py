@@ -305,7 +305,7 @@ class DashView( TemplateView ):
                 state = 'Deal Pending'
         
         buyer = self.request.user
-        terms = Term.objects.filter(buyer = buyer)
+        terms = Term.objects.filter(buyer = buyer).order_by('status')
           
         term_list = []
         total     = 0.0

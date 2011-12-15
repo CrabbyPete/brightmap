@@ -1,4 +1,5 @@
 {% extends 'base.html' %} {% block body_block %}
+
 <!--Body section-->
 <div id="bodysection">
 	<div class="insidesection">
@@ -9,39 +10,45 @@
 			later.
 		</p>
 		<article class="profile"> <section class="bodybg">
-		<nav class="step"> <nav class="step">
-		<ul>
-			<li><a href="{% url or_signup %}" class="noimg">STEP 1 of 3</a>
-			</li>
-			<li><a href="#" class="steptwothree">STEP 2 of 3</a>
-			</li>
-			<li><a href="{% url or_setup %}" class="step3">STEP 3 of 3</a>
-			</li>
-		</ul>
-		</nav> </nav>
+		<nav class="step"> 
+		<nav class="step">
+			<ul>
+				<li><a href="{% url or_signup %}" class="noimg">STEP 1 of 3</a>
+				</li>
+				<li><a href="#" class="steptwothree">STEP 2 of 3</a></li>
+				<li><a href="{% url or_setup %}" class="step3">STEP 3 of 3</a></li>
+			</ul>
+		</nav> 
+		</nav>
 		<h2 class="paymethod">Standard Lead Categories</h2>
-		<form id="profile" name="" method="post" action="{% url or_setup %} ">
+		<form id="profile" name="" method="post" action="{% url or_category %}">
 
 			<section id="my-border" style="padding:20px 0 10px 0;">
-				<div class="chkboxdiv">
-				{{form.standard}}
-				</div>
+			{{form.standard.errors}}
+			<div class="chkboxdiv">
+			{{form.standard }}
+			</div>
+
 			</section>
 			<h2 class="leadcategories">Other Lead Categories</h2>
 
 			<section id="my-categories" style="padding:20px 0 10px 0;">
-				<div class="lftcategorydiv">
-					<div class="chkboxdiv">
-						{{form.other}}
-						{{form.custom}}{{form.custom.label}}
-						{{form.field}}
-					</div>
+			<div class="lftcategorydiv">
+				<div class="chkboxdiv">
+				{{form.other}}
+				<ul>
+					<li>
+					{{form.custom}}&nbsp;{{form.custom.label}} 
+					</li>
+				</ul>
+				{{form.field}}
 				</div>
+			</div>
+			
 			</section>
 
 			<p class="categoory">
-				<input name="" type="submit" value="Next Step: Lead Categories"
-					class="categorybutt">
+				<input name="" type="submit" value="Next Step: Lead Categories" class="categorybutt">
 			</p>
 		</form>
 

@@ -128,12 +128,11 @@ class CategoryView( FormView ):
     template_name = 'organ/or_category.html'
     form_class    = CategoryForm
     
-    """
     def get_initial( self ):
         if self.request.method == 'GET':
-            chapter = self.request.GET['chapter']
-            return  {'chapter':chapter }
-    """
+            if 'chapter' in self.request.GET:
+                chapter = self.request.GET['chapter']
+                return  {'chapter':chapter }
 
     def form_valid( self, form ):
         interests  = form.cleaned_data['standard']
@@ -147,8 +146,12 @@ class CategoryView( FormView ):
             interests.append(form.cleaned_data['field'])
         
         # Make sure no more than 6 choices
+        if len(interests) < 1:
+            form._errors['standard'] = ErrorList(["Minimum number of choices is 1"])
+            return self.form_invalid(form)
+        
         if len(interests) > 6:
-            form._errors['standard'] = ErrorList(["Max number of choices is 6"])
+            form._errors['standard'] = ErrorList(["Maximum number of choices is 6"])
             return self.form_invalid(form)
         
         chapter = Chapter.objects.get(pk = form.cleaned_data['chapter'])
@@ -156,7 +159,7 @@ class CategoryView( FormView ):
             try:
                 interest = Interest.objects.get(interest = inter)
             except Interest.DoesNotExist:
-                interest = Interest(interest = inter, level = 3 )
+                interest = Interest(interest = inter, status='custom' )
                 interest.save()
             
             try: 
@@ -165,7 +168,6 @@ class CategoryView( FormView ):
                 deal = Deal( chapter = chapter, interest = interest)
                 deal.save()
                 
-        
         return HttpResponseRedirect( reverse('or_setup') )
 
 @login_required

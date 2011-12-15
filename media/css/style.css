@@ -402,7 +402,12 @@ p.chkbox span, p.chkbox1 span{
 p.chkbox1 span{
 	font-size:12px;
 }
-p.chkbox input.checkbox, p.chkbox1 input.checkbox{
+
+div.chkboxdiv ul li {
+	width:400px;
+}
+
+p.chkbox input.chkboxdiv input.checkbox, p.chkbox1 input.checkbox{
 	width:13px;
 	height:13px;
 	font-size:0;
@@ -1514,6 +1519,7 @@ p.nextstep input.nxtstepbutt{
 	padding-left:6px;
 	line-height:12px;
 }
+
 .rightcategorydiv{
 	width:230px;
 	float:right;
