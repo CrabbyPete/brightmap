@@ -130,6 +130,8 @@ class SignUpView( FormView ):
         # If you had a profile 
         if not profile.is_organizer:
             profile.is_organizer = True
+            profile.save()
+            
             return HttpResponseRedirect( reverse('or_category')+'?chapter='+str(chapter.id) )
         else:
             return HttpResponseRedirect ( reverse('or_dash')+"?state=profile" )
@@ -142,9 +144,9 @@ class CategoryView( FormView ):
         if self.request.method == 'GET':
             if 'chapter' in self.request.GET:
                 chapter = self.request.GET['chapter']
-                return  {'chapter':chapter }
-            
-            
+                return dict ( chapter = chapter )
+
+
     def form_valid( self, form ):
         interests  = form.cleaned_data['standard']
         interests.extend( form.cleaned_data['other'] )

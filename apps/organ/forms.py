@@ -93,7 +93,10 @@ class CategoryForm( forms.Form ):
 
     def __init__(self, *args, **kwargs):
         super( CategoryForm, self).__init__(*args, **kwargs)
-
-        self.fields['standard'].choices = [(i.interest,i.interest) for i in Interest.objects.filter( status = 'standard')]
-#        self.fields['standard'].initial = [ i.interest for i in Interest.objects.filter( status = 'standard')]
+        
         self.fields['other'].choices    = [(i.interest,i.interest) for i in Interest.objects.filter( status = 'extended')]
+        self.fields['standard'].choices = [(i.interest,i.interest) for i in Interest.objects.filter( status = 'standard')]
+        
+        """ To initialize checked data ...
+        self.fields['standard'].initial = [ i.interest for i in Interest.objects.filter( status = 'standard')]
+        """
