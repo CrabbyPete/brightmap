@@ -14,16 +14,20 @@
 		</p>
 		<article class="profile"> 
 		<section class="bodybg">
+		
+		{% if not user.get_profile.is_organizer %} 
 		<nav class="step">
 		<ul>
 			<li><a href="#" class="stepone">STEP 1 of 3</a>
 			</li>
-			<li><a href="{% url or_category %}">STEP 2 of 3</a>
+			<li><a href="#">STEP 2 of 3</a>
 			</li>
-			<li><a href="{% url or_setup %}" class="step3">STEP 3 of 3</a>
+			<li><a href="#" class="step3">STEP 3 of 3</a>
 			</li>
 		</ul>
 		</nav>
+		{% endif %}
+		
 		<h2 class="paymethod">Organizer Details</h2>
 		<form id="profile" name="" method="post" action="{% url or_signup %}">
 			{% csrf_token %}

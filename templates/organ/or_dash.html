@@ -14,23 +14,20 @@
 <div id="bodysection">
 	<div class="insidesection">
 		<section class="leadbuyer">
+			{% if state %}
 			<p class="profileupdate">
 			<span>Profile Updated</span>
 			</p>
+			{% endif %}
 			<h2 class="leadbuyer">Event Organizer Dashboard  {{today|date:"E Y"}}</h2>
 		</section>
 		<nav class="leadbuyer">
 		<ul>
-			<li><a href="{% url or_signup %}" class="upprofile">Update Profile</a>
-			</li>
-			<li><a href="{% url or_category %}" class="leadcategoris">Add/Update Lead
-					Categories</a>
-			</li>
-			<li><a href="{% url or_setup %}" class="leadsource">Add/Update Lead Source</a>
-			</li>
-			<!--  
-			<li><a href="#" class="eventhistory">My Event History</a>
-			</li>
+			<li><a href="{% url or_signup %}?chapter={{chapter.pk}}" class="upprofile">Update Profile</a></li>
+			<li><a href="{% url or_setup %}" class="leadsource">Add/Update Lead Source</a></li>
+			<!--
+			<li><a href="{% url or_category %}" class="leadcategoris">Add/Update Lead Categories</a></li>  
+			<li><a href="#" class="eventhistory">My Event History</a></li>
 			 -->
 		</ul>
 		</nav>

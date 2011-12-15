@@ -10,16 +10,15 @@
 			later.
 		</p>
 		<article class="profile"> <section class="bodybg">
-		<nav class="step"> 
+		{% if not deals %}
 		<nav class="step">
 			<ul>
-				<li><a href="{% url or_signup %}" class="noimg">STEP 1 of 3</a>
-				</li>
+				<li><a href="#" class="noimg">STEP 1 of 3</a></li>
 				<li><a href="#" class="steptwothree">STEP 2 of 3</a></li>
-				<li><a href="{% url or_setup %}" class="step3">STEP 3 of 3</a></li>
+				<li><a href="#" class="step3">STEP 3 of 3</a></li>
 			</ul>
-		</nav> 
 		</nav>
+		{% endif %} 
 		<h2 class="paymethod">Standard Lead Categories</h2>
 		<form id="profile" name="" method="post" action="{% url or_category %}">
 			{% csrf_token %}

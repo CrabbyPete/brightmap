@@ -29,13 +29,19 @@ class SignUpView( FormView ):
     
     def get_initial( self ):
         if self.request.method == 'GET':
+            if 'chapter' in self.request.GET:
+                chapter = Chapter.objects.get(pk = self.request.GET['chapter'])
+            else:
+                chapter = ""
+            
             if self.request.user.is_authenticated():
                 self.initial = dict ( email         = self.request.user.email,
                                       email_verify  = self.request.user.email,
                                       first_name    = self.request.user.first_name,
                                       last_name     = self.request.user.last_name,
                                       password      = self.password,
-                                      pass_confirm  = self.password 
+                                      pass_confirm  = self.password,
+                                      organization  = chapter.name 
                                     )
         else:
             self.initial = {}
@@ -59,9 +65,11 @@ class SignUpView( FormView ):
         # Check the passwords match
         password     = form.cleaned_data['password']
         pass_confirm = form.cleaned_data['pass_confirm']
-        if password != pass_confirm:
-            form._errors['password'] = ErrorList(["The passwords do not match"])
-            return self.form_invalid(form)
+        
+        if password != self.password:
+            if  password != pass_confirm:
+                form._errors['password'] = ErrorList(["The passwords do not match"])
+                return self.form_invalid(form)
 
         # Make sure they agree
         if not form.cleaned_data['agree']:
@@ -87,16 +95,12 @@ class SignUpView( FormView ):
             profile.save()
         
         else:
-            if not user.check_password(password) and profile.is_ready:
-                form._errors['password'] = ErrorList(["User exist with a different password"])
-                return self.form_invalid(form)
-            else:
+            if password != self.password:
                 user.set_password(password)
                 user.save()
             
         profile.is_agreed    = True
-        profile.is_organizer = True
-        
+  
         # See if the organization and chapter exist
         name = form.cleaned_data['organization']
         try:
@@ -122,8 +126,13 @@ class SignUpView( FormView ):
         user = auth.authenticate(username=user.username, password=password)
         if user is not None and user.is_active:
             auth.login(self.request, user)
-
-        return HttpResponseRedirect( reverse('or_category')+'?chapter='+str(chapter.id) )
+            
+        # If you had a profile 
+        if not profile.is_organizer:
+            profile.is_organizer = True
+            return HttpResponseRedirect( reverse('or_category')+'?chapter='+str(chapter.id) )
+        else:
+            return HttpResponseRedirect ( reverse('or_dash')+"?state=profile" )
 
 class CategoryView( FormView ):
     template_name = 'organ/or_category.html'
@@ -134,7 +143,8 @@ class CategoryView( FormView ):
             if 'chapter' in self.request.GET:
                 chapter = self.request.GET['chapter']
                 return  {'chapter':chapter }
-
+            
+            
     def form_valid( self, form ):
         interests  = form.cleaned_data['standard']
         interests.extend( form.cleaned_data['other'] )
@@ -178,7 +188,12 @@ def setup( request ):
 
 @login_required
 def dashboard( request ):
+    
     user = request.user
+    if 'state' in request.GET:
+        state = request.GET['state']
+    else:
+        state = None
 
     chapters = Chapter.objects.filter( organizer = user )
     if len( chapters ) > 1:
@@ -202,7 +217,7 @@ def dashboard( request ):
                 canceled.append(term)
     today = date.today()      
     return render_to_response( 'organ/or_dash.html', 
-                               {'today':today, 'active':active, 'pending':pending, 'canceled':canceled }, 
+                               {'chapter':chapter,'state':state, 'today':today, 'active':active, 'pending':pending, 'canceled':canceled }, 
                                context_instance=RequestContext(request) 
                              )
 
