@@ -1,0 +1,30 @@
+{% extends 'admin/admin.html' %}
+{% load smartif %}
+
+{% block body_block %}
+	{% if interests %}
+	<table id = 'interests'>
+		{% for interest in interests %}
+		<tr>
+			<td><a href='{% url interest %}?interest={{interest.pk}}'>{{ interest.interest }}</a></td>
+ 			<td>{{ interest.status}}
+ 		</tr>
+ 		{% endfor %}
+ 	</table>
+ 	</br>
+ 	<a href='{% url interest %}?interest=new'}>Create New Interest</a>
+ 	{% endif %}
+ 	
+ 	
+ 	
+ 	{% if form %}
+	<form action="{% url interest %}?interest={{interest.pk}}" method="post" >
+       {% csrf_token %}
+       	<fieldset>
+ 			{{form}}
+        	<input type="submit" name="submit" />
+    	</fieldset>
+    </form>
+    {% endif %}
+
+{% endblock %}

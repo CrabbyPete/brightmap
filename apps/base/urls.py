@@ -8,7 +8,8 @@ from views                      import ( ChapterView,
                                          ConnectionView,
                                          TermView,
                                          ProfileView,
-                                         InvoiceView
+                                         InvoiceView,
+                                         InterestView
                                        )
 
 
@@ -21,6 +22,7 @@ urlpatterns = patterns('base.views',
     url(r'^community/$',            'community',                name='community'            ),
     url(r'^about/$',                'about',                    name='about'                ),
     url(r'^terms/$',                'terms',                    name='terms'                ),
+    url(r'^interest/$',              InterestView.as_view(),    name='interest'             ),
     url(r'^chapter/$',               ChapterView.as_view(),     name='chapter'              ),
     url(r'^eventbrite/$',            EventbriteView.as_view(),  name='eventbrite'           ),
     url(r'^deal/$',                  DealView.as_view(),        name='deal'                 ),

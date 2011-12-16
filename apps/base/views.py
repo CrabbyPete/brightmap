@@ -18,9 +18,9 @@ from django.core.mail               import  EmailMultiAlternatives
 
 
 # Local imports
-from models                         import ( Event, Chapter, Profile, LeadBuyer, 
-                                             Deal,  Survey,  Invoice, Connection,
-                                             Term,  Authorize 
+from models                         import ( Event, Chapter,  Profile, LeadBuyer, 
+                                             Deal,  Survey,   Invoice, Connection,
+                                             Term,  Interest, Authorize, 
                                            )
                                         
 
@@ -29,7 +29,8 @@ from forms                          import ( LoginForm,       DealForm,
                                              EventbriteForm,  EventForm, 
                                              SurveyForm,      ConnectionForm, 
                                              UserProfileForm, UserForm,       
-                                             TermForm,        InvoiceForm
+                                             TermForm,        InvoiceForm,
+                                             InterestForm
                                            )
 
 
@@ -154,7 +155,42 @@ class ProfileView( FormView ):
    
     def form_valid(self, form):
         return HttpResponseRedirect('/')         
-  
+
+
+class InterestView( FormView ):
+    template_name   = 'admin/interest.html'
+    form_class      = InterestForm
+    
+    def get(self, request, *args, **kwargs):
+        if 'interest' in self.request.GET:
+            if self.request.GET['interest'] == 'new':
+                interest = None
+                form = InterestForm()
+            else:
+                interest = Interest.objects.get( pk = self.request.GET['interest'] )
+                form = InterestForm( instance = interest )
+            return self.render_to_response( {'form':form, 'interest':interest} )
+        
+        else:
+            interests = Interest.objects.all()
+            return self.render_to_response( {'interests':interests} )
+
+ 
+    def form_valid(self, form):
+        name = form.cleaned_data['interest']
+        if self.request.GET['interest']:
+            interest = Interest.objects.get( pk = self.request.GET['interest'] )
+        else:
+            try:
+                interest = Interest.objects.get( interest = name )
+            except Interest.DoesNotExist:
+                interest = Interest( interest = name )
+        
+        interest.status = form.cleaned_data['status']
+        interest.save()
+        
+        return HttpResponseRedirect(reverse('interest'))
+
 class ChapterView( FormView ):
     template_name    = 'admin/chapter.html'
     form_class       = ChapterForm
@@ -200,8 +236,12 @@ class DealView( FormView ):
     
     def get(self, request, *args, **kwargs):
         if 'deal' in request.GET:
-            deal = Deal.objects.get(pk = request.GET['deal'])
-            form = DealForm( instance = deal )
+            if request.GET['deal'] == 'new':
+                form = DealForm()
+                deal = None
+            else: 
+                deal = Deal.objects.get(pk = request.GET['deal'])
+                form = DealForm( instance = deal )
             return self.render_to_response( {'form': form, 'deal':deal} )
         
         if 'chapter' in request.GET:
@@ -212,10 +252,15 @@ class DealView( FormView ):
             leadbuyer = LeadBuyer.objects.get(pk = request.GET['leadbuyer'])
             deals = leadbuyer.deals()
             
+ 
+            
         return self.render_to_response( {'deals':deals} )
             
     def form_valid(self, form ):
-        return HttpResponseRedirect('/')
+        if 'interest' in form.cleaned_data:
+            interest = form.cleaned_data['interest']
+        
+        return HttpResponseRedirect(reverse('deal'))
 
 class TermView( FormView ):
     template_name   = 'admin/term.html'
@@ -243,7 +288,17 @@ class TermView( FormView ):
         return HttpResponseRedirect('/')
             
     def form_valid(self, form ):
-        return HttpResponseRedirect('/')
+        if 'term' in self.request.GET:           
+            term = Term.objects.get( pk = self.request.GET['term'] )
+            if form.cleaned_data['status']:
+                term.status = form.cleaned_data['status']
+            
+            if form.cleaned_data['cost']:
+                term.cost = form.cleaned_data['cost']
+            
+            term.save()
+                                     
+        return HttpResponseRedirect(reverse('term')+'?leadbuyer='+str(term.buyer.pk) )
         
 class LeadBuyerView( FormView ):
     template_name   = 'admin/leadbuyer.html'

@@ -403,7 +403,7 @@ def spreadsheet( email, password ):
                 # If not create it
                 except Term.DoesNotExist:
                     term = new_term( deal, user, term_type, cost )
-
+                
                 # Otherwise update the existing term
                 else:
                     term = update_term( term, term_type, cost )
