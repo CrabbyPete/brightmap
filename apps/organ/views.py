@@ -31,8 +31,10 @@ class SignUpView( FormView ):
         if self.request.method == 'GET':
             if 'chapter' in self.request.GET:
                 chapter = Chapter.objects.get(pk = self.request.GET['chapter'])
+                chapter_name = chapter.name
             else:
                 chapter = ""
+                chapter_name = None
             
             if self.request.user.is_authenticated():
                 self.initial = dict ( email         = self.request.user.email,
@@ -41,7 +43,7 @@ class SignUpView( FormView ):
                                       last_name     = self.request.user.last_name,
                                       password      = self.password,
                                       pass_confirm  = self.password,
-                                      organization  = chapter.name 
+                                      organization  = chapter_name 
                                     )
         else:
             self.initial = {}

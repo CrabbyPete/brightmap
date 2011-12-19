@@ -24,6 +24,11 @@ from models                                 import ( Profile,
                                                    )
 
 class LoginForm(forms.Form):
+    forgot          = forms.BooleanField( required = False,
+                                          initial = False,
+                                          widget = forms.HiddenInput(attrs={'id':'forgotten'})
+                                        )
+                                        
     username        = forms.EmailField  ( max_length = 45,
                                           widget = forms.TextInput( attrs={ 'value'  :"Email Address",
                                                                             'onfocus':"if(this.value == 'Email Address')this.value = ''",
@@ -32,6 +37,7 @@ class LoginForm(forms.Form):
                                         )
 
     password        = forms.CharField   ( max_length = 45,
+                                          required = False,
                                           widget = forms.PasswordInput( attrs={} )
                                         )
 
@@ -93,19 +99,6 @@ class SignUpForm(forms.Form):
                                             widget = forms.CheckboxInput(attrs={})
                                         )
 
-
-
-
-class InterestForm(forms.Form):
-    interests        = forms.ChoiceField( choices=(),
-                                          label = 'Interest',
-                                          widget=forms.Select(attrs={})
-                                        )
-
-    def __init__(self, *args, **kwargs):
-        super(InterestForm, self).__init__(*args, **kwargs)
-        self.fields['interests'].choices = [(i.interest,i.interest) for i in Interest.objects.all()]
-
 class ProfileForm( SignUpForm ):
 
     password        = forms.CharField   ( max_length = 45,
@@ -145,35 +138,6 @@ class ProfileForm( SignUpForm ):
                                          )
 
 
-
-
-"""
-DEAL_CHOICES = (('Exclusive','Exclusive ($50.00 per Introduction)'),
-                ('Nonexclusive','Nonexclusive ($20.00 per Introduction'),
-                ('Trial' ,'Trial (free for 1 month)')
-               )
-
-
-class BuyDealForm(forms.Form):
-
-    chapter          = forms.CharField  ( required = False,
-                                            label = 'Community:',
-                                            max_length =45,
-                                            widget = forms.TextInput(attrs={'size':40})
-                                        )
-    interest         = forms.CharField  ( required = False,
-                                            label = 'Interest:',
-                                            max_length =45,
-                                            widget = forms.TextInput(attrs={'size':40})
-                                        )
-
-    deal_type        = forms.ChoiceField( required = False,
-                                            choices=DEAL_CHOICES,
-                                            label = 'Deal Type:',
-                                            widget=forms.RadioSelect(attrs={})
-                                       )
-
-"""
 class UserForm( ModelForm ):
     class Meta:
         model = User
@@ -188,6 +152,17 @@ class UserAndProfileForm( UserForm, UserProfileForm ):
     class Meta ( UserForm.Meta, UserProfileForm.Meta ):
         exclude = ('user',)
 
+class InterestForm ( ModelForm ):
+    class Meta:
+        model = Interest
+        exclude = ('occupation',)
+    
+    def clean(self):
+        """ Override clean so you can edit interest which is unique """
+        super(InterestForm, self).clean()
+        self._validate_unique = False
+        return self.cleaned_data
+        
 class DealForm( ModelForm ):
     class Meta:
         model = Deal

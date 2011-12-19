@@ -417,13 +417,18 @@ def parse_address(address):
 
 class ChapterView( View ):
     def get(self, request, *arg, **kwargs ):
-        chapter     = Chapter.objects.get( pk = request.GET['chapter'] )
-        term        = Term.objects.get( pk = request.GET['term'])
-        connections = term.connections()
-        return render_to_response( 'leadb/lb_organizer.html', 
-                                   { 'chapter':chapter, 'term':term, 'connections':connections }, 
-                                   context_instance=RequestContext(request) 
-                                  )
+        
+        # Explorer does not pass the parameters, so you have to check 
+        if 'chapter' in request.GET  and 'term' in request.GET:            
+            chapter     = Chapter.objects.get( pk = request.GET['chapter'] )
+            term        = Term.objects.get( pk = request.GET['term'])
+            connections = term.connections()
+            return render_to_response( 'leadb/lb_organizer.html', 
+                                       { 'chapter':chapter, 'term':term, 'connections':connections }, 
+                                       context_instance=RequestContext(request) 
+                                     )
+            
+        return HttpResponseRedirect(reverse('lb_dash'))
 
 class PaymentView( FormView ):
     template_name = 'leadb/lb_payment.html'

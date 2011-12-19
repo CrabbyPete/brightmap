@@ -1,5 +1,9 @@
 # Import Python librariess
 import                              django_header
+import logging
+logger = logging.getLogger('accounting')
+
+
 from datetime                       import date, timedelta
 
 # Django imports
@@ -22,7 +26,7 @@ def days_of_month (month = None):
     if  month:
         first_day = first_day.replace( month = int(month) )
 
-    if month == 12:
+    if first_day.month == 12:
         last_day = first_day.replace ( day = 31 )
     else:
         last_day = first_day.replace (month = first_day.month + 1 ) - timedelta( days = 1 )
@@ -97,7 +101,7 @@ def bill_user( invoice ):
     return invoice
      
      
-def notify( invoice ):
+def notify_user( invoice ):
     # Set up the context
     c = Context({'invoice' :invoice })
 
@@ -105,13 +109,11 @@ def notify( invoice ):
     template = loader.get_template('letters/invoice.tmpl')
     message = template.render(c)
 
-    subject = 'BrightMap Invoice: '+invoice.name
-
-    to_email = [ '%s %s <%s>'% ( invoice.user.first_name, invoice.user.last_name, invoice.user.email ) ]
- 
+    subject = 'BrightMap Invoice: '+ invoice.name
     bcc = [ 'bcc@brightmap.com' ]
     from_email = '<invoice@brightmap.com>'
 
+    to_email = [ '%s %s <%s>'% ( invoice.user.first_name, invoice.user.last_name, invoice.user.email ) ]
     #TESTING BELOW REMOVE LATER
     to_email = ['Pete Douma <pete.douma@gmail.com>']
 
@@ -169,4 +171,4 @@ if __name__ == '__main__':
     else:
         month = None
     
-    main()
+    main(month)

@@ -41,7 +41,7 @@ from authorize                      import cim
 from authorize.gen_xml              import VALIDATION_TEST, AUTH_ONLY
 from authorize.responses            import AuthorizeError, _cim_response_codes
 
-from cron.accounting                import invoice_user
+from cron.accounting                import invoice_user, bill_user, notify_user
 
 
 def homepage( request ):
@@ -50,7 +50,7 @@ def homepage( request ):
         return welcome(request)
 
     #return login(request)
-    return render_to_response('index.html', {'login':LoginForm()}, context_instance=RequestContext(request))
+    return render_to_response('indexR.html', {'login':LoginForm()}, context_instance=RequestContext(request))
 
 @csrf_protect
 def welcome( request ):
@@ -76,13 +76,32 @@ def welcome( request ):
         
     return HttpResponseRedirect( reverse('or_signup') )
 
+def learn(request):
+    if request.method == 'GET':
+        if 'organizer' in request.GET:
+            return render_to_response( 'learn_more_organizers.html', 
+                                       {'login':LoginForm()}, 
+                                       context_instance=RequestContext(request)
+                                     )
+        if 'service' in request.GET:
+            return render_to_response( 'learn_more_providers.html', 
+                                       {'login':LoginForm()}, 
+                                       context_instance=RequestContext(request)
+                                     )
+        return welcome(request)
+
+
+def forgot(request):
+    return welcome(request)
+
+    
 @csrf_protect
 def login(request):
     # Login users
 
     def submit_form(form):
         c = {'login':form}
-        return render_to_response('index.html', c, context_instance=RequestContext(request))
+        return render_to_response('indexR.html', c, context_instance=RequestContext(request))
 
     if request.method == 'GET':
         form = LoginForm()
@@ -96,6 +115,9 @@ def login(request):
     username = form.cleaned_data['username']
     password = form.cleaned_data['password']
 
+    if form.cleaned_data['forgot']:
+        return forgot(request)
+    
     try:
         user = User.objects.get(username = username)
     except User.DoesNotExist:
@@ -117,6 +139,8 @@ def login(request):
         return submit_form(form)
 
 
+
+
 def community(request):
     return render_to_response('community.html', {},
                                context_instance=RequestContext(request))
@@ -134,9 +158,12 @@ def logout(request):
     auth.logout(request)
     return HttpResponseRedirect('/')
 
+
+
 """
     All Admin functions are here
 """ 
+
 class ProfileView( FormView ):
     template_name    = 'admin/profile.html'
     form_class       = UserProfileForm
@@ -158,6 +185,8 @@ class ProfileView( FormView ):
 
 
 class InterestView( FormView ):
+    """ View, edit, and create new Interests """
+    
     template_name   = 'admin/interest.html'
     form_class      = InterestForm
     
@@ -172,15 +201,17 @@ class InterestView( FormView ):
             return self.render_to_response( {'form':form, 'interest':interest} )
         
         else:
-            interests = Interest.objects.all()
+            interests = Interest.objects.all().order_by('interest')
             return self.render_to_response( {'interests':interests} )
 
  
     def form_valid(self, form):
+        """ Edit or create a new Interest """
         name = form.cleaned_data['interest']
         if self.request.GET['interest']:
             interest = Interest.objects.get( pk = self.request.GET['interest'] )
         else:
+            # Each interest must be unique. The form overrides unique_validate, so make sure 
             try:
                 interest = Interest.objects.get( interest = name )
             except Interest.DoesNotExist:
@@ -210,7 +241,17 @@ class ChapterView( FormView ):
 
  
     def form_valid(self, form):
-        return HttpResponseRedirect('/')
+        if 'chapter' in self.request.GET:
+            if self.request.GET['chapter']:
+                chapter = Chapter.objects.get( pk = self.request.GET['chapter'] )
+            
+        organization  = form.cleaned_data['organization']
+        organizer     = form.cleaned_data['organizer']
+        logo          = form.cleaned_data['logo']
+        letter        = form.cleaned_data['letter']
+        website       = form.cleaned_data['website']
+        
+        return HttpResponseRedirect(reverse('chapter'))
 
 class EventbriteView( FormView ):
     template_name   = 'admin/eventbrite.html'
@@ -310,7 +351,7 @@ class LeadBuyerView( FormView ):
             form = LeadBuyerForm( instance = leadbuyer )
             return self.render_to_response( {'form': form, 'leadbuyer':leadbuyer} )
         else:
-            leadbuyers = LeadBuyer.objects.all()
+            leadbuyers = LeadBuyer.objects.all().order_by('user__last_name')
             return self.render_to_response( {'leadbuyers': leadbuyers} )
  
     
@@ -386,38 +427,7 @@ class ConnectionView( FormView ):
         return HttpResponseRedirect(reverse('invoice'))
 
 
-def bill_user( invoice ):
-    cim_api  = cim.Api( unicode(AUTHORIZE['API_LOG_IN_ID'] ),
-                        unicode(AUTHORIZE['TRANSACTION_ID']) 
-                      )
-    
-    try:  
-        authorize = Authorize.objects.get( user = invoice.user )
-    except Authorize.DoesNotExist:
-        return
-    
-    try:
-        response = cim_api.create_profile_transaction(  amount = invoice.cost,
-                                                        customer_profile_id = authorize.customer_id,
-                                                        customer_payment_profile_id = authorize.profile_id,
-                                                        profile_type = AUTH_ONLY
-                                                     )
-    except AuthorizeError:
-        invoice.status = 'unauthorized'
-        invoice.save()
-        return invoice
-                
-    else:
-        # Check to see it if its OK
-        result = response.messages.result_code.text_.upper()
-   
-        if result == 'OK':
-            invoice.status = 'paid'
-        else:
-            invoice.status = 'rejected'
-            
-        invoice.save()
-    return invoice
+
 
 def notice_of_invoice( invoice ):
     # Set up the context
@@ -465,7 +475,7 @@ class InvoiceView ( FormView):
             connections = invoice.connections()
             return self.render_to_response( {'form':form, 'invoice':invoice, 'connections':connections} )
         
-        invoices = Invoice.objects.all()
+        invoices = Invoice.objects.all().order_by('issued')
         return self.render_to_response( {'invoices':invoices} )
         
  
@@ -478,3 +488,4 @@ class InvoiceView ( FormView):
         
         
         return HttpResponseRedirect(reverse('invoice'))
+

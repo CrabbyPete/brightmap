@@ -17,8 +17,9 @@ jQuery(function ($) {
 	// Load dialog on click
 	$(".itlink").click( function (e) { 
 		  								e.preventDefault(); 
-		  								$('a.canceldealq').attr('href',this.href)
+		  								$('a.canceldealq').attr('href',this.href);
+		  								var p = $('a.nokeepdeal').attr('href')
 		  								$("#itlinkcontent").modal(); 
-		    						    //return false; 
+		    						    return false; 
 									 });
 });

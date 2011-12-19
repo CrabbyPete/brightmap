@@ -11,7 +11,7 @@
  	{% endif %}
  	
  	{% if form %}
-	<form action="{% url chapter %}" method="post" >
+	<form action="{% url chapter %}?chapter={{chapter.pk}}" method="post" >
        {% csrf_token %}
        	<fieldset>
  			{{form}}
@@ -22,7 +22,6 @@
         <li><a href='{% url eventbrite %}?chapter={{chapter.pk}}'>Eventbrite Info</a></li>
         <li><a href='{% url deal       %}?chapter={{chapter.pk}}'>Deals</a></li>
         <li><a href='{% url event      %}?chapter={{chapter.pk}}'>Events</a></li>
-        
     </menu>
     {% endif %}
 
