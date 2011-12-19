@@ -12,7 +12,7 @@ from django.core.mail               import EmailMultiAlternatives
 
 # Import local library
 from base.models                    import Profile, Connection, Invoice, Authorize
-from settings                       import AUTHORIZE
+from settings                       import AUTHORIZE, SEND_EMAIL
 
 # Import for authorize
 from authorize                      import cim
@@ -75,7 +75,9 @@ def bill_user( invoice ):
     try:  
         authorize = Authorize.objects.get( user = invoice.user )
     except Authorize.DoesNotExist:
-        return
+        invoice.status = 'unauthorized'
+        invoice.save()
+        return invoice
     
     try:
         response = cim_api.create_profile_transaction(  amount = invoice.cost,
@@ -113,9 +115,11 @@ def notify_user( invoice ):
     bcc = [ 'bcc@brightmap.com' ]
     from_email = '<invoice@brightmap.com>'
 
-    to_email = [ '%s %s <%s>'% ( invoice.user.first_name, invoice.user.last_name, invoice.user.email ) ]
-    #TESTING BELOW REMOVE LATER
-    to_email = ['Pete Douma <pete.douma@gmail.com>']
+    if SEND_EMAIL:
+        to_email = [ '%s %s <%s>'% ( invoice.user.first_name, invoice.user.last_name, invoice.user.email ) ]
+    else:
+        #TESTING BELOW REMOVE LATER
+        to_email = ['Pete Douma <pete.douma@gmail.com>']
 
     # Send the email
     msg = EmailMultiAlternatives( subject    = subject,
@@ -125,10 +129,11 @@ def notify_user( invoice ):
                                   bcc        = bcc
                                 )
 
-    try:
-        msg.send( fail_silently = False )
-    except:
-        pass
+    if SEND_EMAIL:
+        try:
+            msg.send( fail_silently = False )
+        except:
+            pass
  
        
 def main(month = None):

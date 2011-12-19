@@ -18,9 +18,10 @@ from django.core.mail               import  EmailMultiAlternatives
 
 
 # Local imports
+from passw                          import generate
 from models                         import ( Event, Chapter,  Profile, LeadBuyer, 
                                              Deal,  Survey,   Invoice, Connection,
-                                             Term,  Interest, Authorize, 
+                                             Term,  Interest,  
                                            )
                                         
 
@@ -34,13 +35,14 @@ from forms                          import ( LoginForm,       DealForm,
                                            )
 
 
-from settings                       import AUTHORIZE
+from settings                       import SEND_EMAIL
 
 # Import for authorize
 from authorize                      import cim
 from authorize.gen_xml              import VALIDATION_TEST, AUTH_ONLY
 from authorize.responses            import AuthorizeError, _cim_response_codes
 
+# Import accounting functions
 from cron.accounting                import invoice_user, bill_user, notify_user
 
 
@@ -91,8 +93,51 @@ def learn(request):
         return welcome(request)
 
 
-def forgot(request):
-    return welcome(request)
+def forgot( request, username ):
+
+    try:
+        user = User.objects.get(email = username)
+    except User.DoesNotExist:
+        user = None
+        password = None
+ 
+    else:
+        password = generate(6)
+        user.set_password(password)
+        user.save()
+    
+    # Set up the context
+    c = Context({ 'user':user, 'password' :password })
+
+    # Render the message and log it
+    template = loader.get_template('letters/forgot.tmpl')
+    message = template.render(c)
+
+    subject = 'BrightMap Account'
+    bcc = [ 'bcc@brightmap.com' ]
+    from_email = '<admin@brightmap.com>'
+
+    to_email = [ '%s %s <%s>'% ( user.first_name, user.last_name, user.email ) ]
+    if SEND_EMAIL:
+        to_email = [ '%s %s <%s>'% ( user.first_name, user.last_name, user.email ) ]
+    else:
+        #TESTING BELOW REMOVE LATER
+        to_email = ['Pete Douma <pete.douma@gmail.com>']
+
+    # Send the email
+    msg = EmailMultiAlternatives( subject    = subject,
+                                  body       = message,
+                                  from_email = from_email,
+                                  to         = to_email,
+                                  bcc        = bcc
+                                )
+
+    try:
+        msg.send( fail_silently = False )
+    except:
+        pass
+ 
+    return HttpResponseRedirect('/')
 
     
 @csrf_protect
@@ -116,7 +161,7 @@ def login(request):
     password = form.cleaned_data['password']
 
     if form.cleaned_data['forgot']:
-        return forgot(request)
+        return forgot(request, username)
     
     try:
         user = User.objects.get(username = username)
@@ -245,11 +290,17 @@ class ChapterView( FormView ):
             if self.request.GET['chapter']:
                 chapter = Chapter.objects.get( pk = self.request.GET['chapter'] )
             
-        organization  = form.cleaned_data['organization']
-        organizer     = form.cleaned_data['organizer']
-        logo          = form.cleaned_data['logo']
-        letter        = form.cleaned_data['letter']
-        website       = form.cleaned_data['website']
+                organization  = form.cleaned_data['organization']
+                organizer     = form.cleaned_data['organizer']
+                logo          = form.cleaned_data['logo']
+                letter        = form.cleaned_data['letter']
+                website       = form.cleaned_data['website']
+                
+                chapter.letter = letter
+                chapter.website = website
+                chapter.logo    = logo
+                
+                chapter.save()
         
         return HttpResponseRedirect(reverse('chapter'))
 
@@ -428,38 +479,6 @@ class ConnectionView( FormView ):
 
 
 
-
-def notice_of_invoice( invoice ):
-    # Set up the context
-    c = Context({'invoice' :invoice })
-
-    # Render the message and log it
-    template = loader.get_template('letters/invoice.tmpl')
-    message = template.render(c)
-
-    subject = 'BrightMap Invoice: '+invoice.title
-
-    bcc = [ 'bcc@brightmap.com' ]
-    from_email = '<invoice@brightmap.com>'
-
-    #TESTING BELOW REMOVE LATER
-    to_email = [ '%s %s <%s>'% ( invoice.user.first_name, invoice.user.last_name, invoice.user.email ) ]
-    to_email = ['Pete Douma <pete.douma@gmail.com>']
-
-    # Send the email
-    msg = EmailMultiAlternatives( subject    = subject,
-                                  body       = message,
-                                  from_email = from_email,
-                                  to         = to_email,
-                                  bcc        = bcc
-                                )
-
-    try:
-        msg.send( fail_silently = False )
-    except Exception, e:
-        logger.error('Exception %s mailing invoice'%(e,))
- 
-
 class InvoiceView ( FormView):
     template_name   = 'admin/invoice.html'
     form_class      = InvoiceForm
@@ -482,8 +501,9 @@ class InvoiceView ( FormView):
             
     def form_valid(self, form ):
         invoice = Invoice.objects.get( pk = self.request.GET['invoice'] )
-        #invoice = bill_user ( invoice )
-        notice_of_invoice( invoice )
+        invoice = bill_user ( invoice )
+        if invoice.status == 'paid':
+            notify_user( invoice )
         invoice.save()
         
         

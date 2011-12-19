@@ -1,0 +1,11 @@
+{% if user %}
+{{user.first_name}},
+
+Thanks for joining BrightMap. You requested a password reset and the new password is now {{password}}
+Please login again.
+{% else %}
+You requested a password reset for your BrightMap account, however we have no record
+of account with this email address. Please sign up for a BrightMap account
+{% endif %}
+
+The BrightMap Team. 

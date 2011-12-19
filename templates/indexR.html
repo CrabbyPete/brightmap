@@ -110,8 +110,8 @@
 						<input name="" type="password" value="password" title="password">
 						-->
 					</div>
-					<div class="block-holder clearfix" onClick="this.form.reset()">
-						<a href="#" onclick="forgot();">
+					<div class="block-holder clearfix">
+						<a href="javascript:forgot();" "onclick="forgot();">
 							Forgot password? Enter Email Address and Click Here
 						</a> 
 						
@@ -156,7 +156,7 @@
 									<li>Earn more money hosting events</li>
 								</ul>
 								<center>
-									<a href="{% url or_signup %}" class="button more"><span>Learn More</span></a>
+									<a href="{% url learn %}?organizer" class="button more"><span>Learn More</span></a>
 								</center>
 							</div>
 							<!--logo panel -->
@@ -190,7 +190,7 @@
 									<li>Great value with less effort</li>
 								</ul>
 								<center>
-									<a href="{% url lb_signup %}" class="button more blue"><span>Learn More</span></a>
+									<a href="{% url learn %}?service" class="button more blue"><span>Learn More</span></a>
 								</center>
 							</div>
 							<!--logo panel -->
