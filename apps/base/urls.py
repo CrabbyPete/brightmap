@@ -1,5 +1,7 @@
 from django.contrib.auth.decorators import  login_required
 from django.conf.urls.defaults  import patterns, url
+from django.views.generic.simple import direct_to_template
+
 
 
 from views                      import ( ChapterView, 
@@ -27,6 +29,7 @@ urlpatterns = patterns('base.views',
     url(r'^community/$',        'community',                                name='community'    ),
     url(r'^about/$',            'about',                                    name='about'        ),
     url(r'^terms/$',            'terms',                                    name='terms'        ),
+    url(r'^faq/$',              direct_to_template,  {'template': 'best-practices.html' }       ),
     url(r'^interest/$',         login_required(InterestView.as_view()),     name='interest'     ),
     url(r'^chapter/$',          login_required(ChapterView.as_view()),      name='chapter'      ),
     url(r'^eventbrite/$',       login_required(EventbriteView.as_view()),   name='eventbrite'   ),

@@ -507,6 +507,10 @@ def main():
 
                             # Connect attendees and mail contacts
                             make_contact( survey, deal, template )
+                            
+                    leads = event.surveys(True)
+                    if len( leads ) == 0:
+                        print log( "%s:%s  has no surveys"%(chapter.name, event.describe))
 
 
 def accounting():
