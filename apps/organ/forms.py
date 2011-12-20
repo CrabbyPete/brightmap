@@ -44,7 +44,7 @@ class OrganizerForm( forms.Form ):
                                         )
 
 
-    organization    = forms.CharField  ( required = True,
+    organization    = forms.CharField  ( required = False,
                                             label = 'Organization Name',
                                             max_length =100,
                                             widget = forms.TextInput(attrs={'size':40})

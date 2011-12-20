@@ -77,6 +77,12 @@ class Organization( models.Model ):
     def __unicode__(self):
         return self.name
 
+class ChapterManager(models.Manager):
+
+    def for_user(self, user ):
+        return self.filter( organizer = user )
+
+
 class Chapter( models.Model ):
     """
     Base for each Organization chapter
@@ -89,6 +95,8 @@ class Chapter( models.Model ):
     logo          = models.URLField(            default = None, blank = True, null = True )
     letter        = models.ForeignKey('Letter', default = None, blank = True, null = True )
     website       = models.URLField(            default = None, blank = True, null = True )
+    objects       = ChapterManager() 
+    
 
     def deals( self ):
         # Get all the deals for this chapter

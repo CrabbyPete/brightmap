@@ -15,9 +15,9 @@ from django.template                import  RequestContext
 from django.contrib.auth.decorators import  login_required
 
 #Local imports
-from base.models                    import ( Profile, Organization, Chapter, 
-                                             Interest, Deal,        Event, 
-                                             Term, TERM_STATUS
+from base.models                    import ( Profile,       Organization,   Chapter, 
+                                             Interest,      Deal,           Event,
+                                             Eventbrite,    Term,           TERM_STATUS
                                             )
 from forms                          import OrganizerForm, CategoryForm
 
@@ -43,13 +43,17 @@ class SignUpView( FormView ):
                                       last_name     = self.request.user.last_name,
                                       password      = self.password,
                                       pass_confirm  = self.password,
-                                      organization  = chapter_name 
+                                      chapter       = chapter_name 
                                     )
         else:
             self.initial = {}
         
         return self.initial
 
+    def form_invalid(self,form):
+        pass
+    
+    
     def form_valid( self, form ):
         """
         Process the validated Event Organizer signup page
@@ -102,25 +106,39 @@ class SignUpView( FormView ):
                 user.save()
             
         profile.is_agreed    = True
+        profile.save()
   
         # See if the organization and chapter exist
+        """ Take this out for now. One organizer, chapter per user 
         name = form.cleaned_data['organization']
         try:
             organization = Organization.objects.get( name = name )
         except Organization.DoesNotExist:
             organization = Organization( name = name )
             organization.save()
-    
+         """
         
         # See if the chapter exists. If its blank its the same as the organization name
-        if form.cleaned_data['chapter'] != '':
-            name = form.cleaned_data['chapter']
+        name = form.cleaned_data['chapter']
+        if name == '':
+            chapters = Chapter.objects.for_user( user = user )
+            if len( chapters) >= 1:
+                chapter = chapters[0]
+                return HttpResponseRedirect( reverse('or_category')+'?chapter='+str(chapter.id) )
+            
         try:
-            chapter = Chapter.objects.get( name = name, organization = organization )
+            chapter = Chapter.objects.get( name = name, organization = name )
         
         except Chapter.DoesNotExist:
+            organization = Organization( name = name )
+            organization.save()
+            
             chapter = Chapter( name = name, organizer = user, organization = organization )
             chapter.save()
+            
+            # Create an Eventbrite record for them 
+            eventbrite = Eventbrite( chapter = chapter )
+            eventbrite.save()
             
         profile.save()
     
@@ -129,14 +147,17 @@ class SignUpView( FormView ):
         if user is not None and user.is_active:
             auth.login(self.request, user)
             
+        
         # If you had a profile 
-        if not profile.is_organizer:
+        if profile.is_organizer:
+            return HttpResponseRedirect ( reverse('or_dash')+"?state=profile" )
+        else: 
+            
             profile.is_organizer = True
             profile.save()
-            
             return HttpResponseRedirect( reverse('or_category')+'?chapter='+str(chapter.id) )
-        else:
-            return HttpResponseRedirect ( reverse('or_dash')+"?state=profile" )
+        
+            
 
 class CategoryView( FormView ):
     template_name = 'organ/or_category.html'
