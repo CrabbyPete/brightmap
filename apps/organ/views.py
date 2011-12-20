@@ -50,10 +50,7 @@ class SignUpView( FormView ):
         
         return self.initial
 
-    def form_invalid(self,form):
-        pass
-    
-    
+   
     def form_valid( self, form ):
         """
         Process the validated Event Organizer signup page
@@ -122,26 +119,40 @@ class SignUpView( FormView ):
         name = form.cleaned_data['chapter']
         if name == '':
             chapters = Chapter.objects.for_user( user = user )
+            
+            # Take the first one now
             if len( chapters) >= 1:
                 chapter = chapters[0]
-                return HttpResponseRedirect( reverse('or_category')+'?chapter='+str(chapter.id) )
-            
-        try:
-            chapter = Chapter.objects.get( name = name, organization = name )
+            else:
+                # If the used did not give a chapter and none exist
+                form._errors['chapter'] = ErrorList(["Please provide a chapter name"])
+                return self.form_invalid(form)
+        else:           
+            try:
+                chapter = Chapter.objects.get( name = name, organization = name )
         
-        except Chapter.DoesNotExist:
-            organization = Organization( name = name )
-            organization.save()
+            except Chapter.DoesNotExist:
+                
+                # If this is the first time here create a chapter
+                if not profile.is_organizer:
+                    organization = Organization( name = name )
+                    organization.save()
             
-            chapter = Chapter( name = name, organizer = user, organization = organization )
-            chapter.save()
+                    chapter = Chapter( name = name, organizer = user, organization = organization )
+                    chapter.save()
             
-            # Create an Eventbrite record for them 
-            eventbrite = Eventbrite( chapter = chapter )
-            eventbrite.save()
-            
-        profile.save()
-    
+                    # Create an Eventbrite record for them 
+                    eventbrite = Eventbrite( chapter = chapter )
+                    eventbrite.save()
+                
+                # Otherwise this is a rename
+                else:
+                    chapters = Chapter.objects.for_user(user)
+                    chapter = chapters[0]
+                    
+                    chapter.name = name
+                    chapter.save()
+                    
         # Login the new user
         user = auth.authenticate(username=user.username, password=password)
         if user is not None and user.is_active:
@@ -152,13 +163,10 @@ class SignUpView( FormView ):
         if profile.is_organizer:
             return HttpResponseRedirect ( reverse('or_dash')+"?state=profile" )
         else: 
-            
             profile.is_organizer = True
             profile.save()
             return HttpResponseRedirect( reverse('or_category')+'?chapter='+str(chapter.id) )
         
-            
-
 class CategoryView( FormView ):
     template_name = 'organ/or_category.html'
     form_class    = CategoryForm
