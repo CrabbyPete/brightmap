@@ -326,6 +326,9 @@ class DashView( TemplateView ):
             elif term.status == 'pending':
                 status = 'Pending'
             
+            elif term.status == 'rejected':
+                status = 'Rejected'
+                
             elif term.cancel:
                 if term.exclusive:
                     status = 'Exclusive'
