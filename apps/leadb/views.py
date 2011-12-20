@@ -430,6 +430,8 @@ class ChapterView( View ):
             
         return HttpResponseRedirect(reverse('lb_dash'))
 
+
+
 class PaymentView( FormView ):
     template_name = 'leadb/lb_payment.html'
     form_class    = PaymentForm

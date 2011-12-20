@@ -72,11 +72,17 @@ def welcome( request ):
     
     if profile.is_leadbuyer:
         if not profile.is_ready:
-            return HttpResponseRedirect( reverse('lb_payment') )
+            start_url = reverse('lb_payment')
         else:
-            return HttpResponseRedirect( reverse('lb_dash') )
-        
-    return HttpResponseRedirect( reverse('or_signup') )
+            start_url = reverse('lb_dash')
+    
+    elif profile.is_organizer:
+        start_url = reverse('or_dash')
+    
+    else:
+        start_url = reverse('/')
+    
+    return HttpResponseRedirect(start_url)
 
 def learn(request):
     if request.method == 'GET':

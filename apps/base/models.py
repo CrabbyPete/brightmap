@@ -84,6 +84,7 @@ class Chapter( models.Model ):
     name          = models.CharField( default = None, max_length = 255 )
     organization  = models.ForeignKey( Organization )
     organizer     = models.ForeignKey( User )
+#    payto         = models.CharField( default = None, max_length = 255 )
 
     logo          = models.URLField(            default = None, blank = True, null = True )
     letter        = models.ForeignKey('Letter', default = None, blank = True, null = True )

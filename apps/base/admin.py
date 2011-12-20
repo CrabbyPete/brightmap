@@ -3,17 +3,19 @@ from models         import *
 
 
 
-admin.site.register(Organization)
+admin.site.register( Organization )
 
-admin.site.register(Chapter)
+admin.site.register( Chapter )
 
-admin.site.register(Deal)
+admin.site.register( Deal )
 
-admin.site.register(Event)
+admin.site.register( Event )
 
-admin.site.register(LeadBuyer)
+admin.site.register( LeadBuyer )
 
 admin.site.register( Survey )
+
+admin.site.register( Eventbrite )
 
 class ProfileAdmin(admin.ModelAdmin):
     ordering = ['user__email'] 

@@ -160,11 +160,7 @@ class CategoryView( FormView ):
                 return self.form_invalid(form)
             interests.append(form.cleaned_data['field'])
         
-        # Make sure no more than 6 choices
-        if len(interests) < 1:
-            form._errors['standard'] = ErrorList(["Minimum number of choices is 1"])
-            return self.form_invalid(form)
-        
+        # Make sure no more than 6 choices        
         if len(interests) > 6:
             form._errors['standard'] = ErrorList(["Maximum number of choices is 6"])
             return self.form_invalid(form)
@@ -184,6 +180,7 @@ class CategoryView( FormView ):
                 deal.save()
                 
         return HttpResponseRedirect( reverse('or_setup') )
+
 
 @login_required
 def setup( request ):
