@@ -106,6 +106,7 @@ def forgot( request, username ):
     except User.DoesNotExist:
         user = None
         password = None
+        
  
     else:
         password = generate(6)
@@ -122,14 +123,13 @@ def forgot( request, username ):
     subject = 'BrightMap Account'
     bcc = [ 'bcc@brightmap.com' ]
     from_email = '<admin@brightmap.com>'
-
-    to_email = [ '%s %s <%s>'% ( user.first_name, user.last_name, user.email ) ]
-    if SEND_EMAIL:
-        to_email = [ '%s %s <%s>'% ( user.first_name, user.last_name, user.email ) ]
+    
+    if not user:
+        to_email = [ '%s'% ( username ) ]
     else:
-        #TESTING BELOW REMOVE LATER
-        to_email = ['Pete Douma <pete.douma@gmail.com>']
-
+        to_email = [ '%s %s <%s>'% ( user.first_name, user.last_name, user.email ) ]
+    
+  
     # Send the email
     msg = EmailMultiAlternatives( subject    = subject,
                                   body       = message,
