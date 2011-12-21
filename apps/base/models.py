@@ -88,13 +88,13 @@ class Chapter( models.Model ):
     Base for each Organization chapter
     """
     name          = models.CharField( default = None, max_length = 255 )
-    organization  = models.ForeignKey( Organization )
+    organization  = models.ForeignKey( Organization, default = None, blank = True, null = True )
     organizer     = models.ForeignKey( User )
-#    payto         = models.CharField( default = None, max_length = 255 )
+    paypal        = models.CharField( default = None, null = True,  max_length = 255 )
 
-    logo          = models.URLField(            default = None, blank = True, null = True )
-    letter        = models.ForeignKey('Letter', default = None, blank = True, null = True )
-    website       = models.URLField(            default = None, blank = True, null = True )
+    logo          = models.URLField(            default = None, null = True )
+    letter        = models.ForeignKey('Letter', default = None, null = True )
+    website       = models.URLField(            default = None, null = True )
     objects       = ChapterManager() 
     
 
@@ -137,9 +137,9 @@ class Eventbrite( models.Model ):
     Information needed to access Eventbrite API
     """
     chapter       = models.ForeignKey( Chapter )
-    user_key      = models.CharField(  default = None, max_length = 45 )
-    organizer_id  = models.CharField(  default = None, max_length = 45 )
-    bot_email     = models.EmailField( default = None, blank = True, null = True )
+    user_key      = models.CharField(  default = None, null = True, max_length = 45 )
+    organizer_id  = models.CharField(  default = None, null = True, max_length = 45 )
+    bot_email     = models.EmailField( default = None, null = True, max_length = 255 )
 
     def __unicode__(self):
         return self.chapter.name
@@ -356,6 +356,8 @@ class Expire( Term ):
 
         if self.date >= date.today():
             return True
+        
+        self.canceled()
         return False
 
     def __unicode__(self, **kwargs):
