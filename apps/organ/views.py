@@ -129,7 +129,7 @@ class SignUpView( FormView ):
                 return self.form_invalid(form)
         else:           
             try:
-                chapter = Chapter.objects.get( name = name, organization = name )
+                chapter = Chapter.objects.get( name = name, organizer = user )
         
             except Chapter.DoesNotExist:
                 
