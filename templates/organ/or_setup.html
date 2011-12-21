@@ -11,6 +11,8 @@
 			these steps:
 		</p>
 		<article class="profile"> <section class="bodybg">
+		
+		{% if header %}
 		<nav class="step"> <nav class="step">
 		<ul>
 			<li><a href="{% url or_signup %}">STEP 1 of 3</a>
@@ -21,6 +23,7 @@
 			</li>
 		</ul>
 		</nav> </nav>
+		{% endif %}
 
 		<h2 class="eventbrite">
 			<span>1</span>Add BrightMap to your Eventbrite Page <a href="#">(click

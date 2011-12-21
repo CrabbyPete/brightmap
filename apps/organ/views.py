@@ -29,6 +29,9 @@ class SignUpView( FormView ):
     
     def get_initial( self ):
         if self.request.method == 'GET':
+            user = self.request.user
+            profile = user.get_profile()
+            
             if 'chapter' in self.request.GET:
                 chapter = Chapter.objects.get(pk = self.request.GET['chapter'])
                 chapter_name = chapter.name
@@ -37,13 +40,15 @@ class SignUpView( FormView ):
                 chapter_name = None
             
             if self.request.user.is_authenticated():
-                self.initial = dict ( email         = self.request.user.email,
-                                      email_verify  = self.request.user.email,
-                                      first_name    = self.request.user.first_name,
-                                      last_name     = self.request.user.last_name,
+                self.initial = dict ( email         = user.email,
+                                      email_verify  = user.email,
+                                      first_name    = user.first_name,
+                                      last_name     = user.last_name,
                                       password      = self.password,
                                       pass_confirm  = self.password,
-                                      chapter       = chapter_name 
+                                      chapter       = chapter_name,
+                                      pay_pal       = chapter.paypal,
+                                      agreed        = profile.is_agreed
                                     )
         else:
             self.initial = {}
@@ -57,7 +62,10 @@ class SignUpView( FormView ):
         """
     
         # Get the email address and see if they are in the database
-        email          = form.cleaned_data['email']
+        email   = form.cleaned_data['email']
+        
+        # Get paypal info
+        pay_pal = form.cleaned_data['pay_pal']
         """
         email_verify   = form.cleaned_data['email_verify']
         if email != email_verify:
@@ -135,10 +143,10 @@ class SignUpView( FormView ):
                 
                 # If this is the first time here create a chapter
                 if not profile.is_organizer:
-                    organization = Organization( name = name )
-                    organization.save()
             
-                    chapter = Chapter( name = name, organizer = user, organization = organization )
+                    chapter = Chapter( name = name, 
+                                       organizer = user,
+                                       paypal = pay_pal )
                     chapter.save()
             
                     # Create an Eventbrite record for them 
@@ -151,6 +159,7 @@ class SignUpView( FormView ):
                     chapter = chapters[0]
                     
                     chapter.name = name
+                    chapter.paypal = pay_pal
                     chapter.save()
                     
         # Login the new user
@@ -213,7 +222,13 @@ class CategoryView( FormView ):
 
 @login_required
 def setup( request ):
-    return render_to_response('organ/or_setup.html', {}, context_instance=RequestContext(request) )
+    if request.method == 'GET':
+        if 'no_header' in request.GET:
+            context = { 'header':False }
+        else: 
+            context = { 'header':True }
+            
+    return render_to_response('organ/or_setup.html',context, context_instance=RequestContext(request) )
 
 
 @login_required

@@ -1,1 +1,1 @@
-from SecureRequiredMiddleware import *
+from SSLRedirectMiddleware import SSLRedirect

@@ -19,7 +19,7 @@
                 </nav>
                 {% endif %}
  
-				<h2 class='number'>Lead-Buyer Profile</h2>
+				<h2 class='number'>Service Provider Profile</h2>
                 <form id="profile" name="" method="post" action="{% url lb_signup %}">
                 {% csrf_token %}
                     <section id="my-border">
@@ -31,7 +31,7 @@
                         <p>{{form.last_name}}</p>
                         {{form.last_name.errors}}
 
-                        <p class="lftcontent">Lead-Buyer Email <span>*</span></p>
+                        <p class="lftcontent">Email <span>*</span></p>
                         <p>{{form.email}}</p>
                         {{form.email.errors}}
 

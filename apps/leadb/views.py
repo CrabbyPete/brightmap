@@ -32,7 +32,7 @@ from base.models                    import ( LeadBuyer, Chapter, Expire, Cancel,
                                             )
 from base.forms                     import LoginForm
 
-from social.models                  import LinkedInProfile
+#from social.models                  import LinkedInProfile
 
 from forms                          import DEAL_CHOICES, BuyerForm, ApplyForm, PaymentForm
 
@@ -107,7 +107,9 @@ class  SignUpView( FormView ):
                     'company':      profile.company,
                     'address':      profile.address,
                     'website':      profile.website,
-                    'agree':        profile.is_agreed
+                    'agree':        profile.is_agreed,
+                    'twitter':      profile.twitter,
+                    'linkedin':     profile.linkedin
                 }
 
             return self.initial
@@ -158,12 +160,8 @@ class  SignUpView( FormView ):
 
         else:
             if password != self.default_password:
-                if not user.check_password(password) and profile.is_ready:
-                    form._errors['password'] = ErrorList(["User exist with a different password"])
-                    return self.form_invalid(form)
-                else:
-                    user.set_password(password)
-                    user.save()
+                user.set_password(password)
+                user.save()
             
         # Update profile details
         profile.is_leadbuyer = True
