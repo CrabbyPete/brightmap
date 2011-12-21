@@ -29,9 +29,7 @@ class SignUpView( FormView ):
     
     def get_initial( self ):
         if self.request.method == 'GET':
-            user = self.request.user
-            profile = user.get_profile()
-            
+ 
             if 'chapter' in self.request.GET:
                 chapter = Chapter.objects.get(pk = self.request.GET['chapter'])
                 chapter_name = chapter.name
@@ -40,6 +38,10 @@ class SignUpView( FormView ):
                 chapter_name = None
             
             if self.request.user.is_authenticated():
+                
+                user = self.request.user
+                profile = user.get_profile()
+                
                 self.initial = dict ( email         = user.email,
                                       email_verify  = user.email,
                                       first_name    = user.first_name,
