@@ -16,7 +16,7 @@ from settings                       import AUTHORIZE, SEND_EMAIL
 
 # Import for authorize
 from authorize                      import cim
-from authorize.gen_xml              import VALIDATION_TEST, AUTH_ONLY
+from authorize.gen_xml              import VALIDATION_TEST, AUTH_ONLY, AUTH_CAPTURE
 from authorize.responses            import AuthorizeError, _cim_response_codes
 
 
@@ -81,9 +81,9 @@ def bill_user( invoice ):
     
     try:
         response = cim_api.create_profile_transaction(  amount = invoice.cost,
-                                                        customer_profile_id = authorize.customer_id,
-                                                        customer_payment_profile_id = authorize.profile_id,
-                                                        profile_type = AUTH_ONLY
+                                                        customer_profile_id         = authorize.profile_id,
+                                                        customer_payment_profile_id = authorize.payment_profile,
+                                                        profile_type = AUTH_CAPTURE
                                                      )
     except AuthorizeError:
         invoice.status = 'unauthorized'
@@ -111,15 +111,12 @@ def notify_user( invoice ):
     template = loader.get_template('letters/invoice.tmpl')
     message = template.render(c)
 
-    subject = 'BrightMap Invoice: '+ invoice.name
+    subject = 'BrightMap Invoice: '+ invoice.title
     bcc = [ 'bcc@brightmap.com' ]
     from_email = '<invoice@brightmap.com>'
 
-    if SEND_EMAIL:
-        to_email = [ '%s %s <%s>'% ( invoice.user.first_name, invoice.user.last_name, invoice.user.email ) ]
-    else:
-        #TESTING BELOW REMOVE LATER
-        to_email = ['Pete Douma <pete.douma@gmail.com>']
+    to_email = [ '%s %s <%s>'% ( invoice.user.first_name, invoice.user.last_name, invoice.user.email ) ]
+ 
 
     # Send the email
     msg = EmailMultiAlternatives( subject    = subject,
