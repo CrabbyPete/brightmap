@@ -79,8 +79,11 @@
 
 			<p class="fieldmakestxt">Fields marked with <span>*</span> are mandatory</p>
 			<p class="nextstep">
-				<input name="" type="submit" value="Next Step: Lead Categories"
-					class="nxtstepbutt">
+				{% if not user.get_profile.is_organizer %}
+				<input name="" type="submit" value="Next Step: Lead Categories" class="nxtstepbutt"/>
+				{% else %}
+				<input name="" type="submit" value="Save Profile" class="nxtstepbutt"/>
+				{% endif %}
 			</p>
 		</form>
 

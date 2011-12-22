@@ -50,7 +50,7 @@ class SignUpView( FormView ):
                                       pass_confirm  = self.password,
                                       chapter       = chapter_name,
                                       pay_pal       = chapter.paypal,
-                                      agreed        = profile.is_agreed
+                                      agree         = profile.is_agreed
                                     )
         else:
             self.initial = {}
