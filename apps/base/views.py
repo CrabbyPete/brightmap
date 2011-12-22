@@ -370,13 +370,15 @@ class TermView( FormView ):
             terms = deal.terms()
             return self.render_to_response( {'terms':terms} )
         
-        
-        
         if 'leadbuyer' in request.GET:
             leadbuyer = LeadBuyer.objects.get(pk = request.GET['leadbuyer'])
             terms = leadbuyer.deals()
             return self.render_to_response( {'terms':terms} )
     
+        if 'pending' in request.GET:
+            terms = Term.objects.get( status = 'pending').order_by('modified')
+            return self.render_to_response( {'terms':terms} )
+            
         if 'term' in request.GET:
             term = Term.objects.get(pk = request.GET['term'])
         

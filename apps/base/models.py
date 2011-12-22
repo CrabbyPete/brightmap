@@ -41,6 +41,8 @@ class Authorize( models.Model ):
     customer_id     = models.CharField( max_length = 255 )
     profile_id      = models.CharField( max_length = 255 )
     payment_profile = models.CharField( max_length = 255 )
+    
+
     def __unicode__(self):
         return self.user.last_name+','+self.user.first_name
 
@@ -56,6 +58,13 @@ class Invoice( models.Model ):
     
     status      = models.CharField( max_length = 20, default ='issued' )
  
+    def authorized(self):
+        try:
+            Authorize.objects.get( user = self.user )
+            return True
+        except Authorize.DoesNotExist:
+            return False
+        
     def connections(self):
         return Connection.objects.for_buyer(self.user,[self.first_day, self.last_day])
     
@@ -170,6 +179,13 @@ class LeadBuyer( models.Model ):
                                        blank = True, null = True
                                      )
 
+    def authorized(self):
+        try:
+            Authorize.objects.get(user = self.user )
+            return True
+        except Authorize.DoesNotExist:
+            return False
+        
     def deals(self):
         return Term.objects.filter(buyer = self.user)
 
@@ -631,10 +647,9 @@ class ConnectionManager(models.Manager):
         if  not user.get_profile().is_leadbuyer:
             return []
         
-        # Dates is a set, but if date instance, change to datetime instance
+        # Dates is a set, but if date instance, change to datetime instance, make sure it max and min
         if dates:
-            if isinstance(dates[0], date) and isinstance(dates[1], date):
-                dates = ( datetime.combine( dates[0], time() ),  datetime.combine( dates[1], time() ) )
+            dates = ( datetime.combine( dates[0], time.min ),  datetime.combine( dates[1], time.max ) )
         
         # Get all the connections
         connections = []

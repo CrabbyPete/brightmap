@@ -4,7 +4,7 @@ import logging
 logger = logging.getLogger('accounting')
 
 
-from datetime                       import date, timedelta
+from datetime                       import datetime, timedelta
 
 # Django imports
 from django.template                import loader, Context
@@ -22,7 +22,7 @@ from authorize.responses            import AuthorizeError, _cim_response_codes
 
 def days_of_month (month = None):
     
-    first_day = date.today().replace(day = 1)
+    first_day = datetime.today().replace(day = 1)
     if  month:
         first_day = first_day.replace( month = int(month) )
 

@@ -10,6 +10,9 @@
             <td>{{invoice.issued|date:"d M Y" }}</td>
             <td>{{invoice.cost}}</td>
             <td>{{invoice.status}}</td>
+            {% if invoice.authorized %}
+            <td>Billable</td>
+            {% endif %}
         </tr>
     {% endfor %}
     </table>
