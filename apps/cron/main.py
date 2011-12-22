@@ -109,7 +109,7 @@ def get_latest_events( evb, organizer_id ):
     # Check if you get an error from Eventbrite
     if 'error' in events:
         err = 'Eventbrite Error: ' + events['error']['error_type'] + ' for ' + str(organizer_id)
-        print log( err )
+        print log( err, 'red' )
         #logger.debug( err )
         return []
 
@@ -427,7 +427,7 @@ def make_contact( survey, deal, template ):
                 msg.send( fail_silently = False )
             except:
                 err = "Email Send Error For:"+log_mess
-                print log(err)
+                print log(err, 'red')
                 #logger.error(log(err))
 
 
@@ -516,7 +516,7 @@ def main():
                             
                     leads = event.surveys(True)
                     if len( leads ) == 0:
-                        print log( "%s:%s  has no surveys"%(chapter.name, event.describe),'cyan')
+                        print log( "%s:%s  has no surveys"%(chapter.name, event.describe),'green')
 
 
 def accounting():
