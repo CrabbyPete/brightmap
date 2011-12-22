@@ -3,6 +3,7 @@ import django_header
 
 # Python libraries
 from datetime                       import datetime, timedelta
+from termcolor                      import colored
 
 # Django libraries
 from django.contrib.auth.models     import User
@@ -33,11 +34,15 @@ PROMPT     = False
 TODAY      = datetime.today()
 
 
-def log(message):
+def log(message, color = None):
     """
     Time stamp all messages
     """
-    return TODAY.strftime("%Y-%m-%d %H:%M")+ ',' + message
+    string = TODAY.strftime("%Y-%m-%d %H:%M")+ message
+    if color:
+        string = colored(string, color )
+        
+    return string
 
 
 def get_attendees( evb, event_id ):
@@ -510,7 +515,7 @@ def main():
                             
                     leads = event.surveys(True)
                     if len( leads ) == 0:
-                        print log( "%s:%s  has no surveys"%(chapter.name, event.describe))
+                        print log( "%s:%s  has no surveys"%(chapter.name, event.describe),'red')
 
 
 def accounting():
