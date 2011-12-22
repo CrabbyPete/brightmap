@@ -38,7 +38,7 @@ def log(message, color = None):
     """
     Time stamp all messages
     """
-    string = TODAY.strftime("%Y-%m-%d %H:%M")+ message
+    string = TODAY.strftime("%Y-%m-%d %H:%M")+ ',  ' + message
     if color:
         string = colored(string, color )
         
@@ -504,10 +504,11 @@ def main():
                                 continue
                             else:
                                 if deal == None:
-                                    print log( chapter.name +        \
-                                           ' has no deal for ' + \
-                                           survey.interest.interest
-                                          )
+                                    print log( chapter.name +    \
+                                               ' has no deal for ' + \
+                                               survey.interest.interest,
+                                               'green'
+                                             )
                                     continue
 
                             # Connect attendees and mail contacts
@@ -515,7 +516,7 @@ def main():
                             
                     leads = event.surveys(True)
                     if len( leads ) == 0:
-                        print log( "%s:%s  has no surveys"%(chapter.name, event.describe),'red')
+                        print log( "%s:%s  has no surveys"%(chapter.name, event.describe),'cyan')
 
 
 def accounting():
