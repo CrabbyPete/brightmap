@@ -330,16 +330,17 @@ class DashView( TemplateView ):
             
             elif term.status == 'rejected':
                 status = 'Rejected'
-                
-            child = term.get_child()
-            if isinstance( child, Cancel ):
-                if term.exclusive:
-                    status = 'Exclusive'
-                else:
-                    status = 'Non-Exclusive'
             
             else:
-                status = 'Trail'
+                child = term.get_child()
+                if isinstance( child, Cancel ):
+                    if term.exclusive:
+                        status = 'Exclusive'
+                    else:
+                        status = 'Standard'
+            
+                elif isinstance( child, Expire ):
+                    status = 'Trail'
         
             args.update(status = status)
             term_list.append(args)
