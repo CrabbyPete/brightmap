@@ -1616,7 +1616,7 @@ table.invoice a.bordernone{
 			width: 68px;
 			height: 53px;
 			margin-left: 18px;
-			background: url(/media/img/ico-authorize.png) no-repeat top left;
+			/*background: url(/media/img/ico-authorize.png) no-repeat top left;*/
 		}
 		#authorize:hover {
 			opacity: .8;

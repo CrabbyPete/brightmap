@@ -90,7 +90,8 @@
 	</script>
 	
 	<div style="display: none">
-		<div id="errorPop">
+		{% if not pop %}
+		<div id="errorPop" >
 			<header style="padding: 12px; background: #f5f6f6; margin-bottom: 12px;">
 				<h2 class="section-title">Invalid user or wrong password. Please try again.</h2>
 			</header>
@@ -123,6 +124,22 @@
 				</fieldset>
 			</form>
 		</div>
+		{% else %}
+		<div id= "errorPop" >
+			<header style="padding: 12px; background: #f5f6f6; margin-bottom: 12px;">
+				<h2 class="section-title">A new password has been mailed to you.</h2>
+			</header>
+			<form id="login-pop" name="" method="post" action="{% url login %}">			
+				{% csrf_token %}
+				<fieldset>
+					<div class="block-holder clearfix" style="margin-top: 20px; width: 150px;">
+						<button type="submit" class="button submit floating" style="margin-right: 6px;"><span>Login</span></button>
+						<button class="button submit fancy-close floating"><span>Cancel</span></button>
+					</div>
+				</fieldset>
+			</form>
+		</div>
+		{% endif %}
 	</div>
 </div>
 <!--Top section-->

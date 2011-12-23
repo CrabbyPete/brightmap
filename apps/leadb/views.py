@@ -252,6 +252,10 @@ class ApplyView( FormView ):
         
         
         elif deal_type == 'Trial':
+            expires = Expire.objects.filter( buyer = self.request.user )
+            if len ( expires ) > 0:
+                pass
+            
             one_month = datetime.now() + relativedelta(months=+1)
             expire = Expire( deal   = deal,
                              date   = one_month,
@@ -327,7 +331,8 @@ class DashView( TemplateView ):
             elif term.status == 'rejected':
                 status = 'Rejected'
                 
-            elif term.cancel:
+            child = term.get_child()
+            if isinstance( child, Cancel ):
                 if term.exclusive:
                     status = 'Exclusive'
                 else:

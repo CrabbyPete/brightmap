@@ -71,10 +71,10 @@ def welcome( request ):
             return render_to_response('welcome.html', {}, context_instance=RequestContext(request))
     
     if profile.is_leadbuyer:
-        if not profile.is_ready:
-            start_url = reverse('lb_payment')
-        else:
+        if profile.is_ready:
             start_url = reverse('lb_dash')
+        else:
+            start_url = reverse('lb_payment')
     
     elif profile.is_organizer:
         start_url = reverse('or_dash')
@@ -143,15 +143,15 @@ def forgot( request, username ):
     except:
         pass
  
-    return HttpResponseRedirect('/')
+    return
 
     
 @csrf_protect
 def login(request):
     # Login users
 
-    def submit_form(form):
-        c = {'login':form}
+    def submit_form(form, pop = False ):
+        c = {'login':form, 'pop': pop }
         return render_to_response('indexR.html', c, context_instance=RequestContext(request))
 
     if request.method == 'GET':
@@ -166,8 +166,13 @@ def login(request):
     username = form.cleaned_data['username']
     password = form.cleaned_data['password']
 
+    # Is this from the javascript pop up
     if form.cleaned_data['forgot']:
-        return forgot(request, username)
+        forgot(request, username)
+        
+        # Force an error so the javascript pops up 
+        form._errors['username']  = ErrorList(["pop"])
+        return submit_form(form, pop = True)
     
     try:
         user = User.objects.get(username = username)
