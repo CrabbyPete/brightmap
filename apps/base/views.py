@@ -80,7 +80,7 @@ def welcome( request ):
         start_url = reverse('or_dash')
     
     else:
-        start_url = reverse('/')
+        start_url = '/'
     
     return HttpResponseRedirect(start_url)
 
