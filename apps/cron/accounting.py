@@ -39,8 +39,21 @@ def invoice_user( user, first_day = None, last_day = None ):
     if not first_day:
         first_day,last_day = days_of_month()
         
+    duplicates = []
     connections = Connection.objects.for_buyer( user,[first_day,last_day] )
-    cost = sum( connection.term.cost for connection in connections if connection.status == 'sent' )
+    #cost = sum( connection.term.cost for connection in connections if connection.status == 'sent' )
+    
+    # Check for duplicate messages 
+    cost = 0
+    for connection in connections:
+        if connection.status == 'sent':
+            if connection.survey.attendee in duplicates:
+                connection.status = 'duplicate'
+                connection.save()
+            else:
+                cost = cost +  connection.term.cost
+                duplicates.append( connection.survey.attendee )
+    
  
     if not cost:
         return None
@@ -61,9 +74,12 @@ def invoice_user( user, first_day = None, last_day = None ):
                            last_day  = last_day 
                          )
     
-    invoice.cost = cost
-    invoice.status = 'pending'
-    invoice.save()
+    if invoice.status != 'paid':
+        invoice.cost = cost
+        invoice.status = 'pending'
+        invoice.save()
+    
+    
     return invoice 
             
 

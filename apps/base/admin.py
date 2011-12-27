@@ -17,6 +17,8 @@ admin.site.register( Survey )
 
 admin.site.register( Eventbrite )
 
+admin.site.register( Invoice )
+
 class ProfileAdmin(admin.ModelAdmin):
     ordering = ['user__email'] 
       

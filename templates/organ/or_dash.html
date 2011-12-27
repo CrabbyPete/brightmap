@@ -19,14 +19,14 @@
 			<span>Profile Updated</span>
 			</p>
 			{% endif %}
-			<h2 class="leadbuyer">Event Organizer Dashboard  {{chapter.name}} </h2>
+			<h2 class="leadbuyer">Event Organizer Dashboard - {{chapter.name}} </h2>
 		</section>
 		<nav class="leadbuyer">
 		<ul>
 			<li><a href="{% url or_signup %}?chapter={{chapter.pk}}" class="upprofile">Update Profile</a></li>
 			<li><a href="{% url or_setup %}?no_header=true" class="leadsource">Add/Update Lead Source</a></li>
 			<!--
-			<li><a href="{% url or_category %}" class="leadcategoris">Add/Update Lead Categories</a></li>  
+			<li><a href="{% url or_category %}" class="leadcategoris">Add/Update Service Categories</a></li>  
 			<li><a href="#" class="eventhistory">My Event History</a></li>
 			 -->
 		</ul>
@@ -52,20 +52,20 @@
 		<div class="botmanagebg"></div>
 		</article>
 
-		<h2 class="leadbuyer">Lead Buyers</h2>
+		<h2 class="leadbuyer">Service Providers</h2>
 
 		<article class="leastrecived">
 		<div class="leadbuyertopdiv">&nbsp;</div>
 		<section class="leadbuyerrept">
 
 		<table class="ins">
-			<caption class="latestrecived">Active Lead Buyers {{today|date:"E Y"}}</caption>
+			<caption class="latestrecived">Active Service Providers - {{today|date:"E Y"}}</caption>
 
 			<tr>
 				<td style="background-color: #F5F6F6;">
 					<table class="ins">
 						<tr>
-							<th class="interest">Lead-Buyer</th>
+							<th class="interest">Service Provider</th>
 							<th class="interest">Service</th>
 							<th class="interest ">TERMS</th>
 							<th class="interest">Rate</th>
@@ -111,14 +111,14 @@
 		<section class="leadbuyerrept">
 
 		<table class="ins">
-			<caption class="latestrecived">Pending Lead Buyer
+			<caption class="latestrecived">Pending Service Provider
 				Applications</caption>
 
 			<tr>
 				<td style="background-color: #F5F6F6;">
 					<table class="ins">
 						<tr>
-							<th class="interest">Lead-Buyer</th>
+							<th class="interest">Service Provider</th>
 							<th class="interest">Service</th>
 							<th class="interest ">TERMS</th>
 							<th class="interest">Rate</th>
@@ -161,13 +161,13 @@
 		<section class="leadbuyerrept">
 
 		<table class="ins">
-			<caption class="latestrecived">Cancelled Lead Buyers</caption>
+			<caption class="latestrecived">Cancelled Service Providers</caption>
 
 			<tr>
 				<td style="background-color: #F5F6F6;">
 					<table class="ins">
 						<tr>
-							<th class="interest">Lead-Buyer</th>
+							<th class="interest">Service Provider</th>
 							<th class="interest">Service</th>
 							<th class="interest ">TERMS</th>
 							<th class="interest">Rate</th>

@@ -80,11 +80,10 @@ class BuyerForm(forms.Form):
                                           widget = forms.TextInput()
                                         )
     
-    
-    twitter         = forms.URLField ( required = False,
-                                       max_length = 100,
-                                       widget = forms.TextInput()
-                                     )
+    twitter         = forms.CharField ( required = False,
+                                        max_length = 100,
+                                        widget = forms.TextInput()
+                                      )
 
     agree           = forms.BooleanField( initial = False,
                                           required = False,
@@ -160,6 +159,9 @@ BUDGET_CHOICES = [
                  ] 
 
 class PaymentForm(forms.Form):
+    """
+    Credit card form
+    """
     number          = CreditCardField()
     
     expire_month    = forms.ChoiceField( choices = MONTH_CHOICES,
@@ -192,14 +194,21 @@ class PaymentForm(forms.Form):
                                           widget= forms.TextInput(attrs={'class':"eightythree"})
                                         )
     
-    
-    #budget          = ChoiceWithOtherField ( choices = BUDGET_CHOICES )
-    budget          =  forms.CharField  ( max_length = 45,
-                                           widget = forms.TextInput
-                                        )
-
-
-  
     def __init__(self,*args, **kwargs):
         super(PaymentForm, self).__init__(*args, **kwargs)
         self.fields['expire_year'].choices =  [(yr,yr) for yr in xrange(date.today().year,date.today().year + 5)]
+        
+
+class BudgetForm( forms.Form ):
+    """
+    Account Budget form
+    """
+    budget          =  forms.CharField  ( max_length = 45,
+                                          widget = forms.TextInput
+                                        )
+    
+class PaymentBudgetForm( PaymentForm, BudgetForm ):
+    """
+    Combination of PaymentForm and BudgetForm
+    """
+    

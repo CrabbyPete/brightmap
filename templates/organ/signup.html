@@ -71,8 +71,9 @@
 			<section id="my-details">
 
 				<p class="chkbox1">
-					{{form.agree}}{{form.agree.errors}}
+					{{form.agree}}
 					<span>I hereby agree to the BrightMap <a href="{% url terms %}">Terms and Conditions</a>.</span>
+					{{form.agree.errors}}
 				</p>
 				<div class="spacer"></div>
 			</section>

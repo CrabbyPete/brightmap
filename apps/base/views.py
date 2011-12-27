@@ -514,11 +514,10 @@ class InvoiceView ( FormView):
             
     def form_valid(self, form ):
         invoice = Invoice.objects.get( pk = self.request.GET['invoice'] )
-        invoice = bill_user ( invoice )
-        if invoice.status == 'paid':
-            notify_user( invoice )
+        if invoice.status == 'pending':
+            invoice = bill_user ( invoice )
+            if invoice.status == 'paid':
+                notify_user( invoice )
         invoice.save()
-        
-        
         return HttpResponseRedirect(reverse('invoice'))
 

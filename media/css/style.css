@@ -1053,6 +1053,26 @@ input.paymentmethod {
 	font-size:0;
 	line-height:0;
 	}
+	
+input.paymentonly {
+	background:url(/media/img/update_payment_method.gif) no-repeat 0 0;
+	width:168px;
+	height:34px;
+	cursor:pointer;
+	border:none;
+	padding:33px 0 0 307px;
+	}
+	
+input.budgetonly {
+	background:url(/media/img/update_budget.gif) no-repeat 0 0;
+	width:113px;
+	height:34px;
+	cursor:pointer;
+	border:none;
+	padding:33px 0 0 307px;
+	}
+	
+	
 span.nobudget{
 	padding:0 0 0 17px !important;
 }
