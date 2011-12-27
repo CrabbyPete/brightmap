@@ -33,8 +33,10 @@ from base.models                    import ( LeadBuyer, Chapter, Expire, Cancel,
 from base.forms                     import LoginForm
 
 #from social.models                  import LinkedInProfile
-
-from forms                          import DEAL_CHOICES, BuyerForm, ApplyForm, PaymentForm
+from multipleforms                  import MultipleFormsView
+from forms                          import ( DEAL_CHOICES, BuyerForm, ApplyForm,  
+                                             PaymentForm, PaymentBudgetForm, BudgetForm
+                                           )
 
 def mail_organizer( user, deal, term, deal_type ):
     # Render the letter
@@ -439,9 +441,185 @@ class ChapterView( View ):
 
 
 
+def budget_form(request):
+    try:
+        lb = LeadBuyer.objects.get(user = request.user)
+    except LeadBuyer.DoesNotExist:
+        budget = '$500.00'
+    else:
+        if lb.budget:
+            budget = lb.budget
+        else: 
+            budget ='$500.00'
+    form = BudgetForm(initial = {'budget':budget})
+    return form
+
+def payment_form( request ):
+        
+    profile = request.user.get_profile()
+    initial = {}
+    if profile.address:
+        if '^' in profile.address:
+            billing = profile.address.split('^')
+            initial = dict (  address = billing[0],
+                              city    = billing[1],
+                              state   = billing[2],
+                              zipcode = billing[3]
+                            )
+    return PaymentForm(initial = initial)
+
+
+class PaymentBudgetView( MultipleFormsView ):
+    """
+    Treat the payment info and budget as two separate forms
+    """
+    template_name = 'leadb/lb_payment2.html'
+    form_classes  = {'payment':PaymentForm, 'budget':BudgetForm }
+    
+    
+    def get(self, request, *args, **kwargs ):
+        form_classes = self.get_form_classes()
+        forms = self.get_forms(form_classes)
+        
+        forms['budget'] = budget_form(request)
+        forms['payment'] = payment_form(request)
+
+        return self.render_to_response(self.get_context_data(forms=forms))
+    
+    
+    def post(self, request, *args, **kwargs):
+        form_classes = self.get_form_classes()
+        forms = self.get_forms(form_classes)
+        
+        # Figure out which for was submitted
+        if 'budget' in request.GET:
+            form = forms['budget']
+            if form.is_valid():
+                return self.budget_form_valid(form)
+            else:
+                forms['payment'] = payment_form( request)
+                return self.forms_invalid(forms)
+        
+        elif 'payment' in request.GET:
+            form = forms['payment']
+            if form.is_valid():
+                return self.payment_form_valid(form)
+            else:
+                forms['budget'] = budget_form( request )
+                return self.forms_invalid(forms)
+            
+    def budget_form_valid(self, form):
+        
+        budget      = form.cleaned_data['budget']
+        try:
+            lb = LeadBuyer.objects.get( user = self.request.user )
+        except LeadBuyer.DoesNotExist:
+            form._errors['budget'] = ErrorList(["Apply as leader first"])
+            return self.form_invalid(form)
+        
+        money = re.compile('^\$?([1-9]{1}[0-9]{0,2}(\,[0-9]{3})*(\.[0-9]{0,2})?|[1-9]{1}[0-9]{0,}(\.[0-9]{0,2})?|0(\.[0-9]{0,2})?|(\.[0-9]{1,2})?)$')
+        money = money.match(budget)
+        if not money or budget == '':
+            form._errors['budget'] = ErrorList(["Not a valid dollar amount"])
+            return self.form_invalid(form)
+        lb.budget = money.groups()[0]
+        lb.save()
+        
+        return HttpResponseRedirect(reverse('lb_dash')+"?state=budget")
+    
+    def payment_form_valid(self, form):
+        user    = self.request.user
+        profile = user.get_profile()
+    
+        # Get the current Authorize record or create a new one
+        try:
+            authorize = Authorize.objects.get( user = user )
+
+        except Authorize.DoesNotExist:
+            authorize = Authorize( user = user )
+            customer_id = 1000 + user.pk
+            authorize.customer_id = str( customer_id )
+            authorize.save()
+
+        # Check the expiration date
+        expiration  = form.cleaned_data['expire_year']+'-'+form.cleaned_data['expire_month']
+        
+        expire = datetime.strptime(expiration,'%Y-%m').replace( day = 1 )
+        if expire < datetime.today():
+            form._errors['expire_year'] = ErrorList(["Date is in the past"])
+            return self.form_invalid(form)
+        
+        # Get the card, expiration date, address and budget
+        card_number = form.cleaned_data[u'number']
+        address     = form.cleaned_data['address']
+        city        = form.cleaned_data['city']
+        state       = form.cleaned_data['state']
+        zipcode     = form.cleaned_data['zipcode']
+         
+        # Prepare the required parameters 
+        billing = dict( bill_first_name = user.first_name,
+                        bill_last_name  = user.last_name,
+                        bill_company    = profile.company,
+                        bill_phone      = profile.phone
+                      )
+    
+        # Look for any sub addresses like Apt, Building .. and dump them
+        sub_address = parse_address( address )
+        if sub_address and sub_address != address:
+            address = sub_address
+  
+        billing.update( bill_address = address )
+        billing.update( bill_city    = city    )
+        billing.update( bill_state   = state   )
+        billing.update( bill_zip     = zipcode )
+ 
+        
+        # Save the address
+        profile.address = address+'^'+city+'^'+state+'^'+zipcode
+ 
+        # Create a Authorize.net CIM profile
+        kw = dict ( card_number     = card_number,
+                    expiration_date = unicode(expiration),
+                    customer_id     = unicode( authorize.customer_id ),          
+                    profile_type    = CREDIT_CARD,
+                    email           = user.email,
+                    validation_mode = VALIDATION_LIVE
+                  )
+    
+        kw.update(billing)
+        
+        # Initialize the API class
+        cim_api = cim.Api( unicode(settings.AUTHORIZE['API_LOG_IN_ID']),
+                           unicode(settings.AUTHORIZE['TRANSACTION_ID']) 
+                         )
+    
+        try:
+            response = cim_api.update_profile( **kw )
+ 
+        except Exception:
+            form._errors['card_number'] = ErrorList( ['Credit Card Authorization Failed'] )
+            return self.form_invalid(form)
+        
+        # Check to see it if its OK
+        result = response.messages.result_code.text_
+        
+        if result != 'Ok':
+            form._errors['number'] = ErrorList( [response.messages.message.text.text_] )
+            return self.form_invalid(form)
+    
+        authorize.profile_id      = response.customer_profile_id.text_
+        authorize.payment_profile = response.customer_payment_profile_id_list.numeric_string.text_
+        authorize.save()
+
+        return HttpResponseRedirect(reverse('lb_dash')+"?state='payment")
+
+   
 class PaymentView( FormView ):
+    """
+    Manage the payment and budget as one form initially
+    """
     template_name = 'leadb/lb_payment.html'
-    form_class    = PaymentForm
+    form_class    = PaymentBudgetForm
     
     def get_initial(self):
         """
@@ -476,7 +654,9 @@ class PaymentView( FormView ):
                             )
         
         return dict ( budget = budget )
-
+    
+    
+    
     def form_valid(self, form):
         """
         Process a valid credit card and budget form

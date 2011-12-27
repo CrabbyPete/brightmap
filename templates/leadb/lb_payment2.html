@@ -4,15 +4,6 @@
 	<div class="insidesection">
 		<article class="profile"> 
 			<section class="bodybg">
-			{% if not user.get_profile.is_ready %} 
-			<nav class="step">
-				<ul>
-					<li><a href="{% url lb_signup %}" class="noimg">STEP 1 of 3</a></li>
-					<li><a href="#" class="steptwothree">STEP 2 of 3</a></li>
-					<li><a href="{% url lb_apply %}" class="step3">STEP 3 of 3</a></li>
-				</ul>
-			</nav> 
-			{% endif %}
 
 			<h2 class="paymethod">Payment Method and Budget</h2>
 		
@@ -23,39 +14,46 @@
 			Sponsored leads or Trial leads).
 			</p>
 
-			<form id="profile" name="" method="post" action="{% url lb_payment %}" >
+			<form id="profile" name="" method="post" action="{% url lb_payment2 %}?payment" >
 				{% csrf_token %}
 				<section id="my-border">
 					<p class="lftcontent">Credit Card Number </p>
-					{{form.number}}{{form.number.errors}}
+					{{forms.payment.number}}{{payment.number.errors}}
 
 					<p class="lftcontent">Expiration </p>
-					{{form.expire_month}}{{form.expire_year}}
+					{{forms.payment.expire_month}}{{forms.payment.expire_year}}
 
 					<p class="lftcontent">Street Address </p>
-					{{form.address}}{{form.address.errors}}
+					{{forms.payment.address}}{{forms.payment.address.errors}}
 
 					<p class="lftcontent">City </p>
-					{{form.city}}{{form.city.errors}}
+					{{forms.payment.city}}{{forms.payment.city.errors}}
 
 					<p class="lftcontent">State</p>
-					{{form.state}}{{form.state.errors}}
+					{{forms.payment.state}}{{forms.payment.state.errors}}
 
 					<p class="lftcontent">Zip Code</p>
-					{{form.zipcode}}{{form.zipcode.errors}}
+					{{forms.payment.zipcode}}{{forms.payment.zipcode.errors}}
+				
 				</section>
-
+				<p class="paddingmethod">
+				<input name="" type="submit" value="Save profile" class="paymentonly" >
+				</p>
+			</form>
+			<form id="profile" name="" method="post" action="{% url lb_payment2 %}?budget" >
+			{% csrf_token %}
 				<p class="budgetdeterminetxt">
 				Your budget determines the maximum dollar value of leads you will receive each month.
 				</p>
 	 
 				<section id="my-categories">
 					<p class="lftcontent lftcontent-monthbudget">Monthly Budget</p>
-					{{form.budget}}{{form.budget.errors}}
+					{{forms.budget.budget}}
+					{{forms.budget.budget.errors}}
 				</section>
 			
 				<p class="paddingmethod">
-					<input name="" type="submit" value="Save profile" class="paymentmethod" >
+					<input name="" type="submit" value="Save profile" class="budgetonly" >
 				</p>
 			</form>
 			</section>

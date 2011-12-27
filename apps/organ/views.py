@@ -116,14 +116,13 @@ class SignUpView( FormView ):
         profile.save()
   
         # See if the organization and chapter exist
-        """ Take this out for now. One organizer, chapter per user 
-        name = form.cleaned_data['organization']
+        """ Take this out for now. One organizer, chapter per user """
+        name = form.cleaned_data['chapter']
         try:
             organization = Organization.objects.get( name = name )
         except Organization.DoesNotExist:
             organization = Organization( name = name )
             organization.save()
-         """
         
         # See if the chapter exists. If its blank its the same as the organization name
         name = form.cleaned_data['chapter']
@@ -148,6 +147,7 @@ class SignUpView( FormView ):
             
                     chapter = Chapter( name = name, 
                                        organizer = user,
+                                       organization = organization,
                                        paypal = pay_pal )
                     chapter.save()
             
