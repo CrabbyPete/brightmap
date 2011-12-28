@@ -80,7 +80,11 @@
 						</tr>
 						{% for term in active %}
 						<tr>
-							<td class="recivedcontent">{{term.buyer.first_name}}&nbsp;{{term.buyer.last_name}}</td>
+							<td class="recivedcontent">
+								<a href ="{% url or_leadb%}?term={{term.pk}}">
+								{{term.buyer.first_name}}&nbsp;{{term.buyer.last_name}}
+								</a>
+							</td>
 							<td class="recivedcontent">{{term.deal.interest.interest}}</td>
 							<td class="recivedcontent">{% if term.expire %}Trial
 							                           {% else %}

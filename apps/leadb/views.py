@@ -307,6 +307,8 @@ class DashView( TemplateView ):
                 state = 'Payment Info Updated'
             elif self.request.GET['state'] == 'apply':
                 state = 'Deal Pending'
+            elif self.request.GET['state'] == 'budget':
+                state = 'Budget Updated'
         
         buyer = self.request.user
         terms = Term.objects.filter(buyer = buyer).order_by('status')
@@ -441,34 +443,6 @@ class ChapterView( View ):
 
 
 
-def budget_form(request):
-    try:
-        lb = LeadBuyer.objects.get(user = request.user)
-    except LeadBuyer.DoesNotExist:
-        budget = '$500.00'
-    else:
-        if lb.budget:
-            budget = lb.budget
-        else: 
-            budget ='$500.00'
-    form = BudgetForm(initial = {'budget':budget})
-    return form
-
-def payment_form( request ):
-        
-    profile = request.user.get_profile()
-    initial = {}
-    if profile.address:
-        if '^' in profile.address:
-            billing = profile.address.split('^')
-            initial = dict (  address = billing[0],
-                              city    = billing[1],
-                              state   = billing[2],
-                              zipcode = billing[3]
-                            )
-    return PaymentForm(initial = initial)
-
-
 class PaymentBudgetView( MultipleFormsView ):
     """
     Treat the payment info and budget as two separate forms
@@ -481,8 +455,8 @@ class PaymentBudgetView( MultipleFormsView ):
         form_classes = self.get_form_classes()
         forms = self.get_forms(form_classes)
         
-        forms['budget'] = budget_form(request)
-        forms['payment'] = payment_form(request)
+        forms['budget'] = self.budget_form()
+        forms['payment'] = self.payment_form()
 
         return self.render_to_response(self.get_context_data(forms=forms))
     
@@ -493,41 +467,67 @@ class PaymentBudgetView( MultipleFormsView ):
         
         # Figure out which for was submitted
         if 'budget' in request.GET:
-            form = forms['budget']
-            if form.is_valid():
-                return self.budget_form_valid(form)
+            if forms['budget'].is_valid():
+                return self.budget_form_valid(forms)
             else:
-                forms['payment'] = payment_form( request)
+                forms['payment'] = self.payment_form()
                 return self.forms_invalid(forms)
         
         elif 'payment' in request.GET:
-            form = forms['payment']
-            if form.is_valid():
-                return self.payment_form_valid(form)
+            if forms['payment'].is_valid():
+                return self.payment_form_valid(forms)
             else:
-                forms['budget'] = budget_form( request )
+                forms['budget']= self.budget_form()
                 return self.forms_invalid(forms)
             
-    def budget_form_valid(self, form):
-        
-        budget      = form.cleaned_data['budget']
+    def budget_form(self):
+        try:
+            lb = LeadBuyer.objects.get(user = self.request.user)
+        except LeadBuyer.DoesNotExist:
+            budget = '$500.00'
+        else:
+            if lb.budget:
+                budget = lb.budget
+            else: 
+                budget ='$500.00'
+        form = BudgetForm(initial = {'budget':budget})
+        return form
+
+
+    def payment_form( self ):    
+        profile = self.request.user.get_profile()
+        initial = {}
+        if profile.address:
+            if '^' in profile.address:
+                billing = profile.address.split('^')
+                initial = dict (  address = billing[0],
+                                  city    = billing[1],
+                                  state   = billing[2],
+                                  zipcode = billing[3]
+                                )
+        return PaymentForm(initial = initial)
+
+
+    def budget_form_valid(self, forms):
+        budget      = forms['budget'].cleaned_data['budget']
         try:
             lb = LeadBuyer.objects.get( user = self.request.user )
         except LeadBuyer.DoesNotExist:
-            form._errors['budget'] = ErrorList(["Apply as leader first"])
-            return self.form_invalid(form)
+            forms['budget']._errors['budget'] = ErrorList(["Apply as leader first"])
+            return self.forms_invalid(forms)
         
         money = re.compile('^\$?([1-9]{1}[0-9]{0,2}(\,[0-9]{3})*(\.[0-9]{0,2})?|[1-9]{1}[0-9]{0,}(\.[0-9]{0,2})?|0(\.[0-9]{0,2})?|(\.[0-9]{1,2})?)$')
         money = money.match(budget)
         if not money or budget == '':
-            form._errors['budget'] = ErrorList(["Not a valid dollar amount"])
-            return self.form_invalid(form)
+            forms['budget']._errors['budget'] = ErrorList(["Not a valid dollar amount"])
+            forms['payment'] = self.payment_form()
+            return self.forms_invalid(forms)
         lb.budget = money.groups()[0]
         lb.save()
         
         return HttpResponseRedirect(reverse('lb_dash')+"?state=budget")
     
-    def payment_form_valid(self, form):
+    def payment_form_valid(self, forms):
         user    = self.request.user
         profile = user.get_profile()
     
@@ -542,19 +542,20 @@ class PaymentBudgetView( MultipleFormsView ):
             authorize.save()
 
         # Check the expiration date
-        expiration  = form.cleaned_data['expire_year']+'-'+form.cleaned_data['expire_month']
+        expiration  = forms['payment'].cleaned_data['expire_year']+'-'+forms['payment'].cleaned_data['expire_month']
         
         expire = datetime.strptime(expiration,'%Y-%m').replace( day = 1 )
         if expire < datetime.today():
-            form._errors['expire_year'] = ErrorList(["Date is in the past"])
-            return self.form_invalid(form)
+            forms['budget'] = self.budget_form()
+            forms['payment']._errors['expire_year'] = ErrorList(["Date is in the past"])
+            return self.forms_invalid(forms)
         
         # Get the card, expiration date, address and budget
-        card_number = form.cleaned_data[u'number']
-        address     = form.cleaned_data['address']
-        city        = form.cleaned_data['city']
-        state       = form.cleaned_data['state']
-        zipcode     = form.cleaned_data['zipcode']
+        card_number = forms['payment'].cleaned_data[u'number']
+        address     = forms['payment'].cleaned_data['address']
+        city        = forms['payment'].cleaned_data['city']
+        state       = forms['payment'].cleaned_data['state']
+        zipcode     = forms['payment'].cleaned_data['zipcode']
          
         # Prepare the required parameters 
         billing = dict( bill_first_name = user.first_name,
@@ -578,10 +579,11 @@ class PaymentBudgetView( MultipleFormsView ):
         profile.address = address+'^'+city+'^'+state+'^'+zipcode
  
         # Create a Authorize.net CIM profile
-        kw = dict ( card_number     = card_number,
-                    expiration_date = unicode(expiration),
-                    customer_id     = unicode( authorize.customer_id ),          
-                    profile_type    = CREDIT_CARD,
+        kw = dict ( card_number         = card_number,
+                    expiration_date     = unicode(expiration),
+                    customer_id         = unicode( authorize.customer_id ),
+                    customer_profile_id = unicode( authorize.profile_id ),          
+                    profile_type        = CREDIT_CARD,
                     email           = user.email,
                     validation_mode = VALIDATION_LIVE
                   )
@@ -596,22 +598,20 @@ class PaymentBudgetView( MultipleFormsView ):
         try:
             response = cim_api.update_profile( **kw )
  
-        except Exception:
-            form._errors['card_number'] = ErrorList( ['Credit Card Authorization Failed'] )
-            return self.form_invalid(form)
+        except Exception,e:
+            forms['budget'] = self.budget_form()
+            forms['payment']._errors['card_number'] = ErrorList( ['Credit Card Authorization Failed'] )
+            return self.forms_invalid(forms)
         
         # Check to see it if its OK
         result = response.messages.result_code.text_
         
         if result != 'Ok':
-            form._errors['number'] = ErrorList( [response.messages.message.text.text_] )
-            return self.form_invalid(form)
+            forms['budget'] = self.budget_form()
+            forms['payment']._errors['number'] = ErrorList( [response.messages.message.text.text_] )
+            return self.forms_invalid(forms)
     
-        authorize.profile_id      = response.customer_profile_id.text_
-        authorize.payment_profile = response.customer_payment_profile_id_list.numeric_string.text_
-        authorize.save()
-
-        return HttpResponseRedirect(reverse('lb_dash')+"?state='payment")
+        return HttpResponseRedirect(reverse('lb_dash')+"?state=payment")
 
    
 class PaymentView( FormView ):

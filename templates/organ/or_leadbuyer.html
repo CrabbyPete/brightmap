@@ -16,36 +16,34 @@
 		<table class="techtable">
 			<caption class="latestrecived">{{chapter.name}}</caption>
 			<tr>
-				<td class="techdrinkrow">Organization</td>
-				<td class="techdrinkRightrow">{{chapter.name}}</td>
+				<td class="techdrinkrow">Service Provider</td>
+				<td class="techdrinkRightrow">{{buyer.first_name}}&nbsp;{{buyer.last_name}}</td>
 			</tr>
 			<tr>
-				<td class="techdrinkrow">Chapter</td>
-				<td class="techdrinkRightrow">{{chapter.name}}</td>
+				<td class="techdrinkrow">Company</td>
+				<td class="techdrinkRightrow">{{profile.company}}</td>
 			</tr>
 			<tr>
-				<td class="techdrinkrow">Organizer</td>
-				<td class="techdrinkRightrow">{{chapter.organizer.first_name}} &nbsp;
-				                              {{chapter.organizer.last_name}}
-				</td>
+				<td class="techdrinkrow">Title</td>
+				<td class="techdrinkRightrow">{{profile.title}}</td>
 			</tr>
 			<tr>
 				<td class="techdrinkrow">Website</td>
 				<td class="techdrinkRightrow"><strong><a
-						href="{{chapter.organizer.get_profile.website}}" target="_blank">{{chapter.organizer.get_profile.website}}</a>
+						href="{{profile.website}}" target="_blank">{{profile.website}}</a>
 				</strong>
 				</td>
 			</tr>
 			<tr>
 				<td class="techdrinkrow">Email</td>
 				<td class="techdrinkRightrow"><strong><a
-						href="mailto:{{chapter.organizer.email}}">{{chapter.organizer.email}}</a>
+						href="mailto:{{buyer.email}}">{{buyer.email}}</a>
 				</strong>
 				</td>
 			</tr>
 			<tr>
 				<td class="techdrinkrow">Phone</td>
-				<td class="techdrinkRightrow">{{chapter.organizer.get_profile.phone}}</td>
+				<td class="techdrinkRightrow">{{profile.phone}}</td>
 			</tr>
 			<tr>
 				<td class="techdrinkrow">Lead Sources</td>
@@ -62,7 +60,7 @@
 		<div class="techdrinkuptopdiv"></div>
 		<section class="techdrinkupreptbg">
 		<table class="techdealtable">
-			<caption class="latestrecived">{{chapter.name}} - Deal Detail</caption>
+			<caption class="latestrecived">Deal Detail</caption>
 			<tr>
 				<td class="tehLeft">Status</td>
 				<td class="tehMiddle">{{term.status}}</td>
@@ -75,7 +73,7 @@
 				<td class="tehMiddle">
 					{% if term.exclusive %}Exclusive
 					{%else%}
-						{% if term.expire %}Trial
+						{% if term.expire %}Trial- {{term.expire.date}}
 						{%else%}Standard
 						{%endif%}
 					{%endif%}
@@ -90,7 +88,7 @@
 			</tr>
 			<tr>
 				<td class="tehLeft">Service</td>
-				<td class="tehMiddle"><strong>{{term.deal.interest.interest}} / Lead</strong>
+				<td class="tehMiddle"><strong>{{term.deal.interest.interest}}</strong>
 				</td>
 				<td class="tehRight tehRight1">&nbsp;</td>
 			</tr>
@@ -121,7 +119,7 @@
 		<section class="leadbuyerrept">
 
 		<table class="ins">
-			<caption class="latestrecived">{{chapter.name}} - Lead History</caption>
+			<caption class="latestrecived">{{buyer.first_name}}&nbsp;{{buyer.last_name}} - Lead History</caption>
 
 			<tr>
 				<td style="background-color: #F5F6F6;">

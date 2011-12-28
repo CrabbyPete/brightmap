@@ -1,4 +1,5 @@
- {% extends 'base.html' %} {% block body_block %}
+ {% extends 'base.html' %} 
+ {% block body_block %}
 <!--Body section-->
 <div id="bodysection">
 	<div class="insidesection">
@@ -22,6 +23,7 @@
 
 					<p class="lftcontent">Expiration </p>
 					{{forms.payment.expire_month}}{{forms.payment.expire_year}}
+					{{forms.payment.expire_month.errors}}{{forms.payment.expire_year.errors}}
 
 					<p class="lftcontent">Street Address </p>
 					{{forms.payment.address}}{{forms.payment.address.errors}}

@@ -221,7 +221,19 @@ class CategoryView( FormView ):
                 
         return HttpResponseRedirect( reverse('or_setup') )
 
-
+def leadb( request ):
+    template_name = 'organ/or_leadbuyer.html'
+    
+    if 'term' in request.GET:
+        term  = Term.objects.get( pk = request.GET['term'])
+        buyer = term.buyer
+        connections = term.connections()
+        
+        profile = buyer.get_profile()
+        context = { 'buyer':buyer, 'profile':profile, 'term':term, 'connections':connections}
+        return render_to_response(template_name,context, context_instance=RequestContext(request) )
+            
+    
 @login_required
 def setup( request ):
     if request.method == 'GET':

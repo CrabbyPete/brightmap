@@ -31,7 +31,8 @@
 
 					<p class="lftcontent">Expiration </p>
 					{{form.expire_month}}{{form.expire_year}}
-
+					{{form.expire_month.errors}}{{form.expire_year.errors}}
+					
 					<p class="lftcontent">Street Address </p>
 					{{form.address}}{{form.address.errors}}
 
