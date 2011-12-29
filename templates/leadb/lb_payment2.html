@@ -36,11 +36,12 @@
 
 					<p class="lftcontent">Zip Code</p>
 					{{forms.payment.zipcode}}{{forms.payment.zipcode.errors}}
+					<p class="onlymethod">
+					<input name="" type="submit" value="Save profile" class="paymentonly" >
+					</p>
 				
 				</section>
-				<p class="paddingmethod">
-				<input name="" type="submit" value="Save profile" class="paymentonly" >
-				</p>
+				
 			</form>
 			<form id="profile" name="" method="post" action="{% url lb_payment2 %}?budget" >
 			{% csrf_token %}
@@ -52,11 +53,11 @@
 					<p class="lftcontent lftcontent-monthbudget">Monthly Budget</p>
 					{{forms.budget.budget}}
 					{{forms.budget.budget.errors}}
+					<p class="onlymethod">
+					<input name="" type="submit" value="Save profile" class="budgetonly" >
+					</p>
 				</section>
 			
-				<p class="paddingmethod">
-					<input name="" type="submit" value="Save profile" class="budgetonly" >
-				</p>
 			</form>
 			</section>
 			<div class="botbg">&nbsp;</div>

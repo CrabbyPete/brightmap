@@ -56,7 +56,7 @@
 <div id="topsection">
 	<header class="tophdr">
 		<section class="logo">
-			<a href="#"><img src="/media/img/logo.gif" alt="Brightmap" width="220" height="93" title="Brightmap"></a> 
+			<a href="{% url homepage %}"><img src="/media/img/logo.gif" alt="Brightmap" width="220" height="93" title="Brightmap"></a> 
 	   </section>
 	   <nav class="topmenu">
 		   <!--tabpanel -->
@@ -156,9 +156,9 @@
                     -->
                     <!--  Don't load video if error it loads late and cover the javascript -->
                     {% if not login.username.errors %}
-                   <iframe class ="new" type="text/html" width="480" height="385" src="http://www.youtube.com/embed/YG8og6Zc9og" frameborder="0">
-				   </iframe> 	                    
-                   {% endif %}
+                    <iframe class ="new" type="text/html" width="480" height="385" src="http://www.youtube.com/embed/YG8og6Zc9og" frameborder="0">
+				    </iframe> 	                    
+                    {% endif %}
                   </section>
                   
                   <article class="orgprovides">
