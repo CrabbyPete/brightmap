@@ -154,6 +154,9 @@ def database_events(organizer, evb = None):
                                 user_key = organizer.user_key     )
 
     # Get the latest from Eventbrite
+    if not organizer.organizer_id:
+        return []
+    
     events = get_latest_events(evb, int(organizer.organizer_id) )
     event_list = []
 
@@ -362,7 +365,7 @@ def make_contact( survey, deal, template ):
         
         # Check if they put in a company or junk
         company      = attendee.get_profile().company
-        if company and company.lower() in ['na','n/a','self','']:
+        if company and company.lower() in ['freelancer','na','n/a','self','']:
             company = None
         
         # Check if the leadbuyer is the organizer and if they have a letter
@@ -507,7 +510,7 @@ def main():
                                     print log( chapter.name +    \
                                                ' has no deal for ' + \
                                                survey.interest.interest,
-                                               'green'
+                                               'red'
                                              )
                                     continue
 
