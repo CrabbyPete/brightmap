@@ -1,11 +1,33 @@
-{% extends 'base.html' %}
-{% load smartif %}
-
+{% extends 'base.html' %} 
+{% load smartif %} 
 {% block body_block %}
- 	<p>
- 		Sorry Brightmap is experiencing a problem. 
- 		Please email admin@brightmap.com and let them know
- 	</p>
- 	
+<!--Body section-->
+<div id="bodysection">
+	<div class="insidesection">
+		<br />
+		<br />
+		<section class="leadbuyer">
+		<h2 class="leadbuyer">Sorry About This</h2>
+		</section>
+		<article class="box-full">
+		<div class="top">&nbsp;</div>
+		<div class="middle">
+			<section> <header class="inside">
+			<h2 class="section-title">We have a problem</h2>
+			</header>
+			<div class="inside">
+				<ul class="bullets">
+					<li> Please let us know by emailing 
+						<a href='maito:admin@brightmap.com' >admin@brightmap.com</a>
+					</li>
+				</ul>
+			</div>
+			</section>
+		</div>
+		<div class="bottom">&nbsp;</div>
+		</article>
+	</div>
+</div>
+<!--Body section-->
 {% endblock %}
 

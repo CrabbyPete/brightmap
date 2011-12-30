@@ -51,9 +51,14 @@
 				<section id="my-border" style="margin-top:20px;">
 					<p class="lftcontent lftcontent-monthbudget">Terms</p>
 					{{form.deal_type}}
-					{{form.deal_type.errors}} 
+					{% if expire %}
+					<p> 
+					Only 1 active trial allowed at a time. The current one with
+					{{expire.deal.chapter.name}} expires {{expire.date}} 
+					</p>
+					{% endif %}
 				</section>
-
+				{{form.deal_type.errors}}
 				<p class="applicationleads">
 					<input name="" type="submit" value="Request deal" class="submitapp">
 				</p>

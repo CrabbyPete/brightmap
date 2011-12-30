@@ -12,17 +12,12 @@ from django.template                import loader, Context
 from django.core.mail               import EmailMultiAlternatives
 
 # Local libraries
+from eventapi                       import EventBrite
 from base.models                    import ( Event, Profile, Survey, Interest, Deal, 
                                              Organization, Connection, LeadBuyer, Invoice    )
 
 from base.passw                     import gen
-from client                         import EventbriteClient
 
-
-""""
-from meetup                         import MeetUpAPI
-from social.models                  import MeetupProfile
-"""
 
 import logging
 logger = logging.getLogger('main.py')
@@ -30,6 +25,7 @@ logger = logging.getLogger('main.py')
 
 # Environment variables
 from settings                       import EVENTBRITE, MAX_MAIL_SEND, SEND_EMAIL
+
 PROMPT     = False
 TODAY      = datetime.today()
 
@@ -45,119 +41,16 @@ def log(message, color = None):
     return string
 
 
-def get_attendees( evb, event_id ):
-    """
-    Get all the attendees for an event from Eventbrite
-    """
-    attendee_list = []
- 
-    # Get all the attendees of each event (New York, Boston, Toronto ..)
-    try:
-        attendees = evb.event_list_attendees( {'id': event_id} )
-    except Exception, e:
-        print log('Eventbrite Error: '+ str(e) +" for event id:" + str(event_id) )
-        return []
-
-    if 'error' in attendees:
-        print log( 'Eventbrite Error: ' + attendees['error']['error_message'] +
-                   ' event id ' + str( event_id )
-                 )
-        return []
-
-    # Append attendee interests note:Eventbrite adds redundant levels
-    for attendee in attendees['attendees']:
-        attendee_list.append( attendee['attendee'] )
-
-    return attendee_list
-
-
-def check_survey(attendee):
-    """
-     Return all the interests from the survey
-    """
-    if not 'answers' in attendee:
-        return [], False
-
-    leadbuyer = False
-
-    # If so parse the survey answers and email attendee and sponser
-    answers = attendee['answers']
-    for answer in answers:
-        """ Do not add leadbuyer automatically
-        if 'Check this box' in answer['answer']['question']:
-            leadbuyer = True
-        """
-        # Did they ask for help
-        if 'Do you need help' in answer['answer']['question']:
-            return answer['answer']['answer_text'].split('|'), leadbuyer
-
-    # No survey answered
-    return [], leadbuyer
-
-
-def get_latest_events( evb, organizer_id ):
-    """
-    Search for the latest events
-    """
-    try:
-        events = evb.organizer_list_events({'id':organizer_id})
-    except Exception:
-        print log( 'Eventbrite Error: Events for ' + organizer_id )
-        logger.debug('Eventbrite Error: Events for ' + organizer_id )
-        return []
-
-    # Check if you get an error from Eventbrite
-    if 'error' in events:
-        err = 'Eventbrite Error: ' + events['error']['error_type'] + ' for ' + str(organizer_id)
-        print log( err, 'red' )
-        #logger.debug( err )
-        return []
-
-
-    # Look through all events and keep all future events after today
-    event_ids = []
-    for event in events['events']:
-        if event['event']['status'] != 'Live':
-            continue
-
-        # Make sure these are not past events
-        start_date =  datetime.strptime(event['event']['start_date'],
-                                     "%Y-%m-%d %H:%M:%S")
-        
-        end_date = datetime.strptime(event['event']['end_date'],
-                                     "%Y-%m-%d %H:%M:%S")
-        
-        # Check if this is multi-day
-        if start_date != end_date:
-            end_date = start_date
-        
-        # Only get future events
-        if end_date < TODAY:
-            continue
-
-        event_ids.append([ event['event']['title'],
-                           event['event']['id'],
-                           end_date
-                          ]
-                         )
-    return event_ids
-
-
-def database_events(organizer, evb = None):
+def database_events( organizer, api ):
     """
     Put the latest event in the database
     """
-    if evb == None:
-
-        # Open a new Eventbrite client
-        evb = EventbriteClient( app_key  = EVENTBRITE['APP_KEY' ],
-                                user_key = organizer.user_key     )
-
+ 
     # Get the latest from Eventbrite
     if not organizer.organizer_id:
         return []
     
-    events = get_latest_events(evb, int(organizer.organizer_id) )
+    events = api.get_latest_events( int(organizer.organizer_id) )
     event_list = []
 
     # Add each event and find the right organizer
@@ -183,14 +76,14 @@ def database_events(organizer, evb = None):
     # Return the events list
     return event_list
 
-def database_attendees( evb, event ):
+def database_attendees( event, api ):
     """
     Generator to put the attendees in the database, returns attendees who
     answered the survey
     """
 
     # Get all the attendees for the event from Eventbrite
-    attendees = get_attendees( evb, event.event_id )
+    attendees = api.get_attendees( event.event_id )
 
     # Add all attendees to the database
     for attendee in attendees:
@@ -233,7 +126,7 @@ def database_attendees( evb, event ):
         profile.save()
 
         # Return attendees who answered the survey
-        interests, leadbuyer = check_survey( attendee )
+        interests, leadbuyer = api.check_survey( attendee )
 
         # If they checked they want leads they are a leadbuyer
         if leadbuyer:
@@ -432,7 +325,10 @@ def make_contact( survey, deal, template ):
                 err = "Email Send Error For:"+log_mess
                 print log(err, 'red')
                 #logger.error(log(err))
-
+        else:
+            recipients = ['pete@brightmap.com' ]
+            bcc = []
+            msg.send( fail_silently = False )
 
 def print_event(event):
     """
@@ -475,7 +371,7 @@ def main():
             for ticket in tickets:
                 app_key  = EVENTBRITE['APP_KEY' ]
                 user_key = ticket.user_key
-                evb = EventbriteClient( tokens = app_key, user_key = user_key )
+                api = EventBrite( tokens = app_key, user_key = user_key )
         
                 #Get the email template for this organization
                 letter = chapter.letter
@@ -485,13 +381,13 @@ def main():
                     template = loader.get_template( 'letters/default.tmpl' )
 
                 # Get the attendess of each event
-                for event in database_events( ticket, evb ):
+                for event in database_events( ticket, api ):
 
                     # Log the events
                     print_event(event)
 
                     # Put all attendees in the db and return surveys
-                    for surveys in database_attendees( evb, event ):
+                    for surveys in database_attendees( event, api ):
 
                         # For each interest match sponsers
                         for survey in surveys:

@@ -43,3 +43,8 @@ class GoogleProfile(SocialProfile):
 
 class MeetupProfile(SocialProfile):
     member_id    = models.CharField(max_length=100,  blank = True, null = True )
+
+"""
+class EventBriteProfile(SocialProfile):
+    pass
+"""

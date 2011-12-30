@@ -1,5 +1,4 @@
 # Python
-import pdb
 import settings
 import cgi
 import urllib
@@ -300,14 +299,44 @@ class OauthMeetup(OauthView):
             except MeetupProfile.DoesNotExist:
                 return None
 
+class OauthEventbrite(OauthView):
+        service           = 'eventbrite'
+  
+        request_token_url = 'https://www.eventbrite.com/oauth/authorize'
+        access_token_url  = 'https://www.eventbrite.com/oauth/token'
+        authenticate_url  = 'https://www.eventbrite.com/oauth/authorize'
+        
+        """
+        https://www.eventbrite.com/oauth/authorize?response_type=token&client_id=YOUR_API_KEY
+        """
+        
+        call_back_url     = settings.SITE_BASE + '/social/eventbrite'
+
+        def __init__(self, api_key, app_secret, **kwargs ):
+            self.consumer  = api_key
+            self.client    = api_key
+  
+        
+        
+        def register(self,request):
+            # Step 1. Get a request token from Provider.
+            url = self.authenticate_url + '?response_type=token&client_id='+self.client
+            return  HttpResponseRedirect(url)
+        
+        def get_info( self, user, content ):
+            try:
+                user = User.objects.get(pk = user.id)
+            except User.DoesNotExist:
+                pass
 
 
 
+twitter     = OauthTwitter( settings.TWITTER['API_KEY'], settings.TWITTER['APP_SECRET'] )
+linkedin    = OauthLinkedIn( settings.LINKEDIN['API_KEY'], settings.LINKEDIN['APP_SECRET'] )
+google      = OauthGoogle( settings.GOOGLE['API_KEY'], settings.GOOGLE['APP_SECRET'],scope='https://mail.google.com/' )
+meetup      = OauthMeetup( settings.MEETUP['API_KEY'], settings.MEETUP['APP_SECRET']  )
+eventbrite  = OauthEventbrite(settings.EVENTBRITE['API_KEY'], settings.EVENTBRITE['APP_SECRET']  )
 
-twitter  = OauthTwitter( settings.TWITTER['API_KEY'], settings.TWITTER['APP_SECRET'] )
-linkedin = OauthLinkedIn( settings.LINKEDIN['API_KEY'], settings.LINKEDIN['APP_SECRET'] )
-google   = OauthGoogle( settings.GOOGLE['API_KEY'], settings.GOOGLE['APP_SECRET'],scope='https://mail.google.com/' )
-meetup   = OauthMeetup( settings.MEETUP['API_KEY'], settings.MEETUP['APP_SECRET']  )
 
 def gmail(request):
     try:
@@ -330,6 +359,9 @@ def gmail(request):
             ok, mess = conn.search(None, "UNDELETED")
 
     return  HttpResponseRedirect('/')
+
+
+
 
 # /2/events args = member_id
 

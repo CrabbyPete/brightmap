@@ -94,10 +94,14 @@ class BuyerForm(forms.Form):
 
 DEAL_CHOICES = [
                 ('Nonexclusive','Standard ($20.00 per introduction)'),
-                ('Trial' ,'Apply for Trial (1 month of free leads)'),
-                ('Sponsored','Apply for Sponsorship')
+                ('Sponsored','Apply for Sponsorship'),
+                ('Trial' ,'Apply for Trial (1 month of free leads)')
                ]
 
+DEAL_CHOICES2 =[
+                ('Nonexclusive','Standard ($20.00 per introduction)'),
+                ('Sponsored','Apply for Sponsorship')
+               ]
 
 """
 STANDARD_CHOICES = [(i.interest,i.interest) for i in Interest.objects.filter(status='standard')]

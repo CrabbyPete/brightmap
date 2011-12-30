@@ -96,10 +96,11 @@ def bill_user( invoice ):
         return invoice
     
     try:
-        response = cim_api.create_profile_transaction(  amount = invoice.cost,
+        response = cim_api.create_profile_transaction(  amount                      = invoice.cost,
                                                         customer_profile_id         = authorize.profile_id,
                                                         customer_payment_profile_id = authorize.payment_profile,
-                                                        profile_type = AUTH_CAPTURE
+                                                        profile_type                = AUTH_CAPTURE,
+                                                        invoice_number              = invoice.pk
                                                      )
     except AuthorizeError:
         invoice.status = 'unauthorized'

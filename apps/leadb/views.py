@@ -28,7 +28,7 @@ from authorize.responses            import AuthorizeError #, _cim_response_codes
 
 #Local imports
 from base.models                    import ( LeadBuyer, Chapter, Expire, Cancel, Connection, Authorize,
-                                             Deal, Term, Interest, Profile, Invoice, TERM_STATUS
+                                             Deal, Term, Interest, Profile, Invoice, TERM_STATUS, Expire
                                             )
 from base.forms                     import LoginForm
 
@@ -51,7 +51,7 @@ def mail_organizer( user, deal, term, deal_type ):
     template = loader.get_template('letters/request.tmpl')
     message = template.render(c)
 
-    subject = "New BrightMap LeadBuyer Request: %s"%(deal.interest)
+    subject = "New BrightMap Service Provider Request: %s"%(deal.interest)
     recipients = [ organizer.email, term.buyer.email ]
 
     msg = EmailMultiAlternatives( subject,
@@ -208,7 +208,11 @@ class ApplyView( FormView ):
     template_name = 'leadb/lb_apply.html'
     form_class    = ApplyForm
     
-
+    def get( self, request, *argv, **kwargs ):
+        expire = Expire.objects.filter( buyer = request.user, status = 'approved')
+        self.form_class = ApplyForm()
+        return self.render_to_response( {'form':self.form_class, 'expire':expire[0] } )
+    
     def form_valid(self,form):
         """
         Process a valid application form
@@ -256,7 +260,9 @@ class ApplyView( FormView ):
         elif deal_type == 'Trial':
             expires = Expire.objects.filter( buyer = self.request.user )
             if len ( expires ) > 0:
-                pass
+                form._errors['deal_type'] = ErrorList(["You already have an active trail"])
+                return self.form_invalid(form)
+
             
             one_month = datetime.now() + relativedelta(months=+1)
             expire = Expire( deal   = deal,
@@ -377,25 +383,31 @@ class BillView( TemplateView ):
     def get_context_data(self):
         if 'invoice' in self.request.GET:
             invoice = Invoice.objects.get(pk=self.request.GET['invoice'])
-            connections = invoice.connections()
-            title = invoice.title
+        else:
+            try:
+                invoice = Invoice.objects.filter(user = self.request.user).latest('issued')
+            except Invoice.DoesNotExist:
+                return {}
+        
+        connections = invoice.connections()
+        title = invoice.title
             
-            total = 0.0
-            bills = []
-            for connection in connections:
-                detail = dict( organization = connection.survey.event.chapter.name,
-                               event        = connection.survey.event.describe,
-                               date         = connection.survey.event.date,
-                               name         = connection.survey.attendee.first_name + ' ' + connection.survey.attendee.last_name, 
-                               email        = connection.survey.attendee.email,
-                               company      = connection.survey.attendee.get_profile().company,
-                               connected    = connection.date,
-                               price        = connection.term.cost
-                              )
-                bills.append(detail)
-                total += float(detail['price'])
+        total = 0.0
+        bills = []
+        for connection in connections:
+            detail = dict( organization = connection.survey.event.chapter.name,
+                           event        = connection.survey.event.describe,
+                           date         = connection.survey.event.date,
+                           name         = connection.survey.attendee.first_name + ' ' + connection.survey.attendee.last_name, 
+                           email        = connection.survey.attendee.email,
+                           company      = connection.survey.attendee.get_profile().company,
+                           connected    = connection.date,
+                           price        = connection.term.cost
+                         )
+            bills.append(detail)
+            total += float(detail['price'])
             
-            bills = dict(bills = bills, total = total, title = title )
+        bills = dict(bills = bills, total = total, title = title )
         return bills
     
 
@@ -773,7 +785,7 @@ class PaymentView( FormView ):
         if not was_ready:
             return HttpResponseRedirect(reverse('lb_apply'))
         else:
-            return HttpResponseRedirect(reverse('lb_dash')+"?state='payment")
+            return HttpResponseRedirect(reverse('lb_dash')+"?state=payment")
 
 
 @login_required
