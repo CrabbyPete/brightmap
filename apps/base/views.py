@@ -48,14 +48,12 @@ from cron.accounting                import invoice_user, bill_user, notify_user
 
 def homepage( request ):
     # Homepage
-    if request.user.is_authenticated():
-        return welcome(request)
+    if not request.user.is_authenticated():
+            return render_to_response( 'indexR.html', 
+                                       {'login':LoginForm()}, 
+                                       context_instance=RequestContext(request)
+                                     )
 
-    #return login(request)
-    return render_to_response('indexR.html', {'login':LoginForm()}, context_instance=RequestContext(request))
-
-@csrf_protect
-def welcome( request ):
     # Check if they are a Lead Buyer, and make sure they have a valid profile
     user = request.user
 
@@ -68,7 +66,7 @@ def welcome( request ):
             profile.save()
 
     if user.is_staff or user.is_superuser:
-            return render_to_response('welcome.html', {}, context_instance=RequestContext(request))
+            return render_to_response('admin/welcome.html', {}, context_instance=RequestContext(request))
     
     if profile.is_leadbuyer:
         if profile.is_ready:
@@ -77,8 +75,8 @@ def welcome( request ):
             start_url = reverse('lb_payment')
     
     elif profile.is_organizer:
+        
         start_url = reverse('or_dash')
-    
     else:
         start_url = '/'
     
@@ -96,7 +94,7 @@ def learn(request):
                                        {'login':LoginForm()}, 
                                        context_instance=RequestContext(request)
                                      )
-        return welcome(request)
+        return homepage(request)
 
 
 def forgot( request, username ):

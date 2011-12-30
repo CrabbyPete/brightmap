@@ -46,6 +46,7 @@ class Authorize( models.Model ):
     def __unicode__(self):
         return self.user.last_name+','+self.user.first_name
 
+
 class Invoice( models.Model ):
     user        = models.ForeignKey( User )
     title       = models.CharField( max_length = 255, blank = True, null = True )
