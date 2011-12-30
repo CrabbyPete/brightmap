@@ -204,14 +204,20 @@ DEAL_TYPES = [c[0] for c in DEAL_CHOICES]
 class ApplyView( FormView ):
     """
     Apply to buy a deal
+    
     """
     template_name = 'leadb/lb_apply.html'
     form_class    = ApplyForm
     
     def get( self, request, *argv, **kwargs ):
         expire = Expire.objects.filter( buyer = request.user, status = 'approved')
+        if len ( expire ) > 0:
+            expire = expire[0]
+        else:
+            expire = None
+        
         self.form_class = ApplyForm()
-        return self.render_to_response( {'form':self.form_class, 'expire':expire[0] } )
+        return self.render_to_response( {'form':self.form_class, 'expire':expire } )
     
     def form_valid(self,form):
         """
@@ -260,7 +266,7 @@ class ApplyView( FormView ):
         elif deal_type == 'Trial':
             expires = Expire.objects.filter( buyer = self.request.user )
             if len ( expires ) > 0:
-                form._errors['deal_type'] = ErrorList(["You already have an active trail"])
+                form._errors['deal_type'] = ErrorList(["Sorry. You already have an active trail"])
                 return self.form_invalid(form)
 
             
