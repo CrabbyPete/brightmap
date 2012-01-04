@@ -27,6 +27,8 @@ logger = logging.getLogger('main.py')
 from settings                       import EVENTBRITE, MAX_MAIL_SEND, SEND_EMAIL
 
 PROMPT     = False
+TEST_EMAIL = False
+
 TODAY      = datetime.today()
 
 
@@ -282,52 +284,64 @@ def make_contact( survey, deal, template ):
         print_connection( attendee, sponser, interest )
 
         subject = deal.chapter.organization.name + ' Intro: '+ interest.interest
+        
+        # If this is live send the message
+        if SEND_EMAIL:
+            recipients = [ '%s %s <%s>'% ( attendee.first_name, attendee.last_name, attendee.email ),
+                          '%s %s <%s>'% ( sponser.first_name, sponser.last_name, sponser.email )
+                         ]
 
-        recipients = [ '%s %s <%s>'% ( attendee.first_name, attendee.last_name, attendee.email ),
-                       '%s %s <%s>'% ( sponser.first_name, sponser.last_name, sponser.email )
-                     ]
+            bcc = [ 'bcc@brightmap.com',
+                    event.chapter.organizer.email
+                  ]
 
-        bcc = [ 'bcc@brightmap.com',
-                event.chapter.organizer.email
-              ]
-
-        #TESTING BELOW REMOVE LATER
-        #recipients = ['Pete Douma <pete.douma@gmail.com>']
-
-        # Send the email
-        msg = EmailMultiAlternatives( subject    = subject,
-                                      body       = message,
-                                      from_email = '%s %s <%s>' % ( organizer.first_name,
-                                                                    organizer.last_name,
-                                                                    organizer.email       ),
-                                      to         = recipients,
-                                      bcc        = bcc
+            
+            msg = EmailMultiAlternatives( subject    = subject,
+                                          body       = message,
+                                          from_email = '%s %s <%s>' % ( organizer.first_name,
+                                                                        organizer.last_name,
+                                                                        organizer.email       ),
+                                         to         = recipients,
+                                         bcc        = bcc
                                      )
 
-        # If the prompt was set ask before sending
-        if PROMPT:
-            ans = raw_input('Send? (y/n)')
-            if ans != 'y':
-                continue
+            # If the prompt was set ask before sending
+            if PROMPT:
+                ans = raw_input('Send? (y/n)')
+                if ans != 'y':
+                    continue
 
-        # Try and send the message
-        log_mess = "%s,%s,%s,%s"%( attendee.email,
-                                   sponser.email,
-                                   chapter,
-                                   interest
-                                 )
+            # Try and send the message
+            log_mess = "%s,%s,%s,%s"%( attendee.email,
+                                       sponser.email,
+                                       chapter,
+                                       interest
+                                     )
 
-        logger.info(log(log_mess))
-        if SEND_EMAIL:
+            logger.info(log(log_mess))
+
             try:
                 msg.send( fail_silently = False )
             except Exception, e:
                 err = "Email Send Error %s for: %s" % ( e, log_mess )
                 print log(err, 'red')
                 #logger.error(log(err))
-        else:
-            recipients = ['pete@brightmap.com' ]
-            bcc = []
+                
+        # To test emails
+        elif TEST_EMAIL:
+            recipients  = [ 'test@brightmap.com' ]
+            bcc         = [ 'pete@brightmap.com' ]
+            from_email  = [ 'test@brightmap.com' ]
+            message = 'TESTING '+ message 
+
+            
+            msg = EmailMultiAlternatives( subject    = subject,
+                                          body       = message,
+                                          from_email = from_email,
+                                          to         = recipients,
+                                          bcc        = bcc
+                                        )
+
             msg.send( fail_silently = False )
 
 def print_event(event):
@@ -459,7 +473,7 @@ import optparse
 if __name__ == '__main__':
     op = optparse.OptionParser( usage="usage: %prog " +" [options]" )
     # Add options for debugging
-    op.add_option('-d', action="store_true", help = 'Debug no emails sent')
+    op.add_option('-d', action="store_true", help = 'Turn off debug email messages')
     op.add_option('-p', action="store_true", help = 'Prompt to send')
     op.add_option('-a', action="store_true", help = 'Run Accounting')
 
@@ -467,9 +481,9 @@ if __name__ == '__main__':
 
     # Check if options were set
     if opts.d:
-        DEBUG = False
+        TEST_EMAIL = True
     else:
-        DEBUG = True
+        TEST_EMAIL = False
 
     if opts.p:
         PROMPT = True
