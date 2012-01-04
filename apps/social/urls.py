@@ -7,6 +7,6 @@ urlpatterns = patterns('social.views',
     url(r'^google/?$',              'google',        name = 'google'       ),
     url(r'^meetup/?$',              'meetup',        name = 'meetup'       ),
     url(r'^gmail/?$',               'gmail',         name = 'gmail'        ),
-    url(r'^eventbrite/?$',          'eventbrite',    name = 'eventbrite'   ), 
+#    url(r'^eventbrite/?$',          'eventbrite',    name = 'eventbrite'   ), 
 )
 
