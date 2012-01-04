@@ -19,9 +19,9 @@ from django.core.mail               import  EmailMultiAlternatives
 
 # Local imports
 from passw                          import generate
-from models                         import ( Event, Chapter,  Profile, LeadBuyer, 
-                                             Deal,  Survey,   Invoice, Connection,
-                                             Term,  Interest,  
+from models                         import ( Event, Chapter,  Profile,  LeadBuyer, 
+                                             Deal,  Survey,   Invoice,  Connection,
+                                             Term,  Interest, Eventbrite  
                                            )
                                         
 
@@ -329,7 +329,22 @@ class EventbriteView( FormView ):
             
   
     def form_valid(self, form ):
-        return HttpResponseRedirect('/')
+        chapter       = form.cleaned_data['chapter']
+        user_key      = form.cleaned_data['user_key']
+        organizer_id  = form.cleaned_data['organizer_id']
+        bot_email     = form.cleaned_data['bot_email']
+        
+        try:
+            eventbrite = Eventbrite.objects.get(chapter = chapter)
+        except Eventbrite.DoesNotExist:
+            pass
+        else:
+            eventbrite.user_key = user_key
+            eventbrite.organizer_id = organizer_id
+            eventbrite.bot_email = bot_email
+            eventbrite.save()
+        return HttpResponseRedirect(reverse('chapter')+'?chapter='+str(chapter.pk))
+ 
     
 class DealView( FormView ):
     template_name   = 'admin/deal.html'
@@ -401,7 +416,8 @@ class TermView( FormView ):
             
             term.save()
                                      
-        return HttpResponseRedirect(reverse('term')+'?leadbuyer='+str(term.buyer.pk) )
+        leadbuyer = LeadBuyer.objects.get(user = term.buyer )
+        return HttpResponseRedirect(reverse('term')+'?leadbuyer='+str(leadbuyer.pk) )
         
 class LeadBuyerView( FormView ):
     template_name   = 'admin/leadbuyer.html'
@@ -418,7 +434,15 @@ class LeadBuyerView( FormView ):
  
     
     def form_valid(self, form):
-        return HttpResponseRedirect('/')
+        budget = form.cleaned_data['budget']
+        letter = form.cleaned_data['letter']
+        
+        leadbuyer = LeadBuyer.objects.get( pk = self.request.GET['leadbuyer'] )
+        leadbuyer.budget = budget
+        leadbuyer.letter = letter
+        leadbuyer.save()
+        
+        return HttpResponseRedirect(reverse('leadbuyer')+'?leadbuyer='+str(leadbuyer.pk))
 
 
 class EventView( FormView ):
@@ -488,8 +512,6 @@ class ConnectionView( FormView ):
         connection.save()        
         return HttpResponseRedirect(reverse('invoice'))
 
-
-
 class InvoiceView ( FormView):
     template_name   = 'admin/invoice.html'
     form_class      = InvoiceForm
@@ -518,4 +540,24 @@ class InvoiceView ( FormView):
                 notify_user( invoice )
         invoice.save()
         return HttpResponseRedirect(reverse('invoice'))
+"""
+class CommissionView ( FormView ):
+    template_name   = 'admin/commission.html'
 
+    def get(self, request, *argv, **kwargs ):
+        if 'chapter' in request.GET:
+            chapter = Chapter.objects.get(pk = request.GET['chapter'])
+
+        payments = []
+        for invoice in Invoice.objects.filter(status = 'paid'):
+            pay = 0.0
+            for connection in invoice.connections():
+                if connection.term.deal.chapter == chapter:
+                    pay += float(connection.term.cost)
+                
+            pay = "%.2f" % ( float(pay) *.45 )
+            payments.append({'invoice':invoice, 'pay':pay})
+        
+        return self.render_to_response( {'payments':payments} )
+"""                   
+            

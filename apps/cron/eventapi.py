@@ -107,9 +107,9 @@ class EventBrite(object):
         """ Search for the latest events """
         try:
             events = self.evb.organizer_list_events({'id':organizer_id})
-        except Exception:
-            print log( 'Eventbrite Error: Events for ' + organizer_id )
-            logger.debug('Eventbrite Error: Events for ' + organizer_id )
+        except Exception, e:
+            print log( 'Eventbrite Error:%s for %u'%(e, organizer_id ) )
+            logger.debug( 'Eventbrite Error:%s for %u'%(e, organizer_id ) )
             return []
 
         # Check if you get an error from Eventbrite
@@ -151,6 +151,6 @@ class EventBrite(object):
         return event_ids
     
 if __name__ == '__main__':
-    api = EventBrite(  EVENTBRITE['APP_KEY'], 131405059418924847729 )
-    api.get_latest_events( 953789113 )
+    api = EventBrite(  EVENTBRITE['APP_KEY'], 132551334525168952013 )
+    api.get_latest_events( 1171027209 )
     

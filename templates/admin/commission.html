@@ -1,0 +1,12 @@
+{% extends "admin/admin.html" %}
+
+{% block body_block %}
+	<table id = 'terms'>
+ 	{% for payment in payments %}
+        <tr>
+            <td>{{payment.invoice}}</td>
+            <td>{{payment.pay}}</td>
+        </tr>
+    {% endfor %}
+    </table>
+{% endblock %}

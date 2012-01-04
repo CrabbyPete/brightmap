@@ -40,5 +40,6 @@ urlpatterns = patterns('base.views',
     url(r'^connection/$',       login_required(ConnectionView.as_view()),   name='connection'   ),
     url(r'^term/$',             login_required(TermView.as_view()),         name='term'         ),
     url(r'^profile/$',          login_required(ProfileView.as_view()),      name='profile'      ),
-    url(r'^invoice/$',          login_required(InvoiceView.as_view()),      name='invoice'      )
+    url(r'^invoice/$',          login_required(InvoiceView.as_view()),      name='invoice'      ),
+ #   url(r'^commission/$',       login_required(CommissionView.as_view()),   name='commission'   )
 )

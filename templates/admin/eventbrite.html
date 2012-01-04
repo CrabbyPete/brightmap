@@ -3,7 +3,7 @@
 
 {% block body_block %} 	
  	{% if form %}
-	<form action="{% url deal %}" method="post" >
+	<form action="{% url eventbrite %}" method="post" >
        {% csrf_token %}
        	<fieldset>
  			{{form}}

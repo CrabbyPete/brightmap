@@ -34,6 +34,27 @@ def days_of_month (month = None):
     return first_day, last_day
 
 
+def pay_commissions( invoice ):
+    
+    chapters = {}
+    for connection in invoice.connections():
+        chapter = connection.term.deal.chapter
+        if chapter.pk in chapters:
+            chapters[chapter.pk] += connection.term.cost
+        else:
+            chapters[chapter.pk] = connection.term.cost
+    
+    for chapter in chapters.keys():
+        try:
+            commission = Commission.objects.get( invoice = invoice, chapter = chapter )
+        except Commission.DoesNotExist:
+            commission = Commission(invoice = invoice, chapter = chapter)
+
+        commission.cost = chapters[chapter]
+        commission.save()
+
+        
+            
 def invoice_user( user, first_day = None, last_day = None ):
     
     if not first_day:

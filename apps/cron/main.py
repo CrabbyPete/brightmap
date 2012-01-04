@@ -321,8 +321,8 @@ def make_contact( survey, deal, template ):
         if SEND_EMAIL:
             try:
                 msg.send( fail_silently = False )
-            except:
-                err = "Email Send Error For:"+log_mess
+            except Exception, e:
+                err = "Email Send Error %s for: %s" % ( e, log_mess )
                 print log(err, 'red')
                 #logger.error(log(err))
         else:

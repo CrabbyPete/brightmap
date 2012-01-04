@@ -202,10 +202,7 @@ class  SignUpView( FormView ):
 DEAL_TYPES = [c[0] for c in DEAL_CHOICES]
 
 class ApplyView( FormView ):
-    """
-    Apply to buy a deal
-    
-    """
+    """ Apply to buy a deal """
     template_name = 'leadb/lb_apply.html'
     form_class    = ApplyForm
     
