@@ -11,6 +11,7 @@
             <td>{{invoice.issued|date:"d M Y" }}</td>
             <td>{{invoice.cost}}</td>
             <td>{{invoice.status}}</td>
+            <td>{{invoice.commissions|length}}
             {% if invoice.authorized %}
             <td>Billable</td>
             {% endif %}

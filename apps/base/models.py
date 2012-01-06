@@ -69,15 +69,18 @@ class Invoice( models.Model ):
     def connections(self):
         return Connection.objects.for_buyer(self.user,[self.first_day, self.last_day])
     
+    def commissions(self):
+        return self.commission_set.all()
+    
     def bill(self):
         return self.issued.strftime('%B %Y')
         
     def __unicode__(self):
         return self.user.email +'-'+self.title
 
-"""
+
 class Commission( models.Model ):
-    invoice     = models.ForeignKey( Invoice )
+    invoice     = models.ForeignKey( 'Invoice' )
     chapter     = models.ForeignKey( 'Chapter' )   
     cost        = models.DecimalField( max_digits = 10, decimal_places = 2, default = 0.00 )
     issued      = models.DateTimeField( auto_now_add = True )    
@@ -85,7 +88,7 @@ class Commission( models.Model ):
 
     def __unicode__(self):
         return self.chapter.name +':'+self.invoice
-"""
+
 
 class Organization( models.Model ):
     """

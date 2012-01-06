@@ -161,9 +161,14 @@ class  SignUpView( FormView ):
                 auth.login(self.request, user)
 
         else:
+            user.first_name = form.cleaned_data['first_name'].capitalize()
+            user.last_name  = form.cleaned_data['last_name'].capitalize()
+            user.email      = email
+            
             if password != self.default_password:
                 user.set_password(password)
-                user.save()
+            
+            user.save()
             
         # Update profile details
         profile.is_leadbuyer = True

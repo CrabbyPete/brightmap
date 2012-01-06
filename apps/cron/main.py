@@ -204,6 +204,31 @@ def days_of_month (month = None):
     return (first_day, last_day)
 
 
+def send_mail( subject, body, to_list, from_list, bcc ):
+    
+    msg = EmailMultiAlternatives( subject    = subject,
+                                  body       = body,
+                                  from_email = from_list,
+                                  to         = to_list,
+                                  bcc        = bcc
+                                )
+    
+    if SEND_EMAIL:
+        if PROMPT:
+            ans = raw_input('Send? (y/n)')
+            if ans != 'y':
+                return
+
+            try:
+                msg.send( fail_silently = False )
+            except Exception, e:
+                err = "Email Send Error %s" % ( e, )
+                print log(err, 'red')
+                #logger.error(log(err))
+                
+    
+
+
 def check_budget( term ):
     """
     Check if the LeadBuy has gone over budget
@@ -219,6 +244,7 @@ def check_budget( term ):
         return False
   
     return True
+ 
  
 def make_contact( survey, deal, template ):
     """
@@ -334,7 +360,12 @@ def make_contact( survey, deal, template ):
             from_email  = [ 'test@brightmap.com' ]
             message = 'TESTING '+ message 
 
-            
+            # If the prompt was set ask before sending
+            if PROMPT:
+                ans = raw_input('Send? (y/n)')
+                if ans != 'y':
+                    continue
+                
             msg = EmailMultiAlternatives( subject    = subject,
                                           body       = message,
                                           from_email = from_email,

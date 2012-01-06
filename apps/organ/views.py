@@ -108,9 +108,13 @@ class SignUpView( FormView ):
             profile.save()
         
         else:
+            user.first_name = form.cleaned_data['first_name'].capitalize()
+            user.last_name  = form.cleaned_data['last_name'].capitalize()
+
             if password != self.password:
                 user.set_password(password)
-                user.save()
+            
+            user.save()
             
         profile.is_agreed    = True
         profile.save()
@@ -160,9 +164,9 @@ class SignUpView( FormView ):
                     chapters = Chapter.objects.for_user(user)
                     chapter = chapters[0]
                     
-                    chapter.name = name
-                    chapter.paypal = pay_pal
-                    chapter.save()
+        chapter.name = name
+        chapter.paypal = pay_pal
+        chapter.save()
                     
         # Login the new user
         user = auth.authenticate(username=user.username, password=password)

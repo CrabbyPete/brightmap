@@ -2,10 +2,12 @@
 
 {% block body_block %}
 	<table id = 'terms'>
- 	{% for payment in payments %}
+ 	{% for commission in commissions %}
         <tr>
-            <td>{{payment.invoice}}</td>
-            <td>{{payment.pay}}</td>
+            <td>{{commission.invoice}}</td>
+            <td>{{commission.cost}}</td>
+            <td>{{commission.chapter}}</td>
+            <td>{{commission.status}}</td>
         </tr>
     {% endfor %}
     </table>

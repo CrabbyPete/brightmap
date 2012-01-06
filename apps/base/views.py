@@ -5,7 +5,7 @@ logger = logging.getLogger(__name__)
 # Django imports
 from django.contrib                 import  auth
 from django.contrib.auth.models     import  User
-from django.http                    import  HttpResponseRedirect
+from django.http                    import  HttpResponseRedirect, HttpResponse
 from django.forms.util              import  ErrorList
 from django.shortcuts               import  render_to_response
 from django.template                import  RequestContext
@@ -19,9 +19,9 @@ from django.core.mail               import  EmailMultiAlternatives
 
 # Local imports
 from passw                          import generate
-from models                         import ( Event, Chapter,  Profile,  LeadBuyer, 
-                                             Deal,  Survey,   Invoice,  Connection,
-                                             Term,  Interest, Eventbrite  
+from models                         import ( Event, Chapter,  Profile,   LeadBuyer, 
+                                             Deal,  Survey,   Invoice,   Connection,
+                                             Term,  Interest, Eventbrite,Commission  
                                            )
                                         
 
@@ -43,7 +43,7 @@ from authorize.gen_xml              import VALIDATION_TEST, AUTH_ONLY
 from authorize.responses            import AuthorizeError, _cim_response_codes
 
 # Import accounting functions
-from cron.accounting                import invoice_user, bill_user, notify_user
+from cron.accounting                import invoice_user, bill_user, notify_user, pay_commissions
 
 
 def homepage( request ):
@@ -536,28 +536,27 @@ class InvoiceView ( FormView):
         invoice = Invoice.objects.get( pk = self.request.GET['invoice'] )
         if invoice.status == 'pending':
             invoice = bill_user ( invoice )
+            pay_commissions( invoice )
             if invoice.status == 'paid':
                 notify_user( invoice )
         invoice.save()
         return HttpResponseRedirect(reverse('invoice'))
-"""
+
 class CommissionView ( FormView ):
     template_name   = 'admin/commission.html'
 
     def get(self, request, *argv, **kwargs ):
         if 'chapter' in request.GET:
             chapter = Chapter.objects.get(pk = request.GET['chapter'])
-
-        payments = []
-        for invoice in Invoice.objects.filter(status = 'paid'):
-            pay = 0.0
-            for connection in invoice.connections():
-                if connection.term.deal.chapter == chapter:
-                    pay += float(connection.term.cost)
-                
-            pay = "%.2f" % ( float(pay) *.45 )
-            payments.append({'invoice':invoice, 'pay':pay})
+            commissions = Commission.objects.filter( chapter = chapter )
+        else:
+            commissions = Commission.objects.all()
         
-        return self.render_to_response( {'payments':payments} )
-"""                   
+        return self.render_to_response( {'commissions':commissions} )          
+
+from paypal import Pay
+def pay( request ):
+    payment = Pay( 'pete.douma@gmail.com', 1.00 )
+    #return HttpResponse() 
+    return HttpResponseRedirect('/')      
             

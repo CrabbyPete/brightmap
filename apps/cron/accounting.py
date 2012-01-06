@@ -11,7 +11,7 @@ from django.template                import loader, Context
 from django.core.mail               import EmailMultiAlternatives
 
 # Import local library
-from base.models                    import Profile, Connection, Invoice, Authorize
+from base.models                    import Profile, Connection, Invoice, Authorize, Commission, Chapter
 from settings                       import AUTHORIZE, SEND_EMAIL
 
 # Import for authorize
@@ -44,13 +44,17 @@ def pay_commissions( invoice ):
         else:
             chapters[chapter.pk] = connection.term.cost
     
-    for chapter in chapters.keys():
+    for chapter_pk in chapters.keys():
+        
+        if chapters[chapter_pk] <= 0:
+            continue
+        
+        chapter = Chapter.objects.get( pk = chapter_pk )
         try:
             commission = Commission.objects.get( invoice = invoice, chapter = chapter )
         except Commission.DoesNotExist:
             commission = Commission(invoice = invoice, chapter = chapter)
-
-        commission.cost = chapters[chapter]
+        commission.cost = "%.2f"%( float( chapters[chapter_pk] ) * 0.45, ) 
         commission.save()
 
         

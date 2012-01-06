@@ -14,7 +14,8 @@ from views                      import ( ChapterView,
                                          TermView,
                                          ProfileView,
                                          InvoiceView,
-                                         InterestView
+                                         InterestView,
+                                         CommissionView
                                        )
 
 
@@ -24,11 +25,12 @@ urlpatterns = patterns('base.views',
     url(r'^$',                  'homepage',                                 name='homepage'     ),
     url(r'^learn/$',            'learn',                                    name='learn'        ),
     url(r'^login/$',            'login',                                    name='login'        ),
-    url(r'^forgot/$',           'forgot',                                   name='forgot'        ),
+    url(r'^forgot/$',           'forgot',                                   name='forgot'       ),
     url(r'^logout/$',           'logout',                                   name='logout'       ),
     url(r'^community/$',        'community',                                name='community'    ),
     url(r'^about/$',            'about',                                    name='about'        ),
     url(r'^terms/$',            'terms',                                    name='terms'        ),
+    url(r'^pay/$',              'pay',                                      name='pay'          ),
     url(r'^faq/$',              direct_to_template,  {'template': 'best-practices.html' }       ),
     url(r'^interest/$',         login_required(InterestView.as_view()),     name='interest'     ),
     url(r'^chapter/$',          login_required(ChapterView.as_view()),      name='chapter'      ),
@@ -41,5 +43,5 @@ urlpatterns = patterns('base.views',
     url(r'^term/$',             login_required(TermView.as_view()),         name='term'         ),
     url(r'^profile/$',          login_required(ProfileView.as_view()),      name='profile'      ),
     url(r'^invoice/$',          login_required(InvoiceView.as_view()),      name='invoice'      ),
- #   url(r'^commission/$',       login_required(CommissionView.as_view()),   name='commission'   )
+    url(r'^commission/$',       login_required(CommissionView.as_view()),   name='commission'   )
 )
