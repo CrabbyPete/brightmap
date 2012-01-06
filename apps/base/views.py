@@ -394,7 +394,7 @@ class TermView( FormView ):
             return self.render_to_response( {'terms':terms} )
     
         if 'pending' in request.GET:
-            terms = Term.objects.get( status = 'pending').order_by('modified')
+            terms = Term.objects.filter( status = 'pending').order_by('modified')
             return self.render_to_response( {'terms':terms} )
             
         if 'term' in request.GET:
