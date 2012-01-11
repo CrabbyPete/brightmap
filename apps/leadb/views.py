@@ -31,6 +31,7 @@ from base.models                    import ( LeadBuyer, Chapter, Expire, Cancel,
                                              Deal, Term, Interest, Profile, Invoice, TERM_STATUS, Expire
                                             )
 from base.forms                     import LoginForm
+from base.mail                      import Mail 
 
 #from social.models                  import LinkedInProfile
 from multipleforms                  import MultipleFormsView
@@ -200,7 +201,7 @@ class  SignUpView( FormView ):
         if profile.is_ready:
             return HttpResponseRedirect ( reverse('lb_dash')+"?state=profile" )
         else:
-            return HttpResponseRedirect ( reverse('lb_payment') )
+            return HttpResponseRedirect ( reverse('lb_apply') )
 
 
 # Initialize the TYPE List form form.DEAL_CHOICES
@@ -302,8 +303,13 @@ class ApplyView( FormView ):
                             )
             cancel.save()
             mail_organizer( self.request.user, deal, cancel, deal_type )
-
-        return HttpResponseRedirect(reverse('lb_dash')+"?state=apply")
+        
+        # If you already have payment details go to dashboard
+        profile = self.request.user.get_profile()
+        if profile.is_ready:
+            return HttpResponseRedirect ( reverse('lb_dash')+"?state=apply" )
+        else:
+            return HttpResponseRedirect ( reverse('lb_payment') )
 
 class DashView( TemplateView ):
     """

@@ -2,21 +2,20 @@ import django_header
 
 
 # Python libraries
-from datetime                       import datetime, timedelta
-from termcolor                      import colored
+from datetime                       import  datetime, timedelta
+from termcolor                      import  colored
 
 # Django libraries
-from django.contrib.auth.models     import User
-
-from django.template                import loader, Context
-from django.core.mail               import EmailMultiAlternatives
+from django.contrib.auth.models     import  User
+from django.core.urlresolvers       import  reverse
 
 # Local libraries
-from eventapi                       import EventBrite
-from base.models                    import ( Event, Profile, Survey, Interest, Deal, 
+from eventapi                       import  EventBrite
+from base.models                    import ( Event, Profile, Survey, Interest, Deal, Expire,
                                              Organization, Connection, LeadBuyer, Invoice    )
 
-from base.passw                     import gen
+from base.mail                      import  Mail 
+from base.passw                     import  gen
 
 
 import logging
@@ -110,7 +109,10 @@ def database_attendees( event, api ):
             profile = Profile( user = user )
         
         except KeyError:
-            print log("No email address for:%s %s"%(attendee['first_name'],attendee['last_name']))
+            if 'email' in attendee:
+                print log("No email address for:%s %s"%(attendee['email'],))
+            else:
+                print log("No Attendee information recieved",'red')
             continue
         
         else:
@@ -204,30 +206,6 @@ def days_of_month (month = None):
     return (first_day, last_day)
 
 
-def send_mail( subject, body, to_list, from_list, bcc ):
-    
-    msg = EmailMultiAlternatives( subject    = subject,
-                                  body       = body,
-                                  from_email = from_list,
-                                  to         = to_list,
-                                  bcc        = bcc
-                                )
-    
-    if SEND_EMAIL:
-        if PROMPT:
-            ans = raw_input('Send? (y/n)')
-            if ans != 'y':
-                return
-
-            try:
-                msg.send( fail_silently = False )
-            except Exception, e:
-                err = "Email Send Error %s" % ( e, )
-                print log(err, 'red')
-                #logger.error(log(err))
-                
-    
-
 
 def check_budget( term ):
     """
@@ -244,9 +222,26 @@ def check_budget( term ):
         return False
   
     return True
+
+
+def warn_user( term ):
+    child = term.get_child()
+    if isinstance(child, Expire):
+        buyer     = term.buyer
+        organizer = term.deal.chapter.organizer
  
+        mail = Mail( [organizer.email],
+                     [buyer.email], 
+                     'Trial Deal Expiration',
+                     'expire_notice.tmpl',
+                     buyer = buyer,
+                     term  = term,
+                     url   = reverse('lb_dash')
+                    )
+        mail.send()
+        return
  
-def make_contact( survey, deal, template ):
+def make_contact( survey, deal, letter ):
     """
     Send an email to those attendees who answered the survey and have a
     corresponding lead buyer for an interest
@@ -254,11 +249,18 @@ def make_contact( survey, deal, template ):
     if deal == None:
         return
 
-    for term in deal.terms():
-        # Determine whether to execute this deal
-        if term == None or not term.execute( event = survey.event ):
+    # Go through all the active deals
+    for term in deal.active():
+        
+        # During test sometimes None would be set to a term, make sure term exists
+        if term == None:
             continue
-
+        
+        # If you had a good deal that went bad .eg trail expires notify user
+        if not term.execute( event = survey.event ):
+            warn_user( term )
+            continue
+             
         # Don't spam, limit the number of emails per event
         if survey.mails_for() > MAX_MAIL_SEND:
             continue
@@ -292,88 +294,44 @@ def make_contact( survey, deal, template ):
         # Check if the leadbuyer is the organizer and if they have a letter
         if sponser == organizer:
             letter = 'self_referral.tmpl'
-            
-            template = loader.get_template('letters/' + letter )
-                
-        # Set up the context
-        c = Context({'interest'    :interest,
-                     'attendee'    :attendee,
-                     'sponser'     :sponser,
-                     'organizer'   :organizer,
-                     'chapter'     :chapter,
-                     'event'       :event,
-                     'company'     :company
-                     })
 
+  
         # Render the message and log it
-        message = template.render(c)
         print_connection( attendee, sponser, interest )
-
         subject = deal.chapter.organization.name + ' Intro: '+ interest.interest
-        
-        # If this is live send the message
-        if SEND_EMAIL:
-            recipients = [ '%s %s <%s>'% ( attendee.first_name, attendee.last_name, attendee.email ),
-                          '%s %s <%s>'% ( sponser.first_name, sponser.last_name, sponser.email )
-                         ]
+        recipients = [ '%s %s <%s>'% ( attendee.first_name, attendee.last_name, attendee.email ),
+                       '%s %s <%s>'% ( sponser.first_name, sponser.last_name, sponser.email )
+                     ]
 
-            bcc = [ 'bcc@brightmap.com',
-                    event.chapter.organizer.email
-                  ]
+        senders =    ['%s %s <%s>' % ( organizer.first_name, organizer.last_name, organizer.email )]     
+        mail  = Mail( senders, recipients, subject, letter, bcc = senders,
+                      interest   = interest,
+                      attendee   = attendee,
+                      sponser    = sponser,
+                      organizer  = organizer,
+                      chapter    = chapter,
+                      event      = event,
+                      company    = company
+                    ) 
+                    
 
-            
-            msg = EmailMultiAlternatives( subject    = subject,
-                                          body       = message,
-                                          from_email = '%s %s <%s>' % ( organizer.first_name,
-                                                                        organizer.last_name,
-                                                                        organizer.email       ),
-                                         to         = recipients,
-                                         bcc        = bcc
-                                     )
+        # If the prompt was set ask before sending
+        if PROMPT:
+            ans = raw_input('Send? (y/n)')
+            if ans != 'y':
+                continue
 
-            # If the prompt was set ask before sending
-            if PROMPT:
-                ans = raw_input('Send? (y/n)')
-                if ans != 'y':
-                    continue
+        # Try and send the message
+        log_mess = "%s,%s,%s,%s"%( attendee.email,
+                                   sponser.email,
+                                   chapter,
+                                   interest
+                                  )
 
-            # Try and send the message
-            log_mess = "%s,%s,%s,%s"%( attendee.email,
-                                       sponser.email,
-                                       chapter,
-                                       interest
-                                     )
-
-            logger.info(log(log_mess))
-
-            try:
-                msg.send( fail_silently = False )
-            except Exception, e:
-                err = "Email Send Error %s for: %s" % ( e, log_mess )
-                print log(err, 'red')
-                #logger.error(log(err))
+        logger.info(log(log_mess))
+        mail.send()
                 
-        # To test emails
-        elif TEST_EMAIL:
-            recipients  = [ 'test@brightmap.com' ]
-            bcc         = [ 'pete@brightmap.com' ]
-            from_email  = [ 'test@brightmap.com' ]
-            message = 'TESTING '+ message 
 
-            # If the prompt was set ask before sending
-            if PROMPT:
-                ans = raw_input('Send? (y/n)')
-                if ans != 'y':
-                    continue
-                
-            msg = EmailMultiAlternatives( subject    = subject,
-                                          body       = message,
-                                          from_email = from_email,
-                                          to         = recipients,
-                                          bcc        = bcc
-                                        )
-
-            msg.send( fail_silently = False )
 
 def print_event(event):
     """
@@ -420,10 +378,8 @@ def main():
         
                 #Get the email template for this organization
                 letter = chapter.letter
-                if letter:
-                    template = loader.get_template('letters/'+letter.name)
-                else:
-                    template = loader.get_template( 'letters/default.tmpl' )
+                if not letter:
+                    letter = 'default.tmpl'
 
                 # Get the attendess of each event
                 for event in database_events( ticket, api ):
@@ -456,7 +412,7 @@ def main():
                                     continue
 
                             # Connect attendees and mail contacts
-                            make_contact( survey, deal, template )
+                            make_contact( survey, deal, letter )
                             
                     leads = event.surveys(True)
                     if len( leads ) == 0:

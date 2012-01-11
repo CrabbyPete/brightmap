@@ -20,7 +20,8 @@ from models                                 import ( Profile,
                                                      Connection,
                                                      Cancel, 
                                                      Expire,
-                                                     Invoice
+                                                     Invoice,
+                                                     Commission
                                                    )
 
 class LoginForm(forms.Form):
@@ -213,3 +214,7 @@ class InvoiceForm(ModelForm):
     class Meta:
         model = Invoice
         exclude = ('user',)
+        
+class CommissionForm(ModelForm):
+    class Meta:
+        model = Commission

@@ -18,6 +18,7 @@ from django.core.mail               import  EmailMultiAlternatives
 
 
 # Local imports
+import settings
 from passw                          import generate
 from models                         import ( Event, Chapter,  Profile,   LeadBuyer, 
                                              Deal,  Survey,   Invoice,   Connection,
@@ -31,7 +32,7 @@ from forms                          import ( LoginForm,       DealForm,
                                              SurveyForm,      ConnectionForm, 
                                              UserProfileForm, UserForm,       
                                              TermForm,        InvoiceForm,
-                                             InterestForm
+                                             InterestForm,    CommissionForm
                                            )
 
 
@@ -44,7 +45,7 @@ from authorize.responses            import AuthorizeError, _cim_response_codes
 
 # Import accounting functions
 from cron.accounting                import invoice_user, bill_user, notify_user, pay_commissions
-
+from paypal                         import pay_commission
 
 def homepage( request ):
     # Homepage
@@ -544,19 +545,65 @@ class InvoiceView ( FormView):
 
 class CommissionView ( FormView ):
     template_name   = 'admin/commission.html'
+    form_class      = CommissionForm
 
     def get(self, request, *argv, **kwargs ):
+        if 'commission' in request.GET:
+            commission = Commission.objects.get(pk = request.GET['commission'])
+            form = CommissionForm( instance = commission )
+            return self.render_to_response({'form':form})
+        
         if 'chapter' in request.GET:
             chapter = Chapter.objects.get(pk = request.GET['chapter'])
             commissions = Commission.objects.filter( chapter = chapter )
         else:
             commissions = Commission.objects.all()
         
-        return self.render_to_response( {'commissions':commissions} )          
-
-from paypal import Pay
-def pay( request ):
-    payment = Pay( 'pete.douma@gmail.com', 1.00 )
-    #return HttpResponse() 
-    return HttpResponseRedirect('/')      
+        return self.render_to_response( {'commissions':commissions} )
+    
+    def form_valid(self, form ): 
+        cost    = form.cleaned_data['cost']
+        chapter = form.cleaned_data['chapter']
+        commission = Commission.objects.get( pk = self.request.GET['commission'] )
+        paypal = chapter.organizer.paypal
+        if paypal:
+            # pay = pay_commission( paypal, cost )
+            commission.status = 'paid'
+            commission.save()
+        return HttpResponseRedirect(reverse('commission'))
             
+            
+def remind( request ):
+    if 'term' in request.GET:
+        term = Term.objects.get( pk = request.GET['term'])
+        
+        # Render the letter
+        organizer = term.deal.chapter.organizer
+        url = 'http://brightmap.com/'+reverse('or_dash')
+        c = Context({'term':term, 'url':url})
+        template = loader.get_template('letters/reminder.tmpl')
+        message = template.render(c)
+
+        subject = "BrightMap Deal Request Reminder"
+        recipients = [ organizer.email ]
+
+        msg = EmailMultiAlternatives( subject,
+                                      message,
+                                      'requests@brightmap.com',
+                                      recipients,
+                                      ['bcc@brightmap.com']
+                                    )
+        if settings.SEND_EMAIL:
+            try:
+                msg.send( fail_silently = False )
+            except:
+                err = "Email Send Error For: " + organizer.email
+                logger.error(err)
+    
+    return HttpResponseRedirect('/')
+        
+        
+        
+        
+        
+        

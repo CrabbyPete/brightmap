@@ -22,6 +22,9 @@
             
             <td>{{term.status}}</td>
             <td>{{term.modified}}</td>
+            {% if term.status == 'pending' %}
+            	<td><a href={% url remind %}?term={{term.pk}}>Send Reminder</a></td>
+            {% endif %}
         </tr>
     {% endfor %}
     </table>

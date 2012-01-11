@@ -294,6 +294,10 @@ class Deal(models.Model):
         # Return all the Terms for this Deal
         return self.term_set.all()
 
+    def active(self):
+        return Term.objects.filter(deal = self, status = 'approved')
+    
+    
     def exclusive ( self ):
         # Return the excluve for this deal, None if none
         # Make sure exclusive don't allow other terms
@@ -326,7 +330,6 @@ class Term( models.Model ):
         approved  - this deal approved by the organizer
         rejected  - this deal rejected
         canceled  - this deal canceled
-        sponsored - free, but only one
     """
     def get_child(self):
         for related in self._meta.get_all_related_objects():
@@ -388,6 +391,9 @@ class Expire( Term ):
 
         if self.date >= date.today():
             return True
+        else:
+            self.canceled()
+            return False
         
         self.canceled()
         return False
@@ -577,9 +583,7 @@ class Event(models.Model):
     def connections(self):
         #return self.connection_set.all()
         conns = []
-        for survey in self.survey_set.all():
-            if not survey.interest:
-                continue
+        for survey in self.surveys(lead = True):
             for c in Connection.objects.filter(survey = survey):
                 conns.append(c)
         return conns
