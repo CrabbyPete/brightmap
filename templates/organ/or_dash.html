@@ -27,8 +27,9 @@
 			<li><a href="{% url or_setup %}?no_header=true" class="leadsource">Add/Update Lead Source</a></li>
 			<!--
 			<li><a href="{% url or_category %}" class="leadcategoris">Add/Update Service Categories</a></li>  
-			<li><a href="#" class="eventhistory">My Event History</a></li>
-			 -->
+			-->
+			<li><a href="{% url or_events %}" class="eventhistory">My Event History</a></li>
+			
 		</ul>
 		</nav>
 
@@ -59,7 +60,7 @@
 		<section class="leadbuyerrept">
 
 		<table class="ins">
-			<caption class="latestrecived">Active Service Providers - {{today|date:"E Y"}}</caption>
+			<caption class="latestrecived">Active Service Providers</caption>
 
 			<tr>
 				<td style="background-color: #F5F6F6;">
@@ -70,10 +71,10 @@
 							<th class="interest ">TERMS</th>
 							<th class="interest">Rate</th>
 							<th class="interest">Leads<br/>
-							<span>(this month)</span>
+							<span>({{today|date:"E Y"}})</span>
 							</th>
 							<th class="interest">Commission<br />
-							<span>(this month)</span>
+							<span>({{today|date:"E Y"}})</span>
 							</th>
 
 							<th class="interest">ACTION</th>
@@ -98,11 +99,9 @@
 							</td>
 						</tr>
 						{% endfor %}
-	
 					</table>
 				</td>
 			</tr>
-
 		</table>
 
 		</section>

@@ -4,7 +4,7 @@
 {% block body_block %}
 	{% if deals %}
 		{% for deal in deals %}
-    		<a href='{% url deal %}?deal={{deal.pk}}'>{{ deal }}</a><br/>
+    		<a href='{% url deal %}?deal={{deal.pk}}'>{{ deal }} {{deal.active|length}}</a><br/>
  		{% endfor %}
  		</br>
  		<a href='{% url deal %}?deal=new'}>Create New Deal</a>

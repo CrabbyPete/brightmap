@@ -1,5 +1,5 @@
 # Python imports
-from datetime                       import date
+from datetime                       import date, datetime
 import  logging
 logger = logging.getLogger('organizer')
 
@@ -15,6 +15,7 @@ from django.template                import  RequestContext
 from django.contrib.auth.decorators import  login_required
 
 #Local imports
+from base.mail                      import Mail
 from base.models                    import ( Profile,       Organization,   Chapter, 
                                              Interest,      Deal,           Event,
                                              Eventbrite,    Term,           TERM_STATUS
@@ -294,9 +295,53 @@ def status( request ):
             if status in TERM_STATUS:
                 term.status = request.GET['status']
                 term.save()
+            
+                mail = Mail([term.buyer.email],
+                            [term.deal.chapter.organizer.email],
+                            'BrightMap Deal',
+                            'deal_status.tmpl',
+                            term = term,
+                            url  = reverse('lb_dash')
+                           )
+                mail.send()
+                
     return HttpResponseRedirect(reverse('or_dash'))
 
+
+def events( request ):
+    chapter = Chapter.objects.get(organizer = request.user )
+    events  = Event.objects.filter( chapter = chapter).order_by('date').reverse()
     
+    event_list = []
+    total = 0.0
+    for i, event in enumerate(events):
+        if i > 12:
+            break
+        title      = event.describe[:60]
+        date       = event.date.strftime('%b %d, %Y')
+        attendees  = event.attendees()
+        surveys    = event.surveys(lead = True)
+        connections= event.connections()
+        commission = 0
+        for c in connections:
+            commission += c.term.cost
+        
+        commission = "%.2f" % ( float(commission) *.45 )   
+        event_list.append( dict ( title       = title,
+                                  date        = date, 
+                                  attendees   = len(attendees), 
+                                  surveys     = len(surveys),
+                                  connections = len(connections),
+                                  commission  = commission
+                                )
+                          )
+        
+    return render_to_response( 'organ/or_events.html', 
+                               {'chapter':chapter,'events':event_list }, 
+                               context_instance=RequestContext(request) 
+                             )
+
+   
 def cancel(request):
     # Cancel Terms of a Deal
     if request.method == 'GET' and 'term' in request.GET:
