@@ -3,6 +3,7 @@ from difflib                                import SequenceMatcher
 from datetime                               import datetime, date, time, timedelta
 
 from django.db                              import models
+from django.db.models                       import Q
 from django.contrib.auth.models             import User
 from django.contrib.localflavor.us.models   import PhoneNumberField
 
@@ -133,6 +134,24 @@ class Chapter( models.Model ):
             return self.deal_set.get( interest = interest )
         except:
             return None
+
+    def configured(self):
+        ticket = self.eventbrite_set.get()
+        if ticket.user_key and ticket.organizer_id:
+            return True
+        return False
+    
+    
+    def sponsors(self):
+        sponsors = []
+        deals = Deal.objects.filter ( chapter = self )
+        for deal in deals:
+            terms = Term.objects.filter( deal = deal, 
+                                         exclusive = True, 
+                                         cost = 0, 
+                                         status = 'approved' )
+            sponsors.extend(terms)
+        return sponsors
 
     def events( self ):
         # Get all the events for this chapter

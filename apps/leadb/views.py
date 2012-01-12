@@ -41,34 +41,24 @@ from forms                          import ( DEAL_CHOICES, BuyerForm, ApplyForm,
 
 def mail_organizer( user, deal, term, deal_type ):
     # Render the letter
-    organizer = deal.chapter.organizer
-    
-    c = Context({'user' : user,
-                 'deal' : deal,
-                 'term' : term,
-                 'type' : deal_type
-                })
-    
-    template = loader.get_template('letters/request.tmpl')
-    message = template.render(c)
-
-    subject = "New BrightMap Service Provider Request: %s"%(deal.interest)
+    organizer  = deal.chapter.organizer
+    subject    = "New BrightMap Service Provider Request: %s"%(deal.interest)
+    senders    = ['requests@brightmap.com']
     recipients = [ organizer.email, term.buyer.email ]
+    
+    mail = Mail( senders, 
+                 recipients, 
+                 subject, 
+                 template_name = 'request.tmpl', 
+                 user =  user,
+                 deal = deal,
+                 term = term,
+                 type = deal_type
+               )
+    mail.send()
+    return 
 
-    msg = EmailMultiAlternatives( subject,
-                                  message,
-                                  'requests@brightmap.com',
-                                  recipients,
-                                  ['requests@brightmap.com']
-                                )
-    if settings.SEND_EMAIL:
-        try:
-            msg.send( fail_silently = False )
-        except:
-            err = "Email Send Error For: " + organizer.email
-            logger.error(err)
-
-
+ 
 class  SignUpView( FormView ):
     initial          = {}
     template_name    = 'leadb/signup.html'
@@ -268,7 +258,7 @@ class ApplyView( FormView ):
         
         elif deal_type == 'Trial':
             expires = Expire.objects.filter( buyer = self.request.user )
-            if len ( expires ) > 0:
+            if len ( expires ) >= settings.MAX_TRIALS:
                 form._errors['deal_type'] = ErrorList(["Sorry. You already have an active trail"])
                 return self.form_invalid(form)
 
@@ -294,7 +284,14 @@ class ApplyView( FormView ):
             elif deal_type == 'Sponsored':
                 cost = 0
                 exclusive = True
+                
+                if len( deal.chapter.sponsors() ) >= settings.MAX_SPONSORS:
+                    form._errors['deal_type'] = \
+                        ErrorList(["Sorry. %s already has the maximum number of sponsors"% (deal.chapter.name,) ])
+                    return self.form_invalid(form)
 
+            
+            
             cancel = Cancel( deal = deal,
                              cost = cost,
                              exclusive = exclusive,

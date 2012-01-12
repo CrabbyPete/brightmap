@@ -4,7 +4,9 @@
 {% block body_block %}
 	{% if chapters %}
 		{% for chapter in chapters %}
-    		<a href='{% url chapter %}?chapter={{chapter.pk}}'>{{ chapter.name }}</a><br/>
+    		<a href='{% url chapter %}?chapter={{chapter.pk}}'>{{ chapter.name }}</a>
+    		{{chapter.configured}}
+    		<br/>
  		{% endfor %}
  		</br>
  		<a href='{% url chapter %}?chapter=new'}>Create New Chapter</a>

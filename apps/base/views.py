@@ -300,8 +300,8 @@ class ChapterView( FormView ):
             if self.request.GET['chapter']:
                 chapter = Chapter.objects.get( pk = self.request.GET['chapter'] )
             
-                organization  = form.cleaned_data['organization']
-                organizer     = form.cleaned_data['organizer']
+                #organization  = form.cleaned_data['organization']
+                #organizer     = form.cleaned_data['organizer']
                 logo          = form.cleaned_data['logo']
                 letter        = form.cleaned_data['letter']
                 website       = form.cleaned_data['website']
@@ -368,9 +368,7 @@ class DealView( FormView ):
         elif 'leadbuyer' in request.GET:
             leadbuyer = LeadBuyer.objects.get(pk = request.GET['leadbuyer'])
             deals = leadbuyer.deals()
-            
- 
-            
+                  
         return self.render_to_response( {'deals':deals} )
             
     def form_valid(self, form ):
@@ -567,9 +565,9 @@ class CommissionView ( FormView ):
         commission = Commission.objects.get( pk = self.request.GET['commission'] )
         paypal = chapter.organizer.paypal
         if paypal:
-            # pay = pay_commission( paypal, cost )
-            commission.status = 'paid'
-            commission.save()
+            if  pay_commission( paypal, cost ):
+                commission.status = 'paid'
+                commission.save()
         return HttpResponseRedirect(reverse('commission'))
             
             

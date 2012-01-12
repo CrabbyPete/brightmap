@@ -121,14 +121,16 @@ class SignUpView( FormView ):
         profile.save()
   
         # See if the organization and chapter exist
-        """ Take this out for now. One organizer, chapter per user """
+        
+        """ Take this out for now. One organizer, chapter per user 
         name = form.cleaned_data['chapter']
+     
         try:
-            organization = Organization.objects.get( name = name )
+            organization = Organization.objects.get( name = name, organizer =  )
         except Organization.DoesNotExist:
             organization = Organization( name = name )
             organization.save()
-        
+        """
         # See if the chapter exists. If its blank its the same as the organization name
         name = form.cleaned_data['chapter']
         if name == '':
@@ -149,7 +151,10 @@ class SignUpView( FormView ):
                 
                 # If this is the first time here create a chapter
                 if not profile.is_organizer:
-            
+                    """ Temporarily one organizer per chapter """
+                    organization = Organization( name = name )
+                    organization.save()
+                    
                     chapter = Chapter( name = name, 
                                        organizer = user,
                                        organization = organization,
@@ -313,12 +318,12 @@ def events( request ):
     events  = Event.objects.filter( chapter = chapter).order_by('date').reverse()
     
     event_list = []
-    total = 0.0
+
     for i, event in enumerate(events):
         if i > 12:
             break
-        title      = event.describe[:60]
-        date       = event.date.strftime('%b %d, %Y')
+        title      = event.describe[:75]
+        date       = event.date.strftime('%d %b %Y')
         attendees  = event.attendees()
         surveys    = event.surveys(lead = True)
         connections= event.connections()
