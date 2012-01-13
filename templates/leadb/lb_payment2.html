@@ -14,6 +14,13 @@
 			the leads are sent. You will not be charged for free leads (e.g.
 			Sponsored leads or Trial leads).
 			</p>
+			{% if forms.payment.ready %}
+			<p class="paybudgetttxt2">
+			Your credit card is on file. Only edit the payment form if you are
+			changing or updating your credit card details
+			</p>
+			{% endif %}
+			
 
 			<form id="profile" name="" method="post" action="{% url lb_payment2 %}?payment" >
 				{% csrf_token %}

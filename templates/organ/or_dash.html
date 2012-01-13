@@ -114,8 +114,12 @@
 		<section class="leadbuyerrept">
 
 		<table class="ins">
-			<caption class="latestrecived">Pending Service Provider
-				Applications</caption>
+			<caption class="latestrecived">
+				Pending Service Provider Applications 
+				{% if pending %}
+				<span>Action Required</span>
+				{% endif %} 
+			</caption>
 
 			<tr>
 				<td style="background-color: #F5F6F6;">

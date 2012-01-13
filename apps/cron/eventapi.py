@@ -90,10 +90,9 @@ class EventBrite(object):
         # If so parse the survey answers and email attendee and sponser
         answers = attendee['answers']
         for answer in answers:
-            """ Do not add leadbuyer automatically
             if 'Check this box' in answer['answer']['question']:
                 leadbuyer = True
-            """
+    
             # Did they ask for help
             if 'Do you need help' in answer['answer']['question']:
                 return answer['answer']['answer_text'].split('|'), leadbuyer

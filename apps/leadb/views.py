@@ -518,16 +518,32 @@ class PaymentBudgetView( MultipleFormsView ):
 
 
     def payment_form( self ):    
+        user    = self.request.user
         profile = self.request.user.get_profile()
-        initial = {}
+        try:
+            Authorize.objects.get( user = user )
+            ready = True
+        except:
+            ready = False
+        
         if profile.address:
             if '^' in profile.address:
                 billing = profile.address.split('^')
-                initial = dict (  address = billing[0],
-                                  city    = billing[1],
-                                  state   = billing[2],
-                                  zipcode = billing[3]
-                                )
+            else:
+                billing = profile.address.split(',')
+                 
+            # Make sure there are no errant commas
+            for i,bill in enumerate(billing):
+                if ',' in bill:
+                    billing[i] = bill.replace(',','')
+            
+            initial = dict (  ready    = ready,
+                              address  = billing[0],
+                              city     = billing[1],
+                              state    = billing[2],
+                              zipcode  = billing[3]
+                            )
+    
         return PaymentForm(initial = initial)
 
 

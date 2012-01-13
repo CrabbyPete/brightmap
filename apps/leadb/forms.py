@@ -166,6 +166,10 @@ class PaymentForm(forms.Form):
     """
     Credit card form
     """
+    ready           = forms.BooleanField( initial = False,
+                                          widget = forms.CheckboxInput 
+                                        )
+    
     number          = CreditCardField()
     
     expire_month    = forms.ChoiceField( choices = MONTH_CHOICES,
@@ -215,4 +219,5 @@ class PaymentBudgetForm( PaymentForm, BudgetForm ):
     """
     Combination of PaymentForm and BudgetForm
     """
+    cc_ready        =  forms.BooleanField()
     

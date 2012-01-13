@@ -23,7 +23,7 @@ logger = logging.getLogger('main.py')
 
 
 # Environment variables
-from settings                       import EVENTBRITE, MAX_MAIL_SEND, SEND_EMAIL
+from settings                       import EVENTBRITE, MAX_MAIL_SEND
 
 PROMPT     = False
 TEST_EMAIL = False
@@ -76,6 +76,24 @@ def database_events( organizer, api ):
 
     # Return the events list
     return event_list
+
+def mail_buyer ( user, event ):
+    """ 
+    Send email to potential leadbuyer asking them to join 
+    """
+    sender   = ['request@brightmap.com']
+    receiver = [ user.email]
+    bcc      = None,
+    subject  = 'Brightmap Invitation'
+    url      = reverse('lb_signup')
+    
+    mail = Mail( sender, receiver,subject,'leadbuyer.tmpl',bcc, 
+                 user = user, 
+                 url = url,  
+                 chapter = event.chapter
+               )
+    mail.send()
+
 
 def database_attendees( event, api ):
     """
@@ -134,9 +152,8 @@ def database_attendees( event, api ):
 
         # If they checked they want leads they are a leadbuyer
         if leadbuyer:
-            profile.is_leadbuyer = True
-            profile.save()
-
+            mail_buyer( user, event )
+            
         # Add the attendee with or with out interests to the event
         if len(interests) == 0:
             query = Survey.objects.filter( event = event,
