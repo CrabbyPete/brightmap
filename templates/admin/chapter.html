@@ -5,8 +5,11 @@
 	{% if chapters %}
 		{% for chapter in chapters %}
     		<a href='{% url chapter %}?chapter={{chapter.pk}}'>{{ chapter.name }}</a>
-    		{{chapter.configured}}
-    		<br/>
+    		{{ chapter.configured }}
+    		{% if not chapter.configured %}
+    		<a href = '{% url remind %}?chapter={{chapter.pk}}'>Send Reminder</a>
+    		{% endif %}
+    		<br />
  		{% endfor %}
  		</br>
  		<a href='{% url chapter %}?chapter=new'}>Create New Chapter</a>

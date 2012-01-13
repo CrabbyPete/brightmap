@@ -181,9 +181,9 @@ class Eventbrite( models.Model ):
     Information needed to access Eventbrite API
     """
     chapter       = models.ForeignKey( Chapter )
-    user_key      = models.CharField(  default = None, null = True, max_length = 45 )
-    organizer_id  = models.CharField(  default = None, null = True, max_length = 45 )
-    bot_email     = models.EmailField( default = None, null = True, max_length = 255 )
+    user_key      = models.CharField(  blank = True, null = True, max_length = 45 )
+    organizer_id  = models.CharField(  blank = True, null = True, max_length = 45 )
+    bot_email     = models.EmailField( blank = True, null = True, max_length = 255 )
 
     def __unicode__(self):
         return self.chapter.name

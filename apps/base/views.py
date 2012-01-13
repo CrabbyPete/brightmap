@@ -46,6 +46,7 @@ from authorize.responses            import AuthorizeError, _cim_response_codes
 # Import accounting functions
 from cron.accounting                import invoice_user, bill_user, notify_user, pay_commissions
 from paypal                         import pay_commission
+from base.mail                      import Mail
 
 def homepage( request ):
     # Homepage
@@ -325,8 +326,8 @@ class EventbriteView( FormView ):
             if len(eventbrite) > 0:
                 form = EventbriteForm( instance = eventbrite[0] )
             else:
-                form = EventbriteForm({'chapter':chapter})
-            return self.render_to_response( {'form':form, 'chapter':chapter} )
+                form = EventbriteForm({'chapter':chapter.pk})
+            return self.render_to_response( {'form':form } )
             
   
     def form_valid(self, form ):
@@ -338,12 +339,13 @@ class EventbriteView( FormView ):
         try:
             eventbrite = Eventbrite.objects.get(chapter = chapter)
         except Eventbrite.DoesNotExist:
-            pass
-        else:
-            eventbrite.user_key = user_key
-            eventbrite.organizer_id = organizer_id
-            eventbrite.bot_email = bot_email
-            eventbrite.save()
+            eventbrite = Eventbrite( chapter = chapter )
+        
+        eventbrite.user_key = user_key
+        eventbrite.organizer_id = organizer_id
+        eventbrite.bot_email = bot_email
+        eventbrite.save()
+        
         return HttpResponseRedirect(reverse('chapter')+'?chapter='+str(chapter.pk))
  
     
@@ -574,30 +576,33 @@ class CommissionView ( FormView ):
 def remind( request ):
     if 'term' in request.GET:
         term = Term.objects.get( pk = request.GET['term'])
-        
-        # Render the letter
-        organizer = term.deal.chapter.organizer
         url = 'http://brightmap.com/'+reverse('or_dash')
-        c = Context({'term':term, 'url':url})
-        template = loader.get_template('letters/reminder.tmpl')
-        message = template.render(c)
-
-        subject = "BrightMap Deal Request Reminder"
-        recipients = [ organizer.email ]
-
-        msg = EmailMultiAlternatives( subject,
-                                      message,
-                                      'requests@brightmap.com',
-                                      recipients,
-                                      ['bcc@brightmap.com']
-                                    )
-        if settings.SEND_EMAIL:
-            try:
-                msg.send( fail_silently = False )
-            except:
-                err = "Email Send Error For: " + organizer.email
-                logger.error(err)
-    
+        context    = {'term':term, 'url':url}
+        template   = 'reminder.tmpl'
+        subject    = "BrightMap Deal Request Reminder"
+        senders    = [ 'requests@brightmap.com']
+        recipients = [ term.deal.chapter.organizer.email ]
+        bcc        = []
+    elif 'chapter' in request.GET:
+        chapter = Chapter.objects.get( pk = request.GET['chapter'] )
+        url = 'http://brightmap.com/'+reverse('or_setup')
+        context    = {'chapter':chapter, 'url':url}
+        template   = 'setup_reminder.tmpl'
+        subject    = "BrightMap Organizer Reminder"
+        senders    = [ 'requests@brightmap.com']
+        recipients = [ chapter.organizer.email ]
+        bcc        = []
+    else:
+        return HttpResponseRedirect('/')
+ 
+    mail = Mail( senders,
+                 recipients,
+                 subject, 
+                 template,
+                 bcc,
+                 kwargs = context 
+               )
+    mail.send()
     return HttpResponseRedirect('/')
         
         

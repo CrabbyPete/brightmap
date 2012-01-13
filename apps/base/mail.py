@@ -40,6 +40,8 @@ class Mail(object):
         # Set up the context
         if 'url' in kwargs:
             kwargs['url'] = SITE_BASE+kwargs['url']
+        if 'kwargs' in kwargs:
+            kwargs = kwargs['kwargs']
         
         c = Context( kwargs )
 
