@@ -28,7 +28,7 @@ class Mail(object):
     # Initialize with Gmail address and password
     def __init__( self, senders, receivers, subject, template_name, bcc = None, **kwargs ):
         self.senders   = senders
-        self.recievers = receivers
+        self.receivers = receivers
         self.subject   = subject
         if bcc:
             self.bcc = [bcc]
