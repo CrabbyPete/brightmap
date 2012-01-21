@@ -323,8 +323,8 @@ class EventbriteView( FormView ):
         if 'chapter' in request.GET:
             chapter = Chapter.objects.get( pk = self.request.GET['chapter'] )
             eventbrite = chapter.get_eventbrite()
-            if len(eventbrite) > 0:
-                form = EventbriteForm( instance = eventbrite[0] )
+            if eventbrite:
+                form = EventbriteForm( instance = eventbrite )
             else:
                 form = EventbriteForm({'chapter':chapter.pk})
             return self.render_to_response( {'form':form } )
