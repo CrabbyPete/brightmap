@@ -159,7 +159,10 @@ class Chapter( models.Model ):
 
     def get_eventbrite( self ):
         # Get the Eventbrite ticket for this chapter
-        tickets = Eventbrite.objects.get( chapter = self )
+        try:
+            tickets = Eventbrite.objects.get( chapter = self )
+        except:
+            return None
         return tickets
 
 
