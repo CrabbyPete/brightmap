@@ -391,10 +391,13 @@ def get_ticket(chapter):
     except AuthToken.DoesNotExist:
         # Returns chapter,  user_key, organizer_id, bot_email
         eventbrite = chapter.get_eventbrite()
-        if eventbrite.organizer_id:
-            ticket.update( {'organizer_id':eventbrite.organizer_id} )
-        if eventbrite.user_key:
-            ticket.update( {'user_key':eventbrite.user_key} )
+        if eventbrite:
+            if eventbrite.organizer_id:
+                ticket.update( {'organizer_id':eventbrite.organizer_id} )
+            
+            if eventbrite.user_key:
+                ticket.update( {'user_key':eventbrite.user_key} )
+    
     return ticket
            
     
