@@ -526,6 +526,7 @@ class PaymentBudgetView( MultipleFormsView ):
         except:
             ready = False
         
+        initial = {}
         if profile.address:
             if '^' in profile.address:
                 billing = profile.address.split('^')

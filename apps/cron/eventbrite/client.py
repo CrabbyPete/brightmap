@@ -5,7 +5,7 @@ import time
 import httplib
 import logging
 import urllib
-import json_lib
+from eventbrite import json_lib
 
 # Input transformations
 def _datetime_to_string(incoming_datetime):
@@ -113,8 +113,9 @@ class EventbriteClient(object):
 
         # Send a GET request to Eventbrite
         # if using OAuth2.0 for authentication, set additional headers
-        if 'access_token' in self._auth_tokens:
-            self._https_connection.request('GET', request_url, None, {'Authorization': "Bearer " + self._auth_tokens['access_token']})
+        #if 'access_token' in self._auth_tokens:
+        if 'access_code' in self._auth_tokens:
+            self._https_connection.request('GET', request_url, None, {'Authorization': "Bearer " + self._auth_tokens['access_code']})
         else:
             self._https_connection.request('GET', request_url)
 

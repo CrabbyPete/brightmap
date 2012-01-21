@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="refresh" content="1" />
+
 <title>Welcome To Brightmap</title>
 
 <meta name="google-site-verification" content="-WaY4HxDsbWzk7gLLMm04vXoC0REDzyO-RxweSULz7E" />
@@ -66,9 +68,36 @@
 		</header>
 	</div>
 	<!--Top section-->
-	{% block body_block %} 
-	{% endblock %}
-	
+
+<!--Body section-->
+<div id="bodysection">
+	<div class="insidesection">
+		<br />
+		<br />
+		<section class="leadbuyer">
+		<h2 class="leadbuyer">THANK YOU</h2>
+		</section>
+		<article class="box-full">
+		<div class="top">&nbsp;</div>
+		<div class="middle">
+			<section> <header class="inside">
+			<h2 class="section-title">We can now start sending you leads</h2>
+			</header>
+			<div class="inside">
+				<ul class="bullets">
+					<li> If you have any questions please don't hesitate to write us
+						<a href='maito:admin@brightmap.com' >admin@brightmap.com</a>
+					</li>
+				</ul>
+			</div>
+			<a href={% url homepage %}><img src='/media/img/keep-dealbutt.gif'/></a>
+			</section>
+		</div>
+		<div class="bottom">&nbsp;</div>
+		</article>
+	</div>
+</div>
+<!--Body section-->
 	<!--Footer section-->
 	<div id="footersection">
 		<footer>
@@ -86,5 +115,4 @@
 	</script>
 </body>
 </html>
-
 

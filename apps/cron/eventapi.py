@@ -1,13 +1,9 @@
 from datetime                       import datetime
 from termcolor                      import colored
-from client                         import EventbriteClient
+from eventbrite.client              import EventbriteClient
 
 from settings                       import EVENTBRITE
 
-""""
-from meetup                         import MeetUpAPI
-from social.models                  import MeetupProfile
-"""
 import logging
 logger = logging.getLogger('main.py')
 
@@ -23,37 +19,29 @@ def log(message, color = None):
     return string
 
 
-class GenericAPI(object):
-    """
-    Define the functions each interface must pform in a standard way
-    """
-    def connect(self):
-        return
-    
-    def get_latest_events(self):
-        """ Return the latest events that have not passed """
-        return
-    
-    def get_attendees(self, event):
-        """ Return the attendees to an event """
-        return
-    
-    def check_survey(self, attendee ):
-        """ Return surveys for attendees """
-        return
-
-class MeetUp(object):
-    """ Meetup API Interface """
-
-
 class EventBrite(object):
     """ Eventbrite API Interface """
     
     evb = None;
     
-    def __init__( self, tokens, user_key ):           
-        self.evb = EventbriteClient( tokens = tokens, user_key = user_key )
+    def __init__( self, app_key = None, user_key = None, access_token = None ):
+        if not access_token:           
+            self.evb = EventbriteClient( {'app_key':app_key, 'user_key':user_key} )
+        else:
+            self.evb = EventbriteClient( {'access_code':access_token} )
+    
+    
+    def get_organizers(self):
+        try:
+            organizers = self.evb.user_list_organizers()
+        except Exception, e:
+            return []
         
+        organizer_list = []
+        
+        for organizer in organizers['organizers']:
+            organizer_list.append(organizer['organizer']['id'])
+        return organizer_list
     
     def get_attendees( self, event_id ):
         """ Get all the attendees for an event from Eventbrite """
@@ -101,11 +89,14 @@ class EventBrite(object):
         return [], leadbuyer
 
 
-    def get_latest_events( self, organizer_id ):
+    def get_latest_events( self, organizer_id = None ):
         
         """ Search for the latest events """
+        param = {}
+        if organizer_id:
+            param = {'id':organizer_id }
         try:
-            events = self.evb.organizer_list_events({'id':organizer_id})
+            events = self.evb.organizer_list_events(param)
         except Exception, e:
             print log( 'Eventbrite Error:%s for %u'%(e, organizer_id ) )
             logger.debug( 'Eventbrite Error:%s for %u'%(e, organizer_id ) )

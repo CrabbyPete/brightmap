@@ -14,6 +14,8 @@ from eventapi                       import  EventBrite
 from base.models                    import ( Event, Profile, Survey, Interest, Deal, Expire,
                                              Organization, Connection, LeadBuyer, Invoice    )
 
+from social.models                  import AuthToken
+
 from base.mail                      import  Mail 
 from base.passw                     import  gen
 
@@ -42,37 +44,38 @@ def log(message, color = None):
     return string
 
 
-def database_events( organizer, api ):
+def database_events( ticket, api ):
     """
     Put the latest event in the database
     """
- 
-    # Get the latest from Eventbrite
-    if not organizer.organizer_id:
-        return []
+    if 'organizer_id' in ticket:
+        organizer_ids = [ ticket['organizer_id'] ]
+    else:
+        organizer_ids = api.get_organizers()
     
-    events = api.get_latest_events( int(organizer.organizer_id) )
     event_list = []
-
-    # Add each event and find the right organizer
-    for event in events:
-        try:
-            event_rec = Event.objects.get(event_id = event[1])
-        except Event.DoesNotExist:
-            event_rec = Event( event_id        = event[1],
-                               describe        = event[0],
-                               date            = event[2],
-                               chapter         = organizer.chapter
-                              )
-        else:
-            # Update any changes to the date or description
-            event_rec.describe = event[0]
-            event_rec.date     = event[2]
+    for organizer_id in organizer_ids:
+        if not organizer_id:
+            continue
+        events = api.get_latest_events( int(organizer_id) )
+   
+        # Add each event and find the right organizer
+        for event in events:
+            try:
+                event_rec = Event.objects.get(event_id = event[1])
+            except Event.DoesNotExist:
+                event_rec = Event( event_id        = event[1],
+                                   describe        = event[0],
+                                   date            = event[2],
+                                   chapter         = ticket['chapter']
+                                 )
+            else:
+                # Update any changes to the date or description
+                event_rec.describe = event[0]
+                event_rec.date     = event[2]
         
-        
-        event_rec.save()
-            
-        event_list.append(event_rec)
+            event_rec.save()
+            event_list.append(event_rec)
 
     # Return the events list
     return event_list
@@ -374,66 +377,81 @@ def print_connection( attendee, sponser, interest ):
                interest.interest
               )
 
+
+def get_ticket(chapter):
+    """
+    Get access to Eventbrite API
+    """
+    ticket = {'chapter':chapter}
+    # First check for AuthTokens
+    try:
+        # Returns user, service,token,refresh,created
+        eventbrite = AuthToken.objects.get(user = chapter.organizer, service = 'eventbrite')
+        ticket.update( {'access_code':eventbrite.token} )
+    except AuthToken.DoesNotExist:
+        # Returns chapter,  user_key, organizer_id, bot_email
+        eventbrite = chapter.get_eventbrite()
+        if eventbrite.organizer_id:
+            ticket.update( {'organizer_id':eventbrite.organizer_id} )
+        if eventbrite.user_key:
+            ticket.update( {'user_key':eventbrite.user_key} )
+    return ticket
+           
+    
 def main():
     # Get all organizers
     organizations = Organization.objects.all()
     for organization in organizations:
         for chapter in organization.chapter_set.all():
 
-            # Check for meetups
-            """
-            meetup = MeetUpAPI( user = chapter.organizer )
-            if meetup:
-                meetup.get_groups()
-            """
             # Open a new Eventbrite client
-            tickets = chapter.get_eventbrite()
-            for ticket in tickets:
+            ticket = get_ticket(chapter)
+            if 'access_code' in ticket:
+                api = EventBrite( access_token = ticket['access_code'] )
+            elif 'user_key' in ticket:
                 app_key  = EVENTBRITE['APP_KEY' ]
-                user_key = ticket.user_key
-                api = EventBrite( tokens = app_key, user_key = user_key )
-        
-                #Get the email template for this organization
-                letter = chapter.letter
-                if not letter:
-                    letter = 'default.tmpl'
+                api = EventBrite( app_key = app_key, user_key = ticket['user_key'] )
+            else:
+                print log("No configuration data for " + chapter.name )
+                continue
 
-                # Get the attendess of each event
-                for event in database_events( ticket, api ):
+            #Get the email template for this organization
+            letter = chapter.letter
+            if not letter:
+                letter = 'default.tmpl'
 
-                    # Log the events
-                    print_event(event)
+            # Get the attendess of each event
+            for event in database_events( ticket, api ):
 
-                    # Put all attendees in the db and return surveys
-                    for surveys in database_attendees( event, api ):
+                # Log the events
+                print_event(event)
 
-                        # For each interest match sponsers
-                        for survey in surveys:
-                            try:
-                                deal = chapter.deal( survey.interest )
+                # Put all attendees in the db and return surveys
+                for surveys in database_attendees( event, api ):
 
-                            # This can happen if no deal for a survey item
-                            except Deal.DoesNotExist:
-                                print log( chapter.name +        \
-                                           ' has no deal for ' + \
-                                           survey.interest.interest
-                                          )
-                                continue
-                            else:
-                                if deal == None:
-                                    print log( chapter.name +    \
-                                               ' has no deal for ' + \
-                                               survey.interest.interest,
-                                               'red'
-                                             )
-                                    continue
+                    # For each interest match sponsers
+                    for survey in surveys:
+                        try:
+                            deal = chapter.deal( survey.interest )
 
-                            # Connect attendees and mail contacts
-                            make_contact( survey, deal, letter )
+                        # This can happen if no deal for a survey item
+                        except Deal.DoesNotExist:
+                            print log( chapter.name + ' has no deal for ' + survey.interest.interest )
+                            continue
+                        
+                        if deal == None:
+                            print log( chapter.name + ' has no deal for ' + survey.interest.interest,
+                                       'red'
+                                     )
+                            continue
+
+                        # Connect attendees and mail contacts
+                        make_contact( survey, deal, letter )
                             
-                    leads = event.surveys(True)
-                    if len( leads ) == 0:
-                        print log( "%s:%s  has no surveys"%(chapter.name, event.describe),'green')
+                # Check if any active surveys
+                leads = event.surveys(True)
+                if len( leads ) == 0:
+                    print log( "%s:%s  has no surveys"%(chapter.name, event.describe),'green')
 
 
 def accounting():

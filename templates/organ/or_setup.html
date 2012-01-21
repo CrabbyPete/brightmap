@@ -1,4 +1,8 @@
-{% extends 'base.html' %} {% block body_block %}
+{% extends 'base.html' %} 
+{% endblock %}
+
+
+{% block body_block %}
 <!--Body section-->
 <div id="bodysection">
 	<div class="insidesection">
@@ -26,12 +30,12 @@
 		{% endif %}
 
 		<h2 class="eventbrite">
-			<span>1</span>Add BrightMap to your Eventbrite Page <a href="#">(click
-				here)</a>
+			<span>1</span>Add BrightMap to your Eventbrite Page 
+			<a href="{% url eventbrite_api %}">CLICK HERE</a>
+
 		</h2>
-		<p class="addbrighttxt">If this link does not work, log in to your
-			Eventbrite.com page, click on the Account tab, Click on Multi-User
-			Access, and then click the "Add Email Address" button</p>
+		<p class="addbrighttxt">If this link does not work, make sure you are logged in to your
+			Eventbrite.com page, then click <a href='https://www.eventbrite.com/permissions' target=_blank>Here</a> 
 		<p class="singleline"></p>
 		<h2 class="entersettings">
 			<span>2</span>Enter the following settings

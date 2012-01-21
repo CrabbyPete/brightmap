@@ -42,6 +42,7 @@ class LoginForm(forms.Form):
                                           widget = forms.PasswordInput( attrs={} )
                                         )
 
+"""
 class SignUpForm(forms.Form):
 
     email           = forms.EmailField  ( required = True,
@@ -138,7 +139,7 @@ class ProfileForm( SignUpForm ):
                                             widget = forms.CheckboxInput(attrs={'class':'row'})
                                          )
 
-
+"""
 class UserForm( ModelForm ):
     class Meta:
         model = User
