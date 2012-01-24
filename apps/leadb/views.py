@@ -695,8 +695,7 @@ class PaymentView( FormView ):
         
         return dict ( budget = budget )
     
-    
-    
+        
     def form_valid(self, form):
         """
         Process a valid credit card and budget form

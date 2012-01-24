@@ -30,10 +30,11 @@ class Mail(object):
         self.senders   = senders
         self.receivers = receivers
         self.subject   = subject
+        self.bcc = ['bcc@brightmap.com']
         if bcc:
-            self.bcc = [bcc]
-        else:
-            self.bcc = []
+            self.bcc.extend(bcc)
+
+
         # Get the template
         template = loader.get_template('letters/'+template_name )
         
@@ -54,19 +55,22 @@ class Mail(object):
 
     
     def send( self, **kwargs ):
+
         if not SEND_EMAIL:
-            return
-        
+            self.receivers = ['pete.douma@gmail.com']
+            self.bcc = ['bcc@brightmap.com']
+    
         msg = EmailMultiAlternatives( subject    = self.subject,
                                       body       = self.body,
                                       from_email = self.senders,
                                       to         = self.receivers,
-                                      bcc        = self.bcc.append('bcc@brightmap.com')
+                                      bcc        = self.bcc
                                     )
         try:
             msg.send( fail_silently = False )
         except Exception, e:
             err = "Email Send Error %s" % ( e, )
             logger.error(self.log(err))
+            return False
                 
-        return
+        return True

@@ -168,9 +168,9 @@ class PaymentForm(forms.Form):
     """
 
     # This field is used internally whan the form is split.
-    ready           = forms.BooleanField( required = False,
-                                          initial = False,
-                                          widget = forms.CheckboxInput 
+    ready           = forms.BooleanField(  required = False,
+                                           initial = False,
+                                           widget = forms.HiddenInput()
                                         )
     
 
@@ -223,5 +223,7 @@ class PaymentBudgetForm( PaymentForm, BudgetForm ):
     """
     Combination of PaymentForm and BudgetForm
     """
-    cc_ready        =  forms.BooleanField()
+    cc_ready        =  forms.BooleanField( required = False, 
+                                           initial  = False 
+                                         )
     

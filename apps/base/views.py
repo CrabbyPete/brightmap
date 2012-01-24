@@ -354,6 +354,7 @@ class DealView( FormView ):
     form_class      = DealForm
     
     def get(self, request, *args, **kwargs):
+        chapter = None
         if 'deal' in request.GET:
             if request.GET['deal'] == 'new':
                 form = DealForm()
@@ -371,7 +372,7 @@ class DealView( FormView ):
             leadbuyer = LeadBuyer.objects.get(pk = request.GET['leadbuyer'])
             deals = leadbuyer.deals()
                   
-        return self.render_to_response( {'deals':deals} )
+        return self.render_to_response( {'deals':deals, 'chapter':chapter} )
             
     def form_valid(self, form ):
         if 'interest' in form.cleaned_data:
@@ -397,7 +398,17 @@ class TermView( FormView ):
         if 'pending' in request.GET:
             terms = Term.objects.filter( status = 'pending').order_by('modified')
             return self.render_to_response( {'terms':terms} )
+        
+        
+        if 'chapter' in request.GET:
+            chapter = Chapter.objects.get( pk = request.GET['chapter'])
+            terms = []
+            for deal in chapter.deals():
+                terms.extend( deal.terms() )
             
+            return self.render_to_response( {'terms':terms} )
+        
+        
         if 'term' in request.GET:
             term = Term.objects.get(pk = request.GET['term'])
         

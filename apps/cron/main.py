@@ -250,7 +250,7 @@ def warn_user( term ):
         buyer     = term.buyer
         organizer = term.deal.chapter.organizer
  
-        mail = Mail( [organizer.email],
+        mail = Mail( organizer.email,
                      [buyer.email], 
                      'Trial Deal Expiration',
                      'expire_notice.tmpl',
@@ -258,8 +258,10 @@ def warn_user( term ):
                      term  = term,
                      url   = reverse('lb_dash')
                     )
-        mail.send()
-        return
+        if not mail.send():
+            print log('Error sending email to %s for deal expiration'%( buyer.email,))
+        
+    return
  
 def make_contact( survey, deal, letter ):
     """
@@ -291,7 +293,8 @@ def make_contact( survey, deal, letter ):
         
         
         # Determine if you did this or not
-        if not survey.event.add_connection( survey, term ):
+        connection = survey.event.add_connection( survey, term )
+        if not connection:
             continue
 
         # Count email so you don't spam
@@ -323,8 +326,8 @@ def make_contact( survey, deal, letter ):
                        '%s %s <%s>'% ( sponser.first_name, sponser.last_name, sponser.email )
                      ]
 
-        senders =    ['%s %s <%s>' % ( organizer.first_name, organizer.last_name, organizer.email )]     
-        mail  = Mail( senders, recipients, subject, letter, bcc = senders,
+        sender =  '%s %s <%s>' % ( organizer.first_name, organizer.last_name, organizer.email )    
+        mail  = Mail( sender, recipients, subject, letter, bcc = [sender],
                       interest   = interest,
                       attendee   = attendee,
                       sponser    = sponser,
@@ -349,7 +352,8 @@ def make_contact( survey, deal, letter ):
                                   )
 
         logger.info(log(log_mess))
-        mail.send()
+        if not mail.send():
+            print log( "Error sending mail for %s"%(sender,) )
                 
 
 

@@ -400,6 +400,7 @@ class Term( models.Model ):
 
     def canceled(self):
         self.status = 'canceled'
+        self.save()
         
 class Expire( Term ):
     """
@@ -576,7 +577,7 @@ class Event(models.Model):
         return attendees
 
     
-    def interests(self, open = False ):
+    def interests(self, opn = False ):
         """
         Return the interests for this event, and the number of each
         If attendee return interests for the attendee otherwise return all
@@ -585,7 +586,7 @@ class Event(models.Model):
         for survey in self.survey_set.exclude( interest = None ):
 
             # Just return open deals
-            if open:
+            if opn:
                 # Only exclude those connected with an exclusive deal
                 try:
                     deal = self.chapter.deal( survey.interest )
@@ -636,7 +637,7 @@ class Event(models.Model):
                                      term   = term
                                    )
             connection.save()
-            return True
+            return connection
 
         return False
 
