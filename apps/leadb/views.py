@@ -43,10 +43,10 @@ def mail_organizer( user, deal, term, deal_type ):
     # Render the letter
     organizer  = deal.chapter.organizer
     subject    = "New BrightMap Service Provider Request: %s"%(deal.interest)
-    senders    = ['requests@brightmap.com']
+    sender     = 'requests@brightmap.com'
     recipients = [ organizer.email, term.buyer.email ]
     
-    mail = Mail( senders, 
+    mail = Mail( sender, 
                  recipients, 
                  subject, 
                  template_name = 'request.tmpl', 

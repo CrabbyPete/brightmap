@@ -301,8 +301,8 @@ def status( request ):
                 term.status = request.GET['status']
                 term.save()
             
-                mail = Mail([term.buyer.email],
-                            [term.deal.chapter.organizer.email],
+                mail = Mail(term.deal.chapter.organizer.email,
+                            [term.buyer.email],
                             'BrightMap Deal',
                             'deal_status.tmpl',
                             term = term,

@@ -263,6 +263,15 @@ def warn_user( term ):
         
     return
  
+def filter_company( company ):
+    if not company:
+        return company
+    c = company.lower().strip()
+    if c in ['freelancer','na','n/a','self','']:
+        return None
+    return company
+ 
+
 def make_contact( survey, deal, letter ):
     """
     Send an email to those attendees who answered the survey and have a
@@ -311,9 +320,8 @@ def make_contact( survey, deal, letter ):
         
         # Check if they put in a company or junk
         company      = attendee.get_profile().company
-        if company and company.lower() in ['freelancer','na','n/a','self','']:
-            company = None
-        
+        company      = filter_company(company)
+  
         # Check if the leadbuyer is the organizer and if they have a letter
         if sponser == organizer:
             letter = 'self_referral.tmpl'

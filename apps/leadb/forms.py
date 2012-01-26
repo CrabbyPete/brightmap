@@ -94,13 +94,13 @@ class BuyerForm(forms.Form):
 
 DEAL_CHOICES = [
                 ('Nonexclusive','Standard ($20.00 per introduction)'),
-                ('Sponsored','Apply for Sponsorship'),
+                ('Sponsored','I am already a sponsor of this organization'),
                 ('Trial' ,'Apply for Trial (1 month of free leads)')
                ]
 
 DEAL_CHOICES2 =[
                 ('Nonexclusive','Standard ($20.00 per introduction)'),
-                ('Sponsored','Apply for Sponsorship')
+                ('Sponsored','I am already a sponsor of this organization')
                ]
 
 """

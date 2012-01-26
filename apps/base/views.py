@@ -562,7 +562,7 @@ class CommissionView ( FormView ):
         if 'commission' in request.GET:
             commission = Commission.objects.get(pk = request.GET['commission'])
             form = CommissionForm( instance = commission )
-            return self.render_to_response({'form':form})
+            return self.render_to_response({'form':form, 'commission':commission})
         
         if 'chapter' in request.GET:
             chapter = Chapter.objects.get(pk = request.GET['chapter'])
@@ -576,7 +576,7 @@ class CommissionView ( FormView ):
         cost    = form.cleaned_data['cost']
         chapter = form.cleaned_data['chapter']
         commission = Commission.objects.get( pk = self.request.GET['commission'] )
-        paypal = chapter.organizer.paypal
+        paypal = commission.chapter.paypal
         if paypal:
             if  pay_commission( paypal, cost ):
                 commission.status = 'paid'
@@ -591,7 +591,7 @@ def remind( request ):
         context    = {'term':term, 'url':url}
         template   = 'reminder.tmpl'
         subject    = "BrightMap Deal Request Reminder"
-        senders    = [ 'requests@brightmap.com']
+        sender     = 'requests@brightmap.com'
         recipients = [ term.deal.chapter.organizer.email ]
         bcc        = []
     elif 'chapter' in request.GET:
@@ -600,13 +600,13 @@ def remind( request ):
         context    = {'chapter':chapter, 'url':url}
         template   = 'setup_reminder.tmpl'
         subject    = "BrightMap Organizer Reminder"
-        senders    = [ 'requests@brightmap.com']
+        sender     = 'requests@brightmap.com'
         recipients = [ chapter.organizer.email ]
         bcc        = []
     else:
         return HttpResponseRedirect('/')
  
-    mail = Mail( senders,
+    mail = Mail( sender,
                  recipients,
                  subject, 
                  template,

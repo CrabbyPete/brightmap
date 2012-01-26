@@ -26,8 +26,8 @@ class Mail(object):
     """
 
     # Initialize with Gmail address and password
-    def __init__( self, senders, receivers, subject, template_name, bcc = None, **kwargs ):
-        self.senders   = senders
+    def __init__( self, sender, receivers, subject, template_name, bcc = None, **kwargs ):
+        self.sender    = sender
         self.receivers = receivers
         self.subject   = subject
         self.bcc = ['bcc@brightmap.com']
@@ -62,7 +62,7 @@ class Mail(object):
     
         msg = EmailMultiAlternatives( subject    = self.subject,
                                       body       = self.body,
-                                      from_email = self.senders,
+                                      from_email = self.sender,
                                       to         = self.receivers,
                                       bcc        = self.bcc
                                     )
