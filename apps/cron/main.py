@@ -84,7 +84,7 @@ def mail_buyer ( user, event ):
     """ 
     Send email to potential leadbuyer asking them to join 
     """
-    sender   = ['request@brightmap.com']
+    sender   = 'request@brightmap.com'
     receiver = [ user.email]
     bcc      = None,
     subject  = 'Brightmap Invitation'
@@ -240,7 +240,24 @@ def check_budget( term ):
  
     if total >= leadbuyer.budget:
         return False
-  
+    
+    warning_level = float(leadbuyer.budget) * 0.80
+    if total >= warning_level:
+        buyer     = term.buyer
+        organizer = term.deal.chapter.organizer
+ 
+        mail = Mail( organizer.email,
+                     [buyer.email], 
+                     'Budget',
+                     'budget_notice.tmpl',
+                     buyer = buyer,
+                     budget = leadbuyer.budget,
+                     total = total,
+                     url   = reverse('lb_dash')
+                    )
+        mail.send()
+    
+    
     return True
 
 
@@ -249,7 +266,7 @@ def warn_user( term ):
     if isinstance(child, Expire):
         buyer     = term.buyer
         organizer = term.deal.chapter.organizer
- 
+        
         mail = Mail( organizer.email,
                      [buyer.email], 
                      'Trial Deal Expiration',

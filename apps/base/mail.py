@@ -69,7 +69,7 @@ class Mail(object):
         try:
             msg.send( fail_silently = False )
         except Exception, e:
-            err = "Email Send Error %s" % ( e, )
+            err = "Email Send Error"
             logger.error(self.log(err))
             return False
                 
