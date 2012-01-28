@@ -129,39 +129,40 @@ class  SignUpView( FormView ):
             form._errors['agree'] = ErrorList(["Please check agreement"])
             return self.form_invalid(form)
     
-        try:
-            user = User.objects.get(email = email)
-            profile = user.get_profile()
-
-        except User.DoesNotExist:
-            username = email[0:30]
-            user  = User.objects.create_user( username = username,
-                                              email = email,
-                                              password = password
-                                            )
+        user = self.request.user
+        if user.is_anonymous():
+            try:
+                user = User.objects.get(email = email)
+            except User.DoesNotExist:
+                username = email[0:30]
+                user  = User.objects.create_user( username = username,
+                                                  email = email,
+                                                  password = password
+                                                )
+                profile = Profile( user = user)
+                profile.save()
+            else:
+                form._errors['email'] = ErrorList(["This email already exists"])
+                return self.form_invalid( form )
+                    
+        elif email != user.email:
+            try:
+                User.objects.get(email = email)
+            except User.DoesNotExist:
+                user.email = email
+            else:
+                form._errors['email'] = ErrorList(["This email already exists"])
+                return self.form_invalid( form )
         
-            user.first_name = form.cleaned_data['first_name'].capitalize()
-            user.last_name  = form.cleaned_data['last_name'].capitalize()
-            
-            user.save()
-            profile = Profile( user = user)
-            
-            # Log them in
-            user = auth.authenticate(username=user.username, password=password)
-            if user is not None and user.is_active:
-                auth.login(self.request, user)
-
-        else:
-            user.first_name = form.cleaned_data['first_name'].capitalize()
-            user.last_name  = form.cleaned_data['last_name'].capitalize()
-            user.email      = email
-            
-            if password != self.default_password:
-                user.set_password(password)
-            
-            user.save()
+        
+        user.first_name = form.cleaned_data['first_name'].capitalize()
+        user.last_name  = form.cleaned_data['last_name'].capitalize()
+        if password != self.default_password:
+            user.set_password(password)
+        user.save()
             
         # Update profile details
+        profile = user.get_profile()
         profile.is_leadbuyer = True
         profile.is_agreed    = True
       

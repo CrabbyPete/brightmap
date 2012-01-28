@@ -106,16 +106,16 @@ class SignUpView( FormView ):
             else:
                 form._errors['email'] = ErrorList(["This email already exists"])
                 return self.form_invalid(form)
-        else:
-            # If the use wants to change email address make sure its a new one
-            if email != user.email:
-                try:
-                    User.objects.get(email = email)
-                except User.DoesNotExist:
-                    user.email = email
-                else:
-                    form._errors['email'] = ErrorList(["This email already exists"])
-                    return self.form_invalid( form )
+        
+        # An existing user is changing their email address
+        elif email != user.email:
+            try:
+                User.objects.get(email = email)
+            except User.DoesNotExist:
+                user.email = email
+            else:
+                form._errors['email'] = ErrorList(["This email already exists"])
+                return self.form_invalid( form )
                     
         user.first_name = form.cleaned_data['first_name'].capitalize()
         user.last_name  = form.cleaned_data['last_name'].capitalize()
