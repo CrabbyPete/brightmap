@@ -118,9 +118,9 @@ class Chapter( models.Model ):
     organizer     = models.ForeignKey( User )
     paypal        = models.CharField( default = None, null = True,  max_length = 255 )
 
-    logo          = models.URLField(            default = None, null = True )
-    letter        = models.ForeignKey('Letter', default = None, null = True )
-    website       = models.URLField(            default = None, null = True )
+    logo          = models.URLField(            blank = True, null = True )
+    letter        = models.ForeignKey('Letter', blank = True, null = True )
+    website       = models.URLField(            blank = True, null = True )
     objects       = ChapterManager() 
     
 
@@ -518,8 +518,8 @@ class Letter( models.Model ):
     """
     Customized Email template letters to attendees and buyer Connections
     """
-    letter      = models.FileField(upload_to = 'letters')
-    name        = models.CharField(max_length = 255, default = None, null = True )
+    letter      = models.FileField(upload_to = '/letters/')
+    name        = models.CharField(max_length = 255, default = None, null = True, unique = True )
 
     def __unicode__(self):
         return self.name

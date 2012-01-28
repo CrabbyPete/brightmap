@@ -1,6 +1,9 @@
 # Python imports
 import logging
 logger = logging.getLogger(__name__)
+from datetime                       import datetime, timedelta, time
+
+
 
 # Django imports
 from django.contrib                 import  auth
@@ -22,7 +25,8 @@ import settings
 from passw                          import generate
 from models                         import ( Event, Chapter,  Profile,   LeadBuyer, 
                                              Deal,  Survey,   Invoice,   Connection,
-                                             Term,  Interest, Eventbrite,Commission  
+                                             Term,  Interest, Eventbrite,Commission,
+                                             Letter  
                                            )
                                         
 
@@ -32,7 +36,8 @@ from forms                          import ( LoginForm,       DealForm,
                                              SurveyForm,      ConnectionForm, 
                                              UserProfileForm, UserForm,       
                                              TermForm,        InvoiceForm,
-                                             InterestForm,    CommissionForm
+                                             InterestForm,    CommissionForm,
+                                             LetterForm
                                            )
 
 
@@ -195,15 +200,10 @@ def login(request):
         return submit_form(form)
 
 
-
-
 def community(request):
     return render_to_response('community.html', {},
                                context_instance=RequestContext(request))
-def about(request):
-    return render_to_response('about.html', {},
-                               context_instance=RequestContext(request))
-    
+
 def terms(request):
     return render_to_response('terms.html', {},
                                context_instance=RequestContext(request))
@@ -472,6 +472,16 @@ class EventView( FormView ):
             events = chapter.events()
             return self.render_to_response( {'events': events} )
 
+        if 'month' in request.GET:
+            first_day = datetime.today().replace(day = 1)
+            if first_day.month == 12:
+                last_day = first_day.replace ( day = 31 )
+            else:
+                last_day = first_day.replace (month = first_day.month + 1 ) - timedelta( days = 1 )
+            
+            dates = ( datetime.combine( first_day, time.min ),  datetime.combine( last_day, time.max ) )
+            events = Event.objects.filter( date__range = dates ).order_by('date')
+            return self.render_to_response( {'events': events} )
     
     def form_valid(self, form):
         return HttpResponseRedirect('/')
@@ -574,7 +584,7 @@ class CommissionView ( FormView ):
     
     def form_valid(self, form ): 
         cost    = form.cleaned_data['cost']
-        chapter = form.cleaned_data['chapter']
+        #chapter = form.cleaned_data['chapter']
         commission = Commission.objects.get( pk = self.request.GET['commission'] )
         paypal = commission.chapter.paypal
         if paypal:
@@ -583,7 +593,37 @@ class CommissionView ( FormView ):
                 commission.save()
         return HttpResponseRedirect(reverse('commission'))
             
-            
+class LetterView( FormView ):
+    initial = {}
+    template_name   = 'admin/letter.html'
+    form_class      = LetterForm
+    
+    def get_initial(self):
+        if 'letter' in self.request.GET:
+            letter = Letter.objects.get(pk = self.request.GET['letter'])
+            return {'letter':letter}
+    
+    def form_valid(self, form):
+        name   = form.cleaned_data['name']
+        upload = form.cleaned_data['letter']
+
+        file_name = settings.PROJECT_ROOT+'//templates//letters//'+ name
+        
+        place = open(file_name, 'wb+')
+        for chunk in upload.chunks():
+            place.write(chunk)
+        place.close()
+        try:
+            letter = Letter.objects.get( name = name )
+        except Letter.DoesNotExist:
+            letter = Letter( name = name )
+            letter.letter = file_name
+        
+        letter.save()
+        return HttpResponseRedirect(reverse('homepage'))
+    
+    
+
 def remind( request ):
     if 'term' in request.GET:
         term = Term.objects.get( pk = request.GET['term'])

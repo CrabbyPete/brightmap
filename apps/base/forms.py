@@ -88,7 +88,7 @@ class EventbriteForm(ModelForm):
 class LetterForm(ModelForm):
     class Meta:
         model = Letter
-        
+ 
 class EventForm(ModelForm):
     class Meta:
         model = Event

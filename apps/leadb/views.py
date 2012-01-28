@@ -259,7 +259,7 @@ class ApplyView( FormView ):
         elif deal_type == 'Trial':
             expires = Expire.objects.filter( buyer = self.request.user )
             if len ( expires ) >= settings.MAX_TRIALS:
-                form._errors['deal_type'] = ErrorList(["Sorry. You already have an active trail"])
+                form._errors['deal_type'] = ErrorList(["Sorry. You already have an active trial"])
                 return self.form_invalid(form)
 
             
@@ -361,7 +361,7 @@ class DashView( TemplateView ):
                         status = 'Standard'
             
                 elif isinstance( child, Expire ):
-                    status = 'Trail'
+                    status = 'Trial'
         
             args.update(status = status)
             term_list.append(args)

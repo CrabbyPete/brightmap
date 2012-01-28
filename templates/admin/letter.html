@@ -1,0 +1,9 @@
+{% extends "admin/admin.html" %}
+
+{% block body_block %}
+	<form action="{% url letter %}" method="post" enctype="multipart/form-data">
+       {% csrf_token %}
+ 		{{form}}
+        <input type="submit" name="Upload Letter" />
+    </form>
+{% endblock %}

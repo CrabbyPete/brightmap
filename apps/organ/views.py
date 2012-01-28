@@ -69,13 +69,8 @@ class SignUpView( FormView ):
         
         # Get paypal info
         pay_pal = form.cleaned_data['pay_pal']
-        """
-        email_verify   = form.cleaned_data['email_verify']
-        if email != email_verify:
-            form._errors['email'] = ErrorList(["The emails do not match"])
-            return self.form_invalid(form)
-        """
-        
+  
+      
         # Check the passwords match
         password     = form.cleaned_data['password']
         pass_confirm = form.cleaned_data['pass_confirm']
@@ -90,33 +85,47 @@ class SignUpView( FormView ):
             form._errors['agree'] = ErrorList(["Please check agreement"])
             return self.form_invalid(form)
     
-        try:
-            user = User.objects.get(email = email)
-            profile = user.get_profile()
-
-        except User.DoesNotExist:
-            username = email[0:30]
-            user  = User.objects.create_user( username = username,
-                                              email = email,
-                                              password = password
-                                            )
+        user = self.request.user
         
-            user.first_name = form.cleaned_data['first_name'].capitalize()
-            user.last_name  = form.cleaned_data['last_name'].capitalize()
-
-            user.save()
-            profile = Profile( user = user)
-            profile.save()
-        
+        # Is this a new account?
+        if user.is_anonymous():
+            
+            # See if this is an exist account
+            try:
+                user = User.objects.get(email = email)
+            except User.DoesNotExist:
+                username = email[0:30]
+                user  = User.objects.create_user( username = username,
+                                                  email = email,
+                                                  password = password
+                                                )
+                user.save()
+                
+                profile = Profile( user = user)
+                profile.save()
+            else:
+                form._errors['email'] = ErrorList(["This email already exists"])
+                return self.form_invalid(form)
         else:
-            user.first_name = form.cleaned_data['first_name'].capitalize()
-            user.last_name  = form.cleaned_data['last_name'].capitalize()
+            # If the use wants to change email address make sure its a new one
+            if email != user.email:
+                try:
+                    User.objects.get(email = email)
+                except User.DoesNotExist:
+                    user.email = email
+                else:
+                    form._errors['email'] = ErrorList(["This email already exists"])
+                    return self.form_invalid( form )
+                    
+        user.first_name = form.cleaned_data['first_name'].capitalize()
+        user.last_name  = form.cleaned_data['last_name'].capitalize()
 
-            if password != self.password:
-                user.set_password(password)
+        if password != self.password:
+            user.set_password(password)
+        
+        user.save()
             
-            user.save()
-            
+        profile = user.get_profile()
         profile.is_agreed    = True
         profile.save()
   
@@ -131,9 +140,12 @@ class SignUpView( FormView ):
             organization = Organization( name = name )
             organization.save()
         """
+        
         # See if the chapter exists. If its blank its the same as the organization name
         name = form.cleaned_data['chapter']
         if name == '':
+            
+            # See if the user already has chapters
             chapters = Chapter.objects.for_user( user = user )
             
             # Take the first one now

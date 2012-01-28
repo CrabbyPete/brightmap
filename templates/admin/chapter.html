@@ -24,6 +24,7 @@
     	</fieldset>
     </form>
     <menu>
+        <li><a href='{% url profile    %}?user={{chapter.organizer.pk}}'>{{chapter.organizer.first_name}} {{chapter.organizer.last_name}}</a></li>
         <li><a href='{% url eventbrite %}?chapter={{chapter.pk}}'>Eventbrite Info</a></li>
         <li><a href='{% url deal       %}?chapter={{chapter.pk}}'>Deals</a></li>
         <li><a href='{% url event      %}?chapter={{chapter.pk}}'>Events</a></li>

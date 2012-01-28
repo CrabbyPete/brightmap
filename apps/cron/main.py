@@ -2,7 +2,7 @@ import django_header
 
 
 # Python libraries
-from datetime                       import  datetime, timedelta
+from datetime                       import  datetime, timedelta, date
 from termcolor                      import  colored
 
 # Django libraries
@@ -12,7 +12,9 @@ from django.core.urlresolvers       import  reverse
 # Local libraries
 from eventapi                       import  EventBrite
 from base.models                    import ( Event, Profile, Survey, Interest, Deal, Expire,
-                                             Organization, Connection, LeadBuyer, Invoice    )
+                                             Organization, Connection, LeadBuyer, Invoice,
+                                             Cancel
+                                            )
 
 from social.models                  import AuthToken
 
@@ -261,26 +263,48 @@ def check_budget( term ):
     return True
 
 
-def warn_user( term ):
+def warn_user( term, warning = False ):
+    """
+    Warn a deal buyer that their deal has changed, if warning is about to expire
+    """
     child = term.get_child()
-    if isinstance(child, Expire):
+    if isinstance(child, Expire) or isinstance(term, Expire):
         buyer     = term.buyer
         organizer = term.deal.chapter.organizer
-        
+        if warning:
+            template = 'expire_notice.tmpl'
+        else:
+            template = 'expire_warning.tmpl'
+            
         mail = Mail( organizer.email,
-                     [buyer.email], 
+                     [buyer.email],
                      'Trial Deal Expiration',
-                     'expire_notice.tmpl',
+                     template,
+                     bcc = [organizer.email], 
                      buyer = buyer,
                      term  = term,
                      url   = reverse('lb_dash')
                     )
+        
         if not mail.send():
             print log('Error sending email to %s for deal expiration'%( buyer.email,))
+        
+        # If this is not warning create a new paid deal
+        if not warning:
+            new_term = Cancel(  deal  = term.deal,
+                                cost  = 20,
+                                buyer = term.buyer,
+                                exclusive = False,
+                                status = 'approved'
+                             )
+            new_term.save()
         
     return
  
 def filter_company( company ):
+    """
+    Filter out non company titles
+    """
     if not company:
         return company
     c = company.lower().strip()
@@ -304,9 +328,9 @@ def make_contact( survey, deal, letter ):
         if term == None:
             continue
         
-        # If you had a good deal that went bad .eg trail expires notify user
+        # If you had a good deal that went bad .eg trial expires notify user
         if not term.execute( event = survey.event ):
-            warn_user( term )
+            warn_user( term ) # This should never be hit now we do it up front. 
             continue
              
         # Don't spam, limit the number of emails per event
@@ -523,13 +547,37 @@ def accounting():
         invoice.save()
         print profile.user.first_name + ' ' + profile.user.last_name + " = " + str( invoice.cost )
 
+
+
+def check_expired():
+    expires = Expire.objects.filter(status='approved')
+    for expire in expires:
+        day =  date.today()
+        warning_day = day - timedelta( days = 5 )
+        if expire.date < date.today():
+            print log( 'Converting trial deal for '+\
+                       expire.buyer.last_name+','+expire.buyer.first_name+ ' ' +\
+                       expire.date.strftime("%Y-%m-%d") + ' '+\
+                       expire.deal.chapter.name +\
+                       ' with ' + str( len(expire.connections()) )+ ' connections: '
+                     )
+
+            #expire.canceled()
+            #warn_user(expire)
+        
+        # Warn the user 5 days before. Make sure main is only run once a day.
+        elif expire.date == warning_day:
+            print str( expire.pk ) + ' ' + expire.buyer.last_name +' ' + expire.date.strftime("%Y-%m-%d %H:%M")
+            warn_user( expire, warning = True )
+            
 import optparse
 if __name__ == '__main__':
     op = optparse.OptionParser( usage="usage: %prog " +" [options]" )
     # Add options for debugging
     op.add_option('-d', action="store_true", help = 'Turn off debug email messages')
     op.add_option('-p', action="store_true", help = 'Prompt to send')
-    op.add_option('-a', action="store_true", help = 'Run Accounting')
+    op.add_option('-a', action="store_true", help = 'Do not run accounting')
+    op.add_option('-e', action="store_true", help = 'Do not check for trial deal')
 
     opts,args = op.parse_args()
 
@@ -544,5 +592,14 @@ if __name__ == '__main__':
     else:
         PROMPT = False
     
+    # Check for trial deals that are expiring
+    if not opts.e:
+        check_expired()
+    
+    # Got and check for new events
     main()
-    accounting()
+    
+    # Check billing
+    if not opts.a:
+        accounting()
+    
