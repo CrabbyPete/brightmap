@@ -478,6 +478,8 @@ def main():
             letter = chapter.letter
             if not letter:
                 letter = 'default.tmpl'
+            else:
+                letter = letter.name
 
             # Get the attendess of each event
             for event in database_events( ticket, api ):
@@ -594,14 +596,7 @@ if __name__ == '__main__':
     else:
         PROMPT = False
     
-    # Check for trial deals that are expiring
-    if not opts.e:
-        check_expired()
-    
     # Got and check for new events
     main()
     
-    # Check billing
-    if not opts.a:
-        accounting()
-    
+ 
