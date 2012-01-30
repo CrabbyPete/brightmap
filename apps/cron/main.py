@@ -87,7 +87,7 @@ def mail_buyer ( user, event ):
     Send email to potential leadbuyer asking them to join 
     """
     sender   = 'request@brightmap.com'
-    receiver = [ user.email]
+    receiver = [ user.email ]
     bcc      = None,
     subject  = 'Brightmap Invitation'
     url      = reverse('lb_signup')
@@ -562,8 +562,8 @@ def check_expired():
                        ' with ' + str( len(expire.connections()) )+ ' connections: '
                      )
 
-            #expire.canceled()
-            #warn_user(expire)
+            expire.canceled()
+            warn_user(expire)
         
         # Warn the user 5 days before. Make sure main is only run once a day.
         elif expire.date == warning_day:
