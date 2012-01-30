@@ -156,8 +156,10 @@ def database_attendees( event, api ):
         interests, leadbuyer = api.check_survey( attendee )
 
         # If they checked they want leads they are a leadbuyer
-        if leadbuyer:
+        if leadbuyer and not profile.is_leadbuyer:
             mail_buyer( user, event )
+            profile.is_leadbuyer = True
+            profile.save()
             
         # Add the attendee with or with out interests to the event
         if len(interests) == 0:
@@ -272,9 +274,9 @@ def warn_user( term, warning = False ):
         buyer     = term.buyer
         organizer = term.deal.chapter.organizer
         if warning:
-            template = 'expire_notice.tmpl'
-        else:
             template = 'expire_warning.tmpl'
+        else:
+            template = 'expire_notice.tmpl'
             
         mail = Mail( organizer.email,
                      [buyer.email],
@@ -289,8 +291,9 @@ def warn_user( term, warning = False ):
         if not mail.send():
             print log('Error sending email to %s for deal expiration'%( buyer.email,))
         
-        # If this is not warning create a new paid deal
+        # If this is not warning, delete the trial and make it a standard deal
         if not warning:
+            term.canceled()
             new_term = Cancel(  deal  = term.deal,
                                 cost  = 20,
                                 buyer = term.buyer,
@@ -330,7 +333,7 @@ def make_contact( survey, deal, letter ):
         
         # If you had a good deal that went bad .eg trial expires notify user
         if not term.execute( event = survey.event ):
-            warn_user( term ) # This should never be hit now we do it up front. 
+            #warn_user( term ) # This should never be hit now we do it up front. 
             continue
              
         # Don't spam, limit the number of emails per event
@@ -562,7 +565,6 @@ def check_expired():
                        ' with ' + str( len(expire.connections()) )+ ' connections: '
                      )
 
-            expire.canceled()
             warn_user(expire)
         
         # Warn the user 5 days before. Make sure main is only run once a day.
