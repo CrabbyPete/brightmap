@@ -2,7 +2,7 @@
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 AUTHNET_DEBUG  = DEBUG
-SERVER = None
+SERVER = None # Change this for each server 
 
 # Brightmap specific whether to actually send emails.
 if DEBUG:
