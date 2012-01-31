@@ -1,6 +1,24 @@
+
 {{buyer.first_name}},
 
 Thanks for trying BrightMap. Your one month free trial deal with {{term.deal.chapter.name}} has expired. 
 Each lead will now be charged to you. If you would like to cancel your deal or create a new deal please go to {{url}} . 
 
-The BrightMap Team. 
+Best regards,
+The BrightMap Team
+
+
+You registered for a 30-day free trial of leads from {{term.deal.chapter.name}} on {{term.date}}.
+
+30 days have passed and you received the following leads:
+{% for connect in connections %}
+{{connect.survey.attendee.first_name}} {{connect.survey.attendee.last_name}}
+{% endfor %}
+
+This trial has now expired.  Starting now, you will be charged $20/lead for each lead from {{term.deal.chapter.name}}.
+
+You can cancel this deal anytime from your BrightMap dashboard at:
+{{url}}
+
+Best regards,
+The BrightMap Team.

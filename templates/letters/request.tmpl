@@ -1,41 +1,18 @@
 {% autoescape off %}
 {{deal.chapter.organizer.first_name}},
 
+You just received a request to sponsor {{deal.chapter.name}} on BrightMap.
 
-I have just received notification that {{user.first_name}} {{user.last_name}} has just applied to purchase leads from {{deal.chapter.name}}.  Here are the proposed terms:
+Proposed Sponsor:
+{{user.first_name}} {{user.last_name}}
+{{deal.interest.interest}}
+{{user.get_profile.title}} at {{user.get_profile.company}}
 
-
-Lead Category: {{deal.interest.interest}}
-Lead Buyer: {{user.first_name}} {{user.last_name}}
-Title: {{user.get_profile.title}}
-Company: {{user.get_profile.company}}
-
-
-Deal Terms: {{type}}
-{% if type == 'Sponsored' %}
-Sponsor (free leads): {{user.first_name}} {{user.last_name}} will receive introductions to every attendee of every {{deal.chapter.name}} event that requests an introduction to your preferred {{deal.interest.interest}} provider.  No other {{deal.interest.interest}} provider will receive introductions from {{deal.chapter.name}}.  BrightMap will not bill {{user.first}} for any leads you send him/her through the system.  Each event on BrightMap has at most one Sponsor.  By accepting {{user.first_name}}'s offer, {{user.get_profile.company}} will be the one and only company to receive leads on these terms from {{deal.chapter.name}}.
-{% endif %}
-{% if type == 'Exclusive' %}
-Standard: {{user.first_name}} {{user.last_name}} will receive introductions to attendees of {{deal.chapter.name}} events that request an introduction to your preferred {{deal.interest.interest}} provider.  The exact number of leads he/she receives will depend on how many leads are generated through {{deal.chapter.name}}, the monthly budget {{user.first_name}} has set, and the other event communities he is receiving leads from.  Any individual lead will go to {{user.first_name}} exclusively, not to any other {{deal.interest.interest}} providers.  {{user.first_name}} will be billed for each introduction sent through BrightMap.
-{% endif %}
-{% if type == 'Nonexclusive' %}
-Standard: {{user.first_name}} {{user.last_name}} will receive introductions to attendees of {{deal.chapter.name}} events that request an introduction to your preferred {{deal.interest.interest}} provider.  The exact number of leads he/she receives will depend on how many leads are generated through {{deal.chapter.name}}, the monthly budget {{user.first_name}} has set, and the other event communities he is receiving leads from.  Any individual lead may go to up to two other {{deal.interest.interest}} providers, in addition to {{user.first_name}}.  {{user.first_name}} will be billed for each introduction sent through BrightMap.
-{% endif %}
-{% if type == 'Trial' %}
-Free Trial: {{user.first_name}} {{user.last_name}} will receive introductions to attendees of {{deal.chapter.name}} events that request an introduction to your preferred {{deal.interest.interest}} provider.  The exact number of leads he/she receives will depend on how many leads are generated through {{deal.chapter.name}} and the number of other {{deal.interest.interest}} providers receiving leads from {{deal.chapter.name}}.  Any individual lead may go to up to two other {{deal.interest.interest}} providers, in addition to {{user.first_name}}.  {{user.first_name}} will not be billed for any leads for this trial, which will last for one month.  After the one-month trial period, {{user.first_name}} will need to purchase leads in order to continue as a provider for {{deal.chapter.name}}
-{% endif %}
-
-{{user.first_name}} {{user.last_name}} Background:
-Website: {{user.get_profile.website}}
-Phone: {{user.get_profile.phone}}
-LinkedIn: {{user.get_profile.linkedin}} 
-Twitter: {{user.get_profile.twitter}}
-
-Check your BrightMap dashboard to approve or decline this deal
+Check your BrightMap dashboard to see complete details on this sponsor and approve this deal
 
 http://brightmap.com/organ/dash/
 
 
 Best regards,
-Graham.
+The BrightMap Team
 {% endautoescape %}

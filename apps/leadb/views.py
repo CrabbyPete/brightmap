@@ -42,7 +42,7 @@ from forms                          import ( DEAL_CHOICES, BuyerForm, ApplyForm,
 def mail_organizer( user, deal, term, deal_type ):
     # Render the letter
     organizer  = deal.chapter.organizer
-    subject    = "New BrightMap Service Provider Request: %s"%(deal.interest)
+    subject    = deal.chapter.name + ' sponsorship: ' + user.first_name + ' '+ user.last_name
     sender     = 'requests@brightmap.com'
     recipients = [ organizer.email, term.buyer.email ]
     

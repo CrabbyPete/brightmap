@@ -193,9 +193,7 @@ def accounting( autobill = False ):
             notify_user( invoice )
             bill_user( invoice )
         
-
-
-       
+   
 def main(month = None):
     """
     Main program to do accounting for all lead buyers and organizers
