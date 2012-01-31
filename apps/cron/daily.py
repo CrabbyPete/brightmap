@@ -31,28 +31,28 @@ def warn_user( term, warning = False ):
         buyer     = term.buyer
         organizer = term.deal.chapter.organizer
         if warning:
-            template = 'expire_warning.tmpl'
+            template_name = 'expire_warning.tmpl'
             subject  = 'BrightMap Trial Expiring: ' + term.deal.chapter.name
             connects = term.connections()
         else:
-            template = 'expire_notice.tmpl'
+            template_name = 'expire_notice.tmpl'
             subject  = 'BrightMap Trial Expired: ' + term.deal.chapter.name
             connects = term.connections()
 
             
-            
-        mail = Mail( organizer.email,
-                     [buyer.email],
-                     subject,
-                     template,
-                     bcc = [organizer.email], 
-                     buyer = buyer,
-                     term  = term,
-                     connections = connects,
-                     url   = reverse('lb_dash')
-                    )
+        msg = Mail( organizer.email,
+                    [buyer.email], 
+                    subject = subject, 
+                    template_name = template_name, 
+                    bcc = [organizer.email], 
+                    buyer = buyer,
+                    term  = term,
+                    connections = connects,
+                    url   = reverse('lb_dash')
+                   )
         
-        if not mail.send():
+        result = msg.send()
+        if not result:
             print log('Error sending email to %s for deal expiration'%( buyer.email,))
         
         # If this is not warning, delete the trial and make it a standard deal

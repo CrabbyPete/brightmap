@@ -20,17 +20,20 @@ logger = logging.getLogger('main.py')
 
 
 
-class Mail(object):
+class Mail():
     """
     Mail class
     """
+    body = ''
+    subject = ''
+    bcc = ['bcc@brightmap.com']
 
     # Initialize with Gmail address and password
     def __init__( self, sender, receivers, subject, template_name, bcc = None, **kwargs ):
         self.sender    = sender
         self.receivers = receivers
         self.subject   = subject
-        self.bcc = ['bcc@brightmap.com']
+
         if bcc:
             self.bcc.extend(bcc)
 
