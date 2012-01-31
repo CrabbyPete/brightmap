@@ -4,7 +4,6 @@ logger = logging.getLogger(__name__)
 from datetime                       import datetime, timedelta, time
 
 
-
 # Django imports
 from django.contrib                 import  auth
 from django.contrib.auth.models     import  User
@@ -420,11 +419,9 @@ class TermView( FormView ):
     def form_valid(self, form ):
         if 'term' in self.request.GET:           
             term = Term.objects.get( pk = self.request.GET['term'] )
-            if form.cleaned_data['status']:
-                term.status = form.cleaned_data['status']
-            
-            if form.cleaned_data['cost']:
-                term.cost = form.cleaned_data['cost']
+            term.status = form.cleaned_data['status']
+            term.cost = form.cleaned_data['cost']
+            term.exclusive = form.cleaned_data['exclusive']
             
             term.save()
                                      
@@ -474,6 +471,11 @@ class EventView( FormView ):
 
         if 'month' in request.GET:
             first_day = datetime.today().replace(day = 1)
+            month = request.GET['month']
+            if month:
+                month = int(month) + 1
+                first_day = first_day.replace(month = month)
+            
             if first_day.month == 12:
                 last_day = first_day.replace ( day = 31 )
             else:
@@ -481,7 +483,7 @@ class EventView( FormView ):
             
             dates = ( datetime.combine( first_day, time.min ),  datetime.combine( last_day, time.max ) )
             events = Event.objects.filter( date__range = dates ).order_by('date')
-            return self.render_to_response( {'events': events} )
+            return self.render_to_response( {'events': events, 'month':first_day.month} )
     
     def form_valid(self, form):
         return HttpResponseRedirect('/')
@@ -630,7 +632,7 @@ def remind( request ):
         url = 'http://brightmap.com/'+reverse('or_dash')
         context    = {'term':term, 'url':url}
         template   = 'reminder.tmpl'
-        subject    = "BrightMap Deal Request Reminder"
+        subject    = 'BrightMap Sponsorship: '+ term.buyer.first_name+ ' '+ term.buyer.last_name+' - APPROVAL REQUIRED' 
         sender     = 'requests@brightmap.com'
         recipients = [ term.deal.chapter.organizer.email ]
         bcc        = []

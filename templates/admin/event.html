@@ -13,6 +13,8 @@
         </tr>
     {% endfor %}
     </table>
+    <a href='{% url event %}?month={{month}}'>Next</a>
+    <br/>
 	{% endif %}
 	
 	{% if form %}
