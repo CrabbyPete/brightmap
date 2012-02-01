@@ -545,13 +545,16 @@ class InvoiceView ( FormView):
             invoice = Invoice.objects.get(pk = request.GET['invoice'])
            
             # Update to the latest invoice
-            invoice = invoice_user ( invoice.user, invoice.first_day, invoice.last_day )
-
-            form = InvoiceForm(instance = invoice)
+            updated_invoice = invoice_user ( invoice.user, invoice.first_day, invoice.last_day )
+            if updated_invoice:
+                invoice = updated_invoice
+            
             connections = invoice.connections()
+            form = InvoiceForm(instance = invoice)
+            
             return self.render_to_response( {'form':form, 'invoice':invoice, 'connections':connections} )
         
-        invoices = Invoice.objects.all().order_by('issued')
+        invoices = Invoice.objects.all().order_by('issued').reverse()
         return self.render_to_response( {'invoices':invoices} )
         
  
