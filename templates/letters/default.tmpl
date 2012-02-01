@@ -7,7 +7,7 @@
 {% if sponser.get_profile.phone %}{{sponser.get_profile.phone|phonenumber}}{% endif %}
 
 {{sponser.first_name}},
-  {{attendee.first_name}} {{attendee.last_name}}{% if attendee.get_profile.company %} of {{attendee.get_profile.company}}{% endif %} will be joining us on {{event.date|date:"M d"}}.  Can you let {{attendee.first_name}} know the best way to find you there and/or if you're available to talk beforehand?
+  {{attendee.first_name}} {{attendee.last_name}}{% if attendee.get_profile.company %} of {{attendee.get_profile.company}}{% endif %} will be joining us on {{event.date|date:"M j"}}.  Can you let {{attendee.first_name}} know the best way to find you there and/or if you're available to talk beforehand?
 
 Please let me know if I can be of further assistance.  Otherwise, I look forward to seeing you both at the event!
 

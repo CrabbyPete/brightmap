@@ -175,14 +175,23 @@ def notify_user( invoice ):
             pass
  
 
-def accounting( autobill = False ):
+def accounting( month = None, autobill = False ):
     """
     Update all the invoices for the month
     """
-    print "Invoicing for the month of: " + datetime.today().strftime("%B %Y")
+    if not month:
+        print "Invoicing for the month of: " + datetime.today().strftime("%B %Y")
+    else:
+        first_day, last_day = days_of_month( month = month )
+        print "Invoicing for the month of: " + first_day.strftime("%B %Y")
+        
     for profile in Profile.objects.filter( is_leadbuyer = True ):
         user = profile.user
-        invoice = invoice_user( user )
+        if month:
+            invoice = invoice_user( user, first_day = first_day, last_day = last_day )
+        else:
+            invoice = invoice_user( user )
+        
         if not invoice:
             continue
  
@@ -198,7 +207,7 @@ def main(month = None):
     """
     Main program to do accounting for all lead buyers and organizers
     """
-    accounting(autobill = False)
+    accounting(month = month, autobill = False)
 
  
 import optparse

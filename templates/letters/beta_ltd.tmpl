@@ -1,0 +1,17 @@
+
+{% load phone %}
+{% autoescape off %}
+Hi {{attendee.first_name}},
+
+When you registered for our upcoming {{chapter.name}} event, you requested an introduction to our preferred {{interest}} provider. Please meet {{sponser.first_name}} {{sponser.last_name}}, {{sponser.get_profile.title}} at {{sponser.get_profile.company}}.
+{% if sponser.get_profile.website %}{{sponser.get_profile.website}}{% endif %}
+
+Hi {{sponser.first_name}},
+
+{{attendee.first_name}} {{attendee.last_name}}{% if attendee.get_profile.company %} of {{attendee.get_profile.company}}{% endif %} will be joining us at Beta on {{event.date|date:"M d"}}.  {{attendee.first_name}} may be interested in learning more about your services, and I suggest you find a time to connect
+
+
+Best regards,
+{{organizer.first_name}} {{organizer.last_name}}
+{{chapter.organization.name}}
+{% endautoescape %}

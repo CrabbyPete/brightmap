@@ -101,12 +101,18 @@ if __name__ == '__main__':
     op.add_option('--accounting', default = False, action="store_true", help = 'Run accounting')
     op.add_option('--trials',     default = False, action="store_true", help = 'Check trial deal expiration')
     op.add_option('--auto',       default = False, action="store_true", help = 'Automatically bill')
-
+    op.add_option('-m',           dest = 'month',  action="store",      help = 'Month number to bill')
     (opts,args) = op.parse_args()
 
     # Check if options were set
     if opts.accounting:
-        accounting()
+        if opts.month:
+            month = opts.month
+        else:
+            month = None
+        
+        accounting(month = month)
+        
     
     if opts.trials:
         check_expired()
