@@ -42,14 +42,20 @@ from forms                          import ( DEAL_CHOICES, BuyerForm, ApplyForm,
 def mail_organizer( user, deal, term, deal_type ):
     # Render the letter
     organizer  = deal.chapter.organizer
-    subject    = deal.chapter.name + ' sponsorship: ' + user.first_name + ' '+ user.last_name
     sender     = 'requests@brightmap.com'
-    recipients = [ organizer.email, term.buyer.email ]
-    
+    if deal_type == 'cancel': 
+        subject    = deal.chapter.name + ' deal canceled: ' + user.first_name + ' '+ user.last_name
+        recipients = [ organizer.email ]
+        template_name = 'canceled.tmpl'
+    else:
+        subject    = deal.chapter.name + ' sponsorship: ' + user.first_name + ' '+ user.last_name
+        recipients = [ organizer.email, term.buyer.email ]
+        template_name = 'request.tmpl'
+
     mail = Mail( sender, 
                  recipients, 
                  subject, 
-                 template_name = 'request.tmpl', 
+                 template_name = template_name, 
                  user =  user,
                  deal = deal,
                  term = term,
@@ -836,5 +842,6 @@ def cancel_term(request):
         term = Term.objects.get(pk = request.GET['term'])
         term.status = 'canceled'
         term.save()
+        mail_organizer( request.user, term.deal, term, deal_type = 'cancel' )
     return HttpResponseRedirect(reverse('lb_dash'))
 

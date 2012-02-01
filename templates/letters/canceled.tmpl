@@ -1,0 +1,18 @@
+{% autoescape off %}
+{{deal.chapter.organizer.first_name}},
+
+{{user.first_name}} {{user.last_name}} has canceled his current sponsorship with {{deal.chapter.name}} on BrightMap.
+
+Canceled Sponsor:
+{{user.first_name}} {{user.last_name}}
+{{deal.interest.interest}}
+{{user.get_profile.title}} at {{user.get_profile.company}}
+
+Check your BrightMap dashboard to see complete details on this sponsor.
+
+http://brightmap.com/organ/dash/
+
+
+Best regards,
+The BrightMap Team
+{% endautoescape %}
