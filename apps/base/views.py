@@ -561,7 +561,7 @@ class InvoiceView ( FormView):
             
     def form_valid(self, form ):
         invoice = Invoice.objects.get( pk = self.request.GET['invoice'] )
-        if invoice.status == 'pending':
+        if invoice.status == 'pending' and invoice.cost > 0:
             invoice = bill_user ( invoice )
             pay_commissions( invoice )
             if invoice.status == 'paid':

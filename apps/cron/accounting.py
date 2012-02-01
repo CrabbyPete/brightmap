@@ -80,9 +80,7 @@ def invoice_user( user, first_day = None, last_day = None ):
                 duplicates.append( connection.survey.attendee )
     
  
-    if not cost:
-        return None
- 
+    # Go throught the invoices
     title = first_day.strftime("%B %Y")
                 
     # See if there is an existing invoice for this month
@@ -92,7 +90,10 @@ def invoice_user( user, first_day = None, last_day = None ):
                                        first_day = first_day,
                                        last_day  = last_day  )
     except Invoice.DoesNotExist:
-        # Create an invoice 
+        # Create a new invoive if the cost is not 0
+        if cost == 0:
+            return None
+        
         invoice = Invoice( user      = user, 
                            title     = title,
                            first_day = first_day, 
@@ -103,7 +104,6 @@ def invoice_user( user, first_day = None, last_day = None ):
         invoice.cost = cost
         invoice.status = 'pending'
         invoice.save()
-    
     
     return invoice 
             
@@ -179,19 +179,13 @@ def accounting( month = None, autobill = False ):
     """
     Update all the invoices for the month
     """
-    if not month:
-        print "Invoicing for the month of: " + datetime.today().strftime("%B %Y")
-    else:
-        first_day, last_day = days_of_month( month = month )
-        print "Invoicing for the month of: " + first_day.strftime("%B %Y")
+    first_day, last_day = days_of_month( month = month )
+    print "Invoicing for the month of: " + first_day.strftime("%B %Y")
         
     for profile in Profile.objects.filter( is_leadbuyer = True ):
         user = profile.user
-        if month:
-            invoice = invoice_user( user, first_day = first_day, last_day = last_day )
-        else:
-            invoice = invoice_user( user )
-        
+        invoice = invoice_user( user, first_day = first_day, last_day = last_day )
+
         if not invoice:
             continue
  
