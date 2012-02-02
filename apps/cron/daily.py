@@ -8,7 +8,8 @@ import optparse
 from datetime                       import  date, datetime, timedelta
 
 # Local Imports
-from base.models                    import  Expire, Cancel
+import settings
+from base.models                    import  Term, Expire, Cancel, Authorize
 from base.mail                      import  Mail 
 from accounting                     import  accounting
 
@@ -93,29 +94,83 @@ def check_expired():
             print str( expire.pk ) + ' ' + expire.buyer.last_name +' ' + expire.date.strftime("%Y-%m-%d %H:%M")
             warn_user( expire, warning = True )
             
+def convert_pending_deals():
+    terms = Term.objects.filter( status = 'pending' )
+    
+    for term in terms:
+        # Check if the user is approved 
+        try:
+            authorize = Authorize.objects.get( user = term.buyer )
+        except Authorize.DoesNotExist:
+            continue
+        if not authorize.profile_id:
+            continue
+        
+        # If this is a Standard or Exclusive deal
+        child = term.get_child()
+        if isinstance(child,Cancel) and child.cost > 0:
+            child.status = 'approved'
+        elif isinstance(child,Expire):
+            # Check the number of trials the buyer has
+            expires = Expire.objects.filter( buyer = term.buyer, status='approved' )
+            if len ( expires ) >= settings.MAX_TRIALS:
+                continue
+            
+            # Check the number of trials the organizer has
+            expires = Expire.objects.filter ( deal = term.deal, status='approved' )
+            if len ( expires ) > 0:
+                continue
+            
+            child.status = 'approved'
+        
+        print "Converting deal: " + term.deal.chapter.name + '-' +\
+                                    term.deal.interest.interest + ' for ' +\
+                                    term.buyer.first_name + ' ' + term.buyer.last_name 
+                                    
+        child.save()
+        subject = term.deal.chapter.name + ' sponsorship approved'
+        mail = Mail( "deals@brightmap.com",
+                     [term.buyer.email, term.deal.chapter.organizer.email],
+                     subject,
+                     'deal_status.tmpl',
+                     term = child,
+                     url  = reverse('lb_dash')
+                    )
+        mail.send()
+
 
 if __name__ == '__main__':
     op = optparse.OptionParser( usage="usage: %prog " +" [options]" )
     
     # Add options for debugging
-    op.add_option('--accounting', default = False, action="store_true", help = 'Run accounting')
     op.add_option('--trials',     default = False, action="store_true", help = 'Check trial deal expiration')
+    op.add_option('--pending',    default = False, action="store_true", help = 'Convert pending deals')
+    op.add_option('--accounting', default = False, action="store_true", help = 'Run accounting')
     op.add_option('--auto',       default = False, action="store_true", help = 'Automatically bill')
     op.add_option('-m',           dest = 'month',  action="store",      help = 'Month number to bill')
+    op.add_option('-y',           dest = 'year',   action="store",      help = 'Year number to bill')
+    
     (opts,args) = op.parse_args()
 
     # Check if options were set
     if opts.accounting:
         if opts.month:
             month = opts.month
+            if opts.year:
+                year = opts.year
         else:
             month = None
+            year  = None
         
-        accounting(month = month)
+        accounting(month = month, year = year )
         
-    
+    # Convert trial deals to standard one
     if opts.trials:
         check_expired()
+    
+    # Convert pending deals to approved ones
+    if opts.pending:
+        convert_pending_deals()
         
  
 

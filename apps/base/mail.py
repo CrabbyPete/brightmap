@@ -61,7 +61,7 @@ class Mail():
 
         if not SEND_EMAIL:
             self.receivers = ['pete.douma@gmail.com']
-            self.bcc = ['bcc@brightmap.com']
+            self.bcc = ['test@brightmap.com']
     
         msg = EmailMultiAlternatives( subject    = self.subject,
                                       body       = self.body,

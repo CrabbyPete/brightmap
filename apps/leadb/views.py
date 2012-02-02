@@ -42,7 +42,7 @@ from forms                          import ( DEAL_CHOICES, BuyerForm, ApplyForm,
 def mail_organizer( user, deal, term, deal_type ):
     # Render the letter
     organizer  = deal.chapter.organizer
-    sender     = 'requests@brightmap.com'
+    sender     = 'deals@brightmap.com'
     if deal_type == 'cancel': 
         subject    = deal.chapter.name + ' deal canceled: ' + user.first_name + ' '+ user.last_name
         recipients = [ organizer.email ]

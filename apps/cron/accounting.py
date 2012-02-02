@@ -20,11 +20,13 @@ from authorize.gen_xml              import VALIDATION_TEST, AUTH_ONLY, AUTH_CAPT
 from authorize.responses            import AuthorizeError, _cim_response_codes
 
 
-def days_of_month (month = None):
+def days_of_month (month = None, year = None):
     
     first_day = datetime.today().replace(day = 1)
     if  month:
         first_day = first_day.replace( month = int(month) )
+        if year:
+            first_day = first_day.replace( year = int(year) )
 
     if first_day.month == 12:
         last_day = first_day.replace ( day = 31 )
@@ -175,11 +177,11 @@ def notify_user( invoice ):
             pass
  
 
-def accounting( month = None, autobill = False ):
+def accounting( month = None, year = None, autobill = False ):
     """
     Update all the invoices for the month
     """
-    first_day, last_day = days_of_month( month = month )
+    first_day, last_day = days_of_month( month = month, year = year )
     print "Invoicing for the month of: " + first_day.strftime("%B %Y")
         
     for profile in Profile.objects.filter( is_leadbuyer = True ):
