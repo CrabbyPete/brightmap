@@ -108,10 +108,15 @@ def convert_pending_deals():
         
         # If this is a Standard or Exclusive deal
         child = term.get_child()
-        if isinstance(child,Cancel) and child.cost > 0:
-            child.status = 'approved'
+        
+        # Approve Standard deals
+        if isinstance(child,Cancel):
+            if child.exclusive:
+                continue
+    
+        # Check trial deals, only allow 1 per buyer, 1 per chapter
         elif isinstance(child,Expire):
-            # Check the number of trials the buyer has
+            
             expires = Expire.objects.filter( buyer = term.buyer, status='approved' )
             if len ( expires ) >= settings.MAX_TRIALS:
                 continue
@@ -121,23 +126,21 @@ def convert_pending_deals():
             if len ( expires ) > 0:
                 continue
             
-            child.status = 'approved'
-        
+        term.status = 'approved'
+        term.save()
         print "Converting deal: " + term.deal.chapter.name + '-' +\
                                     term.deal.interest.interest + ' for ' +\
                                     term.buyer.first_name + ' ' + term.buyer.last_name 
                                     
-        child.save()
         subject = term.deal.chapter.name + ' sponsorship approved'
         mail = Mail( "deals@brightmap.com",
                      [term.buyer.email, term.deal.chapter.organizer.email],
                      subject,
                      'deal_status.tmpl',
-                     term = child,
+                     term = term,
                      url  = reverse('lb_dash')
                     )
         mail.send()
-
 
 if __name__ == '__main__':
     op = optparse.OptionParser( usage="usage: %prog " +" [options]" )

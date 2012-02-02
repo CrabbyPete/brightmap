@@ -515,65 +515,7 @@ def main():
                     print log( "%s:%s  has no surveys"%(chapter.name, event.describe),'green')
 
 
-def accounting():
-    """
-    Update all the invoices for the month
-    """
-    print "Invoicing for the month of: " + TODAY.strftime("%B %Y")
-    for profile in Profile.objects.filter( is_leadbuyer = True ):
-        
-        days = days_of_month()
-        user = profile.user
-        
-        connections = Connection.objects.for_buyer( user, days )
-        cost = sum( connection.term.cost for connection in connections if connection.status == 'sent' )
- 
-        if not cost:
-            continue
- 
-        title = days[0].strftime("%B %Y")
-                
-        # See if there is an existing invoice for this month
-        try:
-            invoice = Invoice.objects.get( user      = user,
-                                           title     = title,
-                                           first_day = days[0],
-                                           last_day  = days[1]  )
-        except Invoice.DoesNotExist:
-            # Create an invoice 
-            invoice = Invoice( user      = user, 
-                               title     = title,
-                               first_day = days[0], 
-                               last_day  = days[1] 
-                             )
-    
-        invoice.cost = cost
-        invoice.status = 'pending'
-        invoice.save()
-        print profile.user.first_name + ' ' + profile.user.last_name + " = " + str( invoice.cost )
-
-
-
-def check_expired():
-    expires = Expire.objects.filter(status='approved')
-    for expire in expires:
-        day =  date.today()
-        warning_day = day - timedelta( days = 5 )
-        if expire.date < date.today():
-            print log( 'Converting trial deal for '+\
-                       expire.buyer.last_name+','+expire.buyer.first_name+ ' ' +\
-                       expire.date.strftime("%Y-%m-%d") + ' '+\
-                       expire.deal.chapter.name +\
-                       ' with ' + str( len(expire.connections()) )+ ' connections: '
-                     )
-
-            warn_user(expire)
-        
-        # Warn the user 5 days before. Make sure main is only run once a day.
-        elif expire.date == warning_day:
-            print str( expire.pk ) + ' ' + expire.buyer.last_name +' ' + expire.date.strftime("%Y-%m-%d %H:%M")
-            warn_user( expire, warning = True )
-            
+         
 import optparse
 if __name__ == '__main__':
     op = optparse.OptionParser( usage="usage: %prog " +" [options]" )
