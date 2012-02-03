@@ -135,7 +135,10 @@ class  SignUpView( FormView ):
             form._errors['agree'] = ErrorList(["Please check agreement"])
             return self.form_invalid(form)
     
+        # Get or create a user
         user = self.request.user
+        
+        # Is this someone new
         if user.is_anonymous():
             try:
                 user = User.objects.get(email = email)
@@ -148,8 +151,10 @@ class  SignUpView( FormView ):
                 profile = Profile( user = user)
                 profile.save()
             else:
-                form._errors['email'] = ErrorList(["This email already exists"])
-                return self.form_invalid( form )
+                # Is an existing user signing up as a leadbuyer
+                if not user.check_password(password):
+                    form._errors['email'] = ErrorList(["This email already exists"])
+                    return self.form_invalid( form )
                     
         elif email != user.email:
             try:
@@ -157,8 +162,9 @@ class  SignUpView( FormView ):
             except User.DoesNotExist:
                 user.email = email
             else:
-                form._errors['email'] = ErrorList(["This email already exists"])
-                return self.form_invalid( form )
+                if not user.check_password(password):
+                    form._errors['email'] = ErrorList(["This email already exists"])
+                    return self.form_invalid( form )
         
         
         user.first_name = form.cleaned_data['first_name'].capitalize()

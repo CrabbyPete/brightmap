@@ -104,8 +104,9 @@ class SignUpView( FormView ):
                 profile = Profile( user = user)
                 profile.save()
             else:
-                form._errors['email'] = ErrorList(["This email already exists"])
-                return self.form_invalid(form)
+                if not user.check_password(password):
+                    form._errors['email'] = ErrorList(["This email already exists"])
+                    return self.form_invalid(form)
         
         # An existing user is changing their email address
         elif email != user.email:
