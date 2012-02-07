@@ -62,11 +62,11 @@ class GoogleSpreadSheet():
     # Get the work for each name
     def getWorkSheet(self, name):
         if self.curr_id != None:
-            id = self.curr_id
+            gid = self.curr_id
         else:
             return None
 
-        feed = self.gd_client.GetWorksheetsFeed(id)
+        feed = self.gd_client.GetWorksheetsFeed(gid)
         #self.printFeed(feed)
         for entry in feed.entry:
             if name in entry.title.text:
@@ -121,7 +121,21 @@ class GoogleSpreadSheet():
 
         return spreadsheet
 
+    def addRow(self, row ):
+        entry = self.gd_client.InsertRow( row, self.curr_id, self.curr_wksht_id )
+        if isinstance(entry, gdata.spreadsheet.SpreadsheetsList):
+            return True
+        return False
+        
+        
+    def editRow(self, index, row ):   
+        feed = self.gd_client.GetListFeed(self.curr_id, self.curr_wksht_id)
+        entry = self.gd_client.UpdateRow( feed.entry[index], row )
+        if isinstance(entry, gdata.spreadsheet.SpreadsheetsList):
+            return True
+        return False
 
+                 
     def printFeed(self, feed):
         for i, entry in enumerate(feed.entry):
             if isinstance(feed, gdata.spreadsheet.SpreadsheetsCellsFeed):
@@ -135,93 +149,4 @@ class GoogleSpreadSheet():
             else:
                 print '%s %s\n' % (i, entry.title.text)
 
-
-class Gmailer(object):
-
-    # Initialize with Gmail address and password
-    def __init__( self, user, password, server = 'smtp.gmail.com' ):
-        self.gmail = self.email_connect( username = user,
-                                         password = password,
-                                         server   = server     )
-
-    # Connect to the gmail stmp server
-    def email_connect( self,
-                       username = None,
-                       password = None,
-                       server   = 'smtp.gmail.com' ):
-
-        em = SMTP(server, 587)
-
-        em.set_debuglevel(False)
-        em.ehlo()
-        em.starttls()
-        em.ehlo()
-        em.login(username, password)
-        return em
-
-    # Mail the message. It will alway be from the current gmail address.
-    def email_to( self, text, to, me, subject ):
-        msg = MIMEText( text )
-        msg['Subject'] = subject
-        msg['From'] = me
-
-        # To is a list of To addresses
-        COMMASPACE = ', '
-        msg['To'] = COMMASPACE.join(to)
-        if not self.gmail:
-            self.gmail = email_connect(username = username, password = password)
-            #self.gmail.sendmail(me, to, msg.as_string())
-
-class GoogleOAuth(object):
-
-    request_token_url = 'https://www.google.com/accounts/OAuthGetRequestToken'
-    access_token_url  = 'https://www.google.com/accounts/OAuthGetAccessToken'
-    authorization_url = 'https://www.google.com/accounts/OAuthAuthorizeToken'
-
-    def __init__( self, api_key, app_secret, callback = None ):
-        self.consumer  = oauth.Consumer(api_key, app_secret)
-        self.callback = callback
-
-    def get_tokens(self):
-        kwargs = {'scope':'https://mail.google.com/'}
-        req = oauth.Request.from_consumer_and_token( self.consumer,
-                                            http_url = self.request_token_url,
-                                            parameters = kwargs
-                                                   )
-
-        req.sign_request(oauth.SignatureMethod_HMAC_SHA1(), self.consumer, None)
-        data = urllib.urlencode(req)
-
-        url='%s?%s'%(self.request_token_url, data)
-        response = urllib.urlopen(url)
-
-        data = response.read()
-        token = oauth.Token.from_string(data)
-        pdb.set_trace()
-        data = oauth.Request.from_token_and_callback( token  = token,
-                                             callback = self.callback,
-                                             http_url = self.authorization_url )
-
-        data = urllib.urlencode(data)
-        url='%s?%s'%(self.authorization_url, data)
-        return url, token
-
-    def callback(self, request):
-        if 'oauth_token' in request.values:
-            oauth_token = request.values['oauth_token']
-
-        token = oauth.Token( self.oauth_token, self.oauth_secret )
-
-        if 'oauth_verifier' in request.values:
-            token.set_verifier(request.values['oauth_verifier'])
-
-        self.client = oauth.Client(self.consumer, token)
-
-        # Step 2. Request the authorized access token from Provider.
-        resp, content = self.client.request(self.access_token_url, "GET")
-        if resp['status'] != '200':
-            raise Exception("Invalid response from Provider.")
-
-        parts = dict(cgi.parse_qsl(content))
-        return parts
 

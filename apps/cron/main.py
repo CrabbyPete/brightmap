@@ -1,5 +1,5 @@
 import django_header
-
+import pdb
 
 # Python libraries
 from datetime                       import  datetime, timedelta, date
@@ -90,14 +90,21 @@ def mail_buyer ( user, event ):
     receiver = [ user.email ]
     bcc      = None,
     subject  = 'Brightmap Invitation'
-    url      = reverse('lb_signup')
+    url      = reverse('learn')+'?service'
     
     mail = Mail( sender, receiver,subject,'leadbuyer.tmpl',bcc, 
                  user = user, 
                  url = url,  
                  chapter = event.chapter
                )
-    mail.send()
+    
+    if PROMPT:
+        ans = raw_input('Send Leadbuyer request? (y/n)')
+        if ans != 'y':
+            return
+    
+    if mail.send():
+        print log( "New lead buyer: " + receiver )
 
 
 def database_attendees( event, api ):
@@ -245,65 +252,9 @@ def check_budget( term ):
     if total >= leadbuyer.budget:
         return False
     
-    warning_level = float(leadbuyer.budget) * 0.80
-    if total >= warning_level:
-        buyer     = term.buyer
-        organizer = term.deal.chapter.organizer
- 
-        mail = Mail( organizer.email,
-                     [buyer.email], 
-                     'Budget',
-                     'budget_notice.tmpl',
-                     buyer = buyer,
-                     budget = leadbuyer.budget,
-                     total = total,
-                     url   = reverse('lb_dash')
-                    )
-        mail.send()
-    
-    
     return True
 
 
-def warn_user( term, warning = False ):
-    """
-    Warn a deal buyer that their deal has changed, if warning is about to expire
-    """
-    child = term.get_child()
-    if isinstance(child, Expire) or isinstance(term, Expire):
-        buyer     = term.buyer
-        organizer = term.deal.chapter.organizer
-        if warning:
-            template = 'expire_warning.tmpl'
-        else:
-            template = 'expire_notice.tmpl'
-            
-        mail = Mail( organizer.email,
-                     [buyer.email],
-                     'Trial Deal Expiration',
-                     template,
-                     bcc = [organizer.email], 
-                     buyer = buyer,
-                     term  = term,
-                     url   = reverse('lb_dash')
-                    )
-        
-        if not mail.send():
-            print log('Error sending email to %s for deal expiration'%( buyer.email,))
-        
-        # If this is not warning, delete the trial and make it a standard deal
-        if not warning:
-            term.canceled()
-            new_term = Cancel(  deal  = term.deal,
-                                cost  = 20,
-                                buyer = term.buyer,
-                                exclusive = False,
-                                status = 'approved'
-                             )
-            new_term.save()
-        
-    return
- 
 def filter_company( company ):
     """
     Filter out non company titles
@@ -333,22 +284,21 @@ def make_contact( survey, deal, letter ):
         
         # If you had a good deal that went bad .eg trial expires notify user
         if not term.execute( event = survey.event ):
-            #warn_user( term ) # This should never be hit now we do it up front. 
             continue
              
         # Don't spam, limit the number of emails per event
         if survey.mails_for() > MAX_MAIL_SEND:
             continue
    
-        # Determine if the budget is exceeded
+        # Determine if the budget is exceeded, don't send the connection
         if not check_budget( term ):
             continue
-        
-        
+            
         # Determine if you did this or not
         connection = survey.event.add_connection( survey, term )
         if not connection:
             continue
+
 
         # Count email so you don't spam
         survey.mailed += 1
@@ -392,7 +342,7 @@ def make_contact( survey, deal, letter ):
 
         # If the prompt was set ask before sending
         if PROMPT:
-            ans = raw_input('Send? (y/n)')
+            ans = raw_input('Send Connection? (y/n)')
             if ans != 'y':
                 continue
 

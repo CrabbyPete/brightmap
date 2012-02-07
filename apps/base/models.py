@@ -136,7 +136,11 @@ class Chapter( models.Model ):
             return None
 
     def configured(self):
-        ticket = self.eventbrite_set.get()
+        try:
+            ticket = self.eventbrite_set.get()
+        except:
+            return False
+        
         if ticket.user_key and ticket.organizer_id:
             return True
         return False
@@ -318,6 +322,10 @@ class Deal(models.Model):
 
     def active(self):
         return Term.objects.filter(deal = self, status = 'approved')
+    
+    
+    def trials(self):
+        return Expire.objects.filter( deal = self, status = 'approved' )
     
     
     def exclusive ( self ):
@@ -603,11 +611,15 @@ class Event(models.Model):
                 interests[survey.interest.interest] += 1
         return interests
     
-    def connections(self):
+    def connections(self, paid = False):
         #return self.connection_set.all()
         conns = []
         for survey in self.surveys(lead = True):
             for c in Connection.objects.filter(survey = survey):
+                if paid:
+                    if c.term.cost == 0:
+                        continue
+                
                 conns.append(c)
         return conns
     

@@ -1,7 +1,18 @@
+
 {{buyer.first_name}},
 
-This is to let you know that the total value of leads you have received is now ${{total}} and your budget is set at
-${{budget}}
+Your BrightMap budget this month is nearly used up.
 
+Your current monthly budget is ${{budget}}.  So far this month, you have received {{connections|length}} leads totaling ${{total}}.  
+These leads are:
+{% for connection in connections %}
+{{connection.survey.attendee.first_name}} {{connection.survey.attendee.last_name }}
+{% endfor %}
 
-The BrightMap Team. 
+You will receive more leads this month, if you increase your budget now.  
+You can increase your monthly budget from your BrightMap dashboard here:
+
+{{url}}
+
+Best regards,
+The BrightMap Team

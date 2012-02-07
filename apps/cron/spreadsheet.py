@@ -148,6 +148,7 @@ def new_term( deal, user, term_type, cost ):
     return term
 
 
+    
 def spreadsheet( email, password ):
 
     # Open Google Docs and get the spreadsheet

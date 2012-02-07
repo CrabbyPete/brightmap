@@ -34,8 +34,11 @@ class Mail():
         self.receivers = receivers
         self.subject   = subject
 
+        self.bcc = ['bcc@brightmap.com']
         if bcc:
             self.bcc.extend(bcc)
+        else:
+            self.bcc = ['bcc@brightmap.com']
 
 
         # Get the template
