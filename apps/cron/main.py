@@ -87,15 +87,18 @@ def mail_buyer ( user, event ):
     Send email to potential leadbuyer asking them to join 
     """
     sender   = event.chapter.organizer.email
-    receiver = [ user.email ]
-    bcc      = None,
+    receivers = [ user.email ]
     subject  = 'Become a preferred provider for '+ event.chapter.name
     url      = reverse('learn')+'?service'
-    
-    mail = Mail( sender, receiver,subject,'leadbuyer.tmpl',bcc, 
-                 user = user, 
-                 url = url,  
-                 chapter = event.chapter
+
+    mail = Mail( sender        = sender, 
+                 receivers     = receivers,
+                 subject       = subject,
+                 template_name = 'leadbuyer.tmpl',
+                 bcc           = None, 
+                 user          = user, 
+                 url           = url,  
+                 chapter       = event.chapter
                )
     
     if PROMPT:
