@@ -103,7 +103,6 @@ def mail_buyer ( user, event ):
     
     if PROMPT:
         ans = raw_input('Send Leadbuyer request? (y/n)')
-        pdb.set_trace()
         if ans != 'y':
             return
     
