@@ -651,7 +651,7 @@ class PaymentBudgetView( MultipleFormsView ):
         try:
             response = cim_api.update_profile( **kw )
  
-        except Exception,e:
+        except Exception:
             forms['budget'] = self.budget_form()
             forms['payment']._errors['card_number'] = ErrorList( ['Credit Card Authorization Failed'] )
             return self.forms_invalid(forms)

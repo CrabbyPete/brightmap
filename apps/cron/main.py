@@ -104,7 +104,7 @@ def mail_buyer ( user, event ):
             return
     
     if mail.send():
-        print log( "New lead buyer: " + receiver )
+        print log( "New lead buyer: " + user.email )
 
 
 def database_attendees( event, api ):
@@ -163,6 +163,9 @@ def database_attendees( event, api ):
         interests, leadbuyer = api.check_survey( attendee )
 
         # If they checked they want leads they are a leadbuyer
+        if leadbuyer:
+            print user.email+':leadbuyer'
+            
         if leadbuyer and not profile.is_leadbuyer:
             mail_buyer( user, event )
             profile.is_leadbuyer = True
@@ -286,10 +289,10 @@ def make_contact( survey, deal, letter ):
         if not term.execute( event = survey.event ):
             continue
              
-        # Don't spam, limit the number of emails per event
+        # Don't spam, limit the number of emails per event, per interest
         if survey.mails_for() > MAX_MAIL_SEND:
             continue
-   
+           
         # Determine if the budget is exceeded, don't send the connection
         if not check_budget( term ):
             continue
@@ -298,7 +301,6 @@ def make_contact( survey, deal, letter ):
         connection = survey.event.add_connection( survey, term )
         if not connection:
             continue
-
 
         # Count email so you don't spam
         survey.mailed += 1

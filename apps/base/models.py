@@ -674,15 +674,10 @@ class Survey(models.Model):
 
     def mails_for(self):
         """
-        Emails sent for an attendee, per event
+        Emails sent for an attendee, per event, per interest
         """
-        total_mails = 0
-        mails = Survey.objects.filter( event    = self.event,
-                                       attendee = self.attendee )
-        for mail in mails:
-            total_mails += mail.mailed
-        return total_mails
-
+        mails = Connection.objects.filter( survey = self, status = 'sent' )
+        return len( mails )
 
     def __unicode__(self):
         name = self.attendee.email+':'+ self.event.describe

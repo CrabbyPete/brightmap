@@ -496,7 +496,7 @@ class SurveyView( FormView ):
     def get(self, request, *args, **kwargs):
         if 'event' in request.GET:
             event = Event.objects.get(pk = request.GET['event'])
-            surveys = event.surveys( lead = True )
+            surveys = event.surveys()
             return self.render_to_response( {'surveys': surveys} )
         
         if 'survey' in request.GET:
