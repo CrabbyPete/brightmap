@@ -10,7 +10,7 @@ from dateutils                      import relativedelta
 # Django imports
 from django.views.generic.base      import  TemplateView, View
 from django.views.generic.edit      import  FormView
-from django.template                import  loader, Context, RequestContext
+from django.template                import  RequestContext
 from django.contrib                 import  auth
 from django.contrib.auth.models     import  User
 from django.contrib.auth.decorators import  login_required
@@ -18,7 +18,6 @@ from django.http                    import  HttpResponseRedirect
 from django.shortcuts               import  render_to_response
 from django.forms.util              import  ErrorList
 from django.core.urlresolvers       import  reverse
-from django.core.mail               import  EmailMultiAlternatives
 
 
 #Authorize imports

@@ -2,7 +2,7 @@ import django_header
 import pdb
 
 # Python libraries
-from datetime                       import  datetime, timedelta, date
+from datetime                       import  datetime, timedelta
 from termcolor                      import  colored
 
 # Django libraries
@@ -86,10 +86,10 @@ def mail_buyer ( user, event ):
     """ 
     Send email to potential leadbuyer asking them to join 
     """
-    sender   = 'request@brightmap.com'
+    sender   = event.chapter.organizer.email
     receiver = [ user.email ]
     bcc      = None,
-    subject  = 'Brightmap Invitation'
+    subject  = 'Become a preferred provider for '+ event.chapter.name
     url      = reverse('learn')+'?service'
     
     mail = Mail( sender, receiver,subject,'leadbuyer.tmpl',bcc, 
@@ -100,6 +100,7 @@ def mail_buyer ( user, event ):
     
     if PROMPT:
         ans = raw_input('Send Leadbuyer request? (y/n)')
+        pdb.set_trace()
         if ans != 'y':
             return
     

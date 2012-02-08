@@ -236,6 +236,23 @@ class ProfileView( FormView ):
         return HttpResponseRedirect('/')   
    
     def form_valid(self, form):
+        """
+        profile.address       = form.cleaned_data['address']
+        profile.phone         = form.cleaned_data['phone']
+        profile.company       = form.cleaned_data['company']
+        profile.title         = form.cleaned_data['title']
+        profile.website       = form.cleaned_data['website']
+        profile.twitter       = form.cleaned_data['twitter']
+        profile.linkedin      = form.cleaned_data['linkedin']
+        profile.photo         = form.cleaned_data['photo']
+        profile.is_ready      = form.cleaned_data['is_ready']
+        profile.is_active     = form.cleaned_data['is_active']
+        profile.is_organizer  = form.cleaned_data['is_organizer']
+        profile.is_leadbuyer  = form.cleaned_data['is_leadbuyer']
+        profile.is_attendee   = form.cleaned_data['is_attendee']
+        profile.is_agreed     = form.cleaned_data['is_agreed']
+        profile.newsletter    = form.cleaned_data['newsletter']
+        """
         return HttpResponseRedirect('/')         
 
 
