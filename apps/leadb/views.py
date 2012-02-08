@@ -319,7 +319,7 @@ class ApplyView( FormView ):
         if profile.is_ready:
             return HttpResponseRedirect ( reverse('lb_dash')+"?state=apply" )
         else:
-            return HttpResponseRedirect ( reverse('lb_payment') )
+            return HttpResponseRedirect ( reverse('lb_payment2') )
 
 class DashView( TemplateView ):
     """
