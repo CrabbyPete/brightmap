@@ -44,10 +44,12 @@ def warn_user( term, warning = False ):
             template_name = 'expire_warning.tmpl'
             subject  = 'BrightMap Trial Expiring: ' + term.deal.chapter.name
             connects = term.connections()
+            chapter  = term.deal.chapter
         else:
             template_name = 'expire_notice.tmpl'
             subject  = 'BrightMap Trial Expired: ' + term.deal.chapter.name
             connects = term.connections()
+            chapter = term.deal.chapter
 
             
         msg = Mail( organizer.email,
@@ -58,6 +60,7 @@ def warn_user( term, warning = False ):
                     buyer = buyer,
                     term  = term,
                     connections = connects,
+                    chapter = chapter,
                     url   = reverse('lb_dash')
                    )
         
@@ -83,12 +86,20 @@ def check_expired():
     for expire in expires:
         
         # Make sure they got some connections
-        if len( expire.connections() ) == 0:
-            continue
-        
+        connections = len(expire.connections())
         day =  date.today()
         warning_day = day - timedelta( days = 5 )
-        if expire.date < date.today():
+        days_left = expire.date - day
+        
+        print 'Trial deal for %s %s Chapter %s expires in %d days with %d connections'\
+        %( expire.buyer.first_name,
+           expire.buyer.last_name,
+           expire.deal.chapter.name,
+           days_left.days,
+           connections
+         ) 
+        
+        if expire.date <= date.today() and connections > 0:
             print log( 'Converting trial deal for '+\
                        expire.buyer.last_name+','+expire.buyer.first_name+ ' ' +\
                        expire.date.strftime("%Y-%m-%d") + ' '+\
@@ -99,7 +110,7 @@ def check_expired():
             warn_user(expire)
         
         # Warn the user 5 days before. Make sure main is only run once a day.
-        elif expire.date == warning_day:
+        elif expire.date == warning_day and connections > 0:
             print str( expire.pk ) + ' ' + expire.buyer.last_name +' ' + expire.date.strftime("%Y-%m-%d %H:%M")
             warn_user( expire, warning = True )
             
@@ -324,7 +335,10 @@ if __name__ == '__main__':
 
     # Check if options were set
     if opts.metric:
-        metric(opts.email, opts.password)
+        # -e brightmap.data@gmail.com -p 8jcgjg93j
+        email = 'brightmap.data@gmail.com'
+        password = '8jcgjg93j'
+        metric( email, password )
         
     if opts.accounting:
         if opts.month:
