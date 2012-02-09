@@ -10,7 +10,10 @@
             <td>{{leadbuyer.user.last_name}}</td>
             {% if leadbuyer.authorized %}
             <td>Authorized</td>
+            {% else %}
+            <td>Not Authorized</td>
             {% endif %}
+            <td> {% for i in leadbuyer.interests %} {{i}}: {% endfor %} </td>
         </tr>
     {% endfor %}
     </table>

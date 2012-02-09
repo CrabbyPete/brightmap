@@ -1,11 +1,18 @@
- {% extends 'base.html' %}
-  
- {% block body_block %}
+ {% extends 'base.html' %} {% block body_block %}
 <!--Body section-->
 <div id="bodysection">
 	<div class="insidesection">
 		<article class="profile"> 
 			<section class="bodybg">
+			{% if not user.get_profile.is_ready %} 
+			<nav class="step">
+				<ul>
+					<li><a href="#">STEP 1 of 3</a></li>
+					<li><a href="#" class="active">STEP 2 of 3</a></li>
+					<li><a href="#" class="step3to3bg">STEP 3 of 3</a></li>
+				</ul>
+			</nav> 
+			{% endif %}
 
 			<h2 class="paymethod">Payment Method and Budget</h2>
 		
@@ -15,57 +22,42 @@
 			the leads are sent. You will not be charged for free leads (e.g.
 			Sponsored leads or Trial leads).
 			</p>
-			{% if forms.payment.ready.value %}
-			<p class="paybudgetttxt2">
-			Your credit card is on file. Only edit the payment form if you are
-			changing or updating your credit card details
-			</p>
-			{% endif %}
-			
 
-			<form id="profile" name="" method="post" action="{% url lb_payment2 %}?payment" >
+			<form id="profile" name="" method="post" action="{% url lb_payment %}" >
 				{% csrf_token %}
 				<section id="my-border">
 					<p class="lftcontent">Credit Card Number </p>
-					{{forms.payment.number}}{{forms.payment.number.errors}}
+					{{form.number}}{{form.number.errors}}
 
 					<p class="lftcontent">Expiration </p>
-					{{forms.payment.expire_month}}{{forms.payment.expire_year}}
-					{{forms.payment.expire_month.errors}}{{forms.payment.expire_year.errors}}
-
+					{{form.expire_month}}{{form.expire_year}}
+					{{form.expire_month.errors}}{{form.expire_year.errors}}
+					
 					<p class="lftcontent">Street Address </p>
-					{{forms.payment.address}}{{forms.payment.address.errors}}
+					{{form.address}}{{form.address.errors}}
 
 					<p class="lftcontent">City </p>
-					{{forms.payment.city}}{{forms.payment.city.errors}}
+					{{form.city}}{{form.city.errors}}
 
 					<p class="lftcontent">State</p>
-					{{forms.payment.state}}{{forms.payment.state.errors}}
+					{{form.state}}{{form.state.errors}}
 
 					<p class="lftcontent">Zip Code</p>
-					{{forms.payment.zipcode}}{{forms.payment.zipcode.errors}}
-					<p class="onlymethod">
-					<input name="" type="submit" value="Save profile" class="paymentonly" >
-					</p>
-				
+					{{form.zipcode}}{{form.zipcode.errors}}
 				</section>
-				
-			</form>
-			<form id="profile" name="" method="post" action="{% url lb_payment2 %}?budget" >
-			{% csrf_token %}
+
 				<p class="budgetdeterminetxt">
 				Your budget determines the maximum dollar value of leads you will receive each month.
 				</p>
 	 
 				<section id="my-categories">
 					<p class="lftcontent lftcontent-monthbudget">Monthly Budget</p>
-					{{forms.budget.budget}}
-					{{forms.budget.budget.errors}}
-					<p class="onlymethod">
-					<input name="" type="submit" value="Save profile" class="budgetonly" >
-					</p>
+					{{form.budget}}{{form.budget.errors}}
 				</section>
 			
+				<p class="paddingmethod">
+					<input name="" type="submit" value="Save profile" class="paymentmethod" >
+				</p>
 			</form>
 			</section>
 			<div class="botbg">&nbsp;</div>

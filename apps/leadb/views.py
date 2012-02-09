@@ -318,7 +318,7 @@ class ApplyView( FormView ):
         if profile.is_ready:
             return HttpResponseRedirect ( reverse('lb_dash')+"?state=apply" )
         else:
-            return HttpResponseRedirect ( reverse('lb_payment2') )
+            return HttpResponseRedirect ( reverse('lb_payment') )
 
 class DashView( TemplateView ):
     """
@@ -487,6 +487,7 @@ class PaymentBudgetView( MultipleFormsView ):
     
     
     def get(self, request, *args, **kwargs ):
+  
         form_classes = self.get_form_classes()
         forms = self.get_forms(form_classes)
         
@@ -533,12 +534,13 @@ class PaymentBudgetView( MultipleFormsView ):
         user    = self.request.user
         profile = self.request.user.get_profile()
         try:
-            Authorize.objects.get( user = user )
-            ready = True
+            authorize = Authorize.objects.get( user = user )
         except:
             ready = False
+        else:
+            ready = True if authorize.payment_profile else False
         
-        initial = {}
+        initial = dict( ready = ready )
         if profile.address:
             if '^' in profile.address:
                 billing = profile.address.split('^')
@@ -550,12 +552,12 @@ class PaymentBudgetView( MultipleFormsView ):
                 if ',' in bill:
                     billing[i] = bill.replace(',','')
             
-            initial = dict (  ready    = ready,
-                              address  = billing[0],
-                              city     = billing[1],
-                              state    = billing[2],
-                              zipcode  = billing[3]
-                            )
+            initial.update( dict (  address  = billing[0],
+                                    city     = billing[1],
+                                    state    = billing[2],
+                                    zipcode  = billing[3]
+                                 )
+                          )
     
         return PaymentForm(initial = initial)
 

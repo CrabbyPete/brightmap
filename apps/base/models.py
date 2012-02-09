@@ -231,6 +231,16 @@ class LeadBuyer( models.Model ):
     def deals(self):
         return Term.objects.filter(buyer = self.user)
 
+    def interests(self):
+        interest = []
+        for term in self.deals():
+            if term.deal.interest.interest not in interest:
+                interest.append(term.deal.interest.interest)
+        return interest
+    
+        
+        
+        
     def connections(self):
         return Connection.objects.for_buyer(self.user)
 

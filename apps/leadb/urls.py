@@ -4,7 +4,7 @@ from views                          import  SignUpView, ApplyView, PaymentView, 
 
 urlpatterns = patterns('leadb.views',
     url(r'^lb_signup/$',                    SignUpView.as_view(),           name='lb_signup'      ),
-#    url(r'^lb_payment/$',   login_required( PaymentView.as_view() ),        name='lb_payment'     ),
+    url(r'^lb_payment/$',   login_required( PaymentView.as_view() ),        name='lb_payment'     ),
     url(r'^lb_payment2/$',  login_required( PaymentBudgetView.as_view() ),  name='lb_payment2'    ),
     url(r'^lb_apply/$',     login_required( ApplyView.as_view()   ),        name='lb_apply'       ),
     url(r'^lb_dash/$',      login_required( DashView.as_view()    ),        name='lb_dash'        ),
