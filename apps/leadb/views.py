@@ -482,7 +482,7 @@ class PaymentBudgetView( MultipleFormsView ):
     """
     Treat the payment info and budget as two separate forms
     """
-    template_name = 'leadb/lb_payment2.html'
+    template_name = 'leadb/lb_budget.html'
     form_classes  = {'payment':PaymentForm, 'budget':BudgetForm }
     
     
@@ -496,7 +496,7 @@ class PaymentBudgetView( MultipleFormsView ):
 
         return self.render_to_response(self.get_context_data(forms=forms))
     
-    
+
     def post(self, request, *args, **kwargs):
         form_classes = self.get_form_classes()
         forms = self.get_forms(form_classes)
@@ -559,7 +559,7 @@ class PaymentBudgetView( MultipleFormsView ):
                                  )
                           )
     
-        return PaymentForm(initial = initial)
+        return PaymentForm( initial = initial )
 
 
     def budget_form_valid(self, forms):

@@ -78,7 +78,7 @@ def homepage( request ):
         if profile.is_ready:
             start_url = reverse('lb_dash')
         else:
-            start_url = reverse('lb_payment2')
+            start_url = reverse('lb_budget')
     
     elif profile.is_organizer:
         
