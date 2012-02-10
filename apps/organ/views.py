@@ -43,16 +43,22 @@ class SignUpView( FormView ):
                 user = self.request.user
                 profile = user.get_profile()
                 
+                
+                
                 self.initial = dict ( email         = user.email,
                                       email_verify  = user.email,
                                       first_name    = user.first_name,
                                       last_name     = user.last_name,
                                       password      = self.password,
                                       pass_confirm  = self.password,
-                                      chapter       = chapter_name,
-                                      pay_pal       = chapter.paypal,
                                       agree         = profile.is_agreed
                                     )
+                
+                if not 'user' in self.request.GET:
+                    self.initial.update( dict( chapter = chapter_name,
+                                               pay_pal = chapter.paypal
+                                             )
+                                       )
         else:
             self.initial = {}
         

@@ -36,12 +36,20 @@
 			{% if user.is_authenticated %}
 				<!--tabpanel -->
 				<ul>
+					<li>
 					{% if user.get_profile.is_leadbuyer %}
-					<li><a href="{% url lb_dash %}"><span>Service Provider Dashboard</span></a></li>
+					<a href="{% url lb_dash %}"><span>Service Provider Dashboard</span></a>
+					{% else %}
+					<a href="{% url lb_signup %}?user={{user.pk}}"><span>Service Provider Dashboard</span></a>
+					</li>
 					{% endif %}
+					<li>
 					{% if user.get_profile.is_organizer %}
-					<li><a href="{% url or_dash %}"><span>Event Organizer Dashboard</span></a></li>
+					<a href="{% url or_dash %}"><span>Event Organizer Dashboard</span></a></li>
+					{% else %}
+					<a href="{% url or_signup %}?user={{user.pk}}"><span>Event Organizer Dashboard</span></a></li>
 					{% endif %}
+					</li>
 				</ul>
 				<!--tabpanel -->
 
