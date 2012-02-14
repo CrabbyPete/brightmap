@@ -398,7 +398,10 @@ class Term( models.Model ):
 
     def total( self, dates = None ):
         connections = self.connections( dates )
-        price = self.cost * len(connections)
+        price = 0;
+        for connection in connections:
+            if connection.status == 'sent':
+                price += self.cost
         return price
 
     

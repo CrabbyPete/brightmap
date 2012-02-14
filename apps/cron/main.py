@@ -193,6 +193,9 @@ def database_attendees( event, api ):
         for interest in interests:
 
             # Normalize the interest and see if you have it
+            if '(' in interest:
+                interest = interest.split('(')[0]
+            
             interest = interest.lstrip().rstrip()
             normal_interest = Interest.objects.close_to( interest )
 
@@ -437,7 +440,12 @@ def main():
                 letter = letter.name
 
             # Get the attendess of each event
-            for event in database_events( ticket, api ):
+            events = database_events( ticket, api )
+            if len(events) == 0:
+                print log("Chapter:" + chapter.name +' has no events')
+                continue
+            
+            for event in events:
 
                 # Log the events
                 print_event(event)

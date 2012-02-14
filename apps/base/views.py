@@ -159,7 +159,7 @@ def login(request):
         return render_to_response('indexR.html', c, context_instance=RequestContext(request))
 
     if request.method == 'GET':
-        form = LoginForm()
+        form = LoginForm(initial={'forgot':False})
         return submit_form(form)
 
     form = LoginForm(request.POST)
@@ -678,8 +678,26 @@ def remind( request ):
     mail.send()
     return HttpResponseRedirect('/')
         
-        
-        
-        
-        
-        
+
+@csrf_protect
+def faq(request):
+
+    def submit_form(form, pop = False ):
+        c = {'login':form, 'pop': pop }
+        return render_to_response('faq.html', c, context_instance=RequestContext(request))
+
+    if request.method == 'GET':
+        form = LoginForm()
+        return submit_form(form)
+
+
+@csrf_protect
+def about(request):
+
+    def submit_form(form, pop = False ):
+        c = {'login':form, 'pop': pop }
+        return render_to_response('about.html', c, context_instance=RequestContext(request))
+
+    if request.method == 'GET':
+        form = LoginForm()
+        return submit_form(form)

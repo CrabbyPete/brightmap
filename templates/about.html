@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>  
-<title>About BrightMap</title>
+<title>Welcome To Brightmap</title>
 <link href="/media/css/styleR.css" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" href="/media/js/jquery.fancybox/jquery.fancybox-1.3.4.css" type="text/css" media="screen" />
 <script type="text/javascript" src="/media/js/jquery-1.6.2.min.js"></script>
-
+<script type="text/javascript" src="/media/js/jquery.fancybox/jquery.fancybox-1.3.4.pack.js"></script>
+<script src="/media/js/site.js"></script>
 <!--[if IE]>
 	<script src="/media/js/html5.js" type="text/javascript"></script>
-    
 <![endif]-->
-
 </head>
 
-<body id="faq" class="not-logged-in">
+<body id="more-organizers" class="not-logged-in">
 <!--Top section-->
 <div id="topsection">
 	<header class="tophdr">
@@ -20,61 +20,74 @@
 			<a href="{% url homepage %}"><img src="/media/img/logo.gif" alt="Brightmap" width="220" height="93" title="Brightmap"></a> 
 	   </section>
 	   <nav class="topmenu">
-	   		<!--tabpanel -->
+		   <!--tabpanel -->
 		   <form id="login" name="" method="post" action="{% url login %}">	
 		   		{% csrf_token %}		
 				<fieldset>
 					<div class="inline-holder">
 						<label>Email Address</label>
-						<input type="text" value="">
+						{{login.username}}
 					</div>
 					<div class="inline-holder">
 						<label>Password</label>
-						<input name="" type="password">
+						{{login.password}}
 					</div>
 					<div class="inline-holder last">
 						<button class="button submit"><span>Login</span></button>
 					</div>
 				</fieldset>
 			</form>
-		   <!--tabpanel -->	 
+		   <!--tabpanel -->	  
 	   </nav>
 	</header>
 </div>
-<!--Top section-->
+
 
 <!--Body section-->
 <div id="bodysection">
-		<div class="insidesection">
-			<br /><br />
-			<section class="leadbuyer">
-				<h2 class="leadbuyer">About BrightMap</h2> 
-			</section>
-			<article class="box-full">
-				<div class="top">&nbsp;</div>
-				<div class="middle">
-					<section>
-						<div class="inside">
-<p>&nbsp;</p>
-                          <p>BrightMap is a community-driven lead-generation system.</p>
-                          <p>&nbsp;</p>
-                          <p>Community organizers use BrightMap to monetize their events and provide a valuable introduction service for their members. Service providers use BrightMap to get introduced to people interested in buying their services.</p>
-                          <p>&nbsp;</p>
-                          <p>BrightMap was founded in 2011 by <a href="http://www.linkedin.com/in/grahamlawlor">Graham Lawlor</a> and <a href="http://www.linkedin.com/pub/peter-douma/0/4aa/a6">Peter Douma</a>.</p>
-                          <p>&nbsp;</p>
-                          <p>For more information, contact <a href="mailto:info@brightmap.com">info@brightmap.com</a></p>
-                        </div>
-					</section>
-					<section>
-		  <header class="inside"></header>
-					</section>
-					<section> </section>
-				</div>
-				<div class="bottom">&nbsp;</div>
-			</article>
-        </div>
+	<div class="insidesection">
+		<br />
+		<br />
+		<section class="leadbuyer">
+			<h2 class="leadbuyer">About BrightMap</h2>
+		</section>
+		<article class="box-full">
+			<div class="top">&nbsp;</div>
+			<div class="middle">
+				<section>
+					<div class="inside">
+						<p>&nbsp;</p>
+						<p>BrightMap is a community-driven lead-generation system.</p>
+						<p>&nbsp;</p>
+						<p>Community organizers use BrightMap to monetize their events
+							and provide a valuable introduction service for their members.
+							Service providers use BrightMap to get introduced to people
+							interested in buying their services.</p>
+						<p>&nbsp;</p>
+						<p>
+							BrightMap was founded in 2011 by <a
+								href="http://www.linkedin.com/in/grahamlawlor">Graham Lawlor</a> and <a
+								href="http://www.linkedin.com/pub/peter-douma/0/4aa/a6">Peter
+								Douma</a>.
+						</p>
+						<p>&nbsp;</p>
+						<p>
+							For more information, contact <a href="mailto:info@brightmap.com">info@brightmap.com</a>
+						</p>
+					</div>
+				</section>
+				<section>
+					<header class="inside"></header>
+				</section>
+				<section></section>
+			</div>
+			<div class="bottom">&nbsp;</div>
+		</article>
+	</div>
 </div>
 <!--Body section-->
+
+
 <!--Footer section-->
 <div id="footersection">
 	<footer>
@@ -89,6 +102,6 @@
 	</footer>
 </div>
 <!--Footer section-->
-
 </body>
 </html>
+

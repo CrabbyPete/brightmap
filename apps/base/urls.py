@@ -3,7 +3,6 @@ from django.conf.urls.defaults  import patterns, url
 from django.views.generic.simple import direct_to_template
 
 
-
 from views                      import ( ChapterView, 
                                          EventbriteView, 
                                          DealView, 
@@ -31,8 +30,8 @@ urlpatterns = patterns('base.views',
     url(r'^community/$',        'community',                                name='community'    ),
     url(r'^terms/$',            'terms',                                    name='terms'        ),
     url(r'^remind/$',           'remind',                                   name='remind'       ),
-    url(r'^about/$',            direct_to_template,  {'template': 'about.html' }, name = 'about'),
-    url(r'^faq/$',              direct_to_template,  {'template': 'faq.html'   }, name = 'faq'  ),
+    url(r'^about/$',            'about',                                    name ='about'       ),
+    url(r'^faq/$',              'faq',                                      name ='faq'         ),
     url(r'^interest/$',         login_required(InterestView.as_view()),     name='interest'     ),
     url(r'^chapter/$',          login_required(ChapterView.as_view()),      name='chapter'      ),
     url(r'^eventbrite/$',       login_required(EventbriteView.as_view()),   name='eventbrite'   ),

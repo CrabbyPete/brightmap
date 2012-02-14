@@ -330,14 +330,23 @@ def status( request ):
                 mail.send()
                 
     return HttpResponseRedirect(reverse('or_dash'))
-
-
+"""
+def commissions( request ):
+    chapter     = Chapter.objects.get(organizer = request.user )
+    commissions = Commission.objects.filter( chapter = chapter )
+    report = []
+    for commission in commissions:
+        leadbuyer = commission.invoice.user.get_profile().company
+        if leadbuyer in report:
+            history = report
+"""
 def events( request ):
     chapter = Chapter.objects.get(organizer = request.user )
     events  = Event.objects.filter( chapter = chapter).order_by('date').reverse()
     
     event_list = []
 
+    total = 0
     for i, event in enumerate(events):
         if i > 12:
             break
@@ -348,9 +357,12 @@ def events( request ):
         connections= event.connections()
         commission = 0
         for c in connections:
-            commission += c.term.cost
+            if c.status == 'sent':
+                commission += c.term.cost
         
-        commission = "%.2f" % ( float(commission) *.45 )   
+        total += commission
+        commission = "%.2f" % ( float(commission) *.45 )
+   
         event_list.append( dict ( title       = title,
                                   date        = date, 
                                   attendees   = len(attendees), 
@@ -359,9 +371,9 @@ def events( request ):
                                   commission  = commission
                                 )
                           )
-        
+    total = "%.2f" % ( float(total) *.45 )    
     return render_to_response( 'organ/or_events.html', 
-                               {'chapter':chapter,'events':event_list }, 
+                               {'chapter':chapter,'events':event_list, 'total':total}, 
                                context_instance=RequestContext(request) 
                              )
 
