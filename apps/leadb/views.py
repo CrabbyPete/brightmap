@@ -10,11 +10,11 @@ from dateutils                      import relativedelta
 # Django imports
 from django.views.generic.base      import  TemplateView, View
 from django.views.generic.edit      import  FormView
-from django.template                import  RequestContext
+from django.template                import  RequestContext, loader, Context
 from django.contrib                 import  auth
 from django.contrib.auth.models     import  User
 from django.contrib.auth.decorators import  login_required
-from django.http                    import  HttpResponseRedirect
+from django.http                    import  HttpResponseRedirect, HttpResponse
 from django.shortcuts               import  render_to_response
 from django.forms.util              import  ErrorList
 from django.core.urlresolvers       import  reverse
@@ -124,11 +124,12 @@ class  SignUpView( FormView ):
     
         # Check the passwords match
         password     = form.cleaned_data['password']
+        """
         pass_confirm = form.cleaned_data['pass_confirm']
         if password != pass_confirm:
             form._errors['password'] = ErrorList(["The passwords do not match"])
             return self.form_invalid(form)
-
+        """
         # Make sure they agree
         if not form.cleaned_data['agree']:
             form._errors['agree'] = ErrorList(["Please check agreement"])
@@ -211,19 +212,30 @@ DEAL_TYPES = [c[0] for c in DEAL_CHOICES]
 
 class ApplyView( FormView ):
     """ Apply to buy a deal """
-    template_name = 'leadb/lb_apply.html'
+    template_name = 'leadb/lb_community_two.html'
     form_class    = ApplyForm
     
     def get( self, request, *argv, **kwargs ):
+        """
+        Handle GET for apply form, Limit trials to one
+        """
         expire = Expire.objects.filter( buyer = request.user, status = 'approved')
         if len ( expire ) > 0:
-            expire = expire[0]
+            expire = True
         else:
-            expire = None
+            expire = False
         
+        chapter = Chapter.objects.all().order_by('name')[0]
         self.form_class = ApplyForm()
-        return self.render_to_response( {'form':self.form_class, 'expire':expire } )
+        return self.render_to_response( {'form':self.form_class, 'expire':expire, 'chapter':chapter } )
     
+    def form_invalid(self, form, chapter = None):
+        context = self.get_context_data(form=form)
+        if chapter:
+            context.update(chapter=chapter)
+        return self.render_to_response(context)
+
+
     def form_valid(self,form):
         """
         Process a valid application form
@@ -240,11 +252,12 @@ class ApplyView( FormView ):
 
         # Check if this is a custom request
         if custom:
-            interest = Interest( interest = custom, status = 'custom')
-            interest.save()
-        else:
-            interest = Interest.objects.get(interest = interest)
-        
+            try:
+                interest = Interest.objects.get(interest = custom)
+            except Interest.DoesNotExist:
+                interest = Interest( interest = custom, status = 'custom')
+                interest.save()
+            
         # Check if there are any existing deals
         chapter  = Chapter.objects.get(name = chapter)
         try:
@@ -255,24 +268,13 @@ class ApplyView( FormView ):
             deal = Deal( chapter = chapter, interest = interest )
             deal.save()
 
-        # Check the type of deal
-        if custom:
-            deal_type = 'Exclusive'
-            cancel = Cancel( deal = deal,
-                             cost = 50,
-                             exclusive = True,
-                             buyer = self.request.user,
-                             status = 'pending'
-                            )
-            cancel.save()
-            mail_organizer( self.request.user, deal, cancel, deal_type )
-        
-        
-        elif deal_type == 'Trial':
+        # Check the type of deal       
+        if deal_type == 'Trial':
             expires = Expire.objects.filter( buyer = self.request.user )
             if len ( expires ) >= settings.MAX_TRIALS:
                 form._errors['deal_type'] = ErrorList(["Sorry. You already have an active trial"])
-                return self.form_invalid(form)
+                
+                return self.form_invalid(form, chapter)
 
             
             one_month = datetime.now() + relativedelta(months=+1)
@@ -285,11 +287,7 @@ class ApplyView( FormView ):
             expire.save()
             mail_organizer( self.request.user, deal, expire, deal_type )
         else:
-            if deal_type == 'Exclusive':
-                cost = 50
-                exclusive = True
-
-            elif deal_type ==  'Nonexclusive':
+            if deal_type ==  'Nonexclusive':
                 cost = 20
                 exclusive = False
 
@@ -300,7 +298,7 @@ class ApplyView( FormView ):
                 if len( deal.chapter.sponsors() ) >= settings.MAX_SPONSORS:
                     form._errors['deal_type'] = \
                         ErrorList(["Sorry. %s already has the maximum number of sponsors"% (deal.chapter.name,) ])
-                    return self.form_invalid(form)
+                    return self.form_invalid(form, chapter)
 
             
             
@@ -852,3 +850,15 @@ def cancel_term(request):
         mail_organizer( request.user, term.deal, term, deal_type = 'cancel' )
     return HttpResponseRedirect(reverse('lb_dash'))
 
+def ajax(request):
+    if 'chapter' in request.GET:
+        try:
+            chapter = Chapter.objects.get( name = request.GET['chapter'] )
+        except:
+            return
+        
+    template = loader.get_template('leadb/lb_community.html')
+    c = Context({'chapter':chapter})
+    html = template.render(c)
+    
+    return HttpResponse(html, mimetype='text/html')

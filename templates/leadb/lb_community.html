@@ -1,0 +1,29 @@
+
+<table class="table-community">
+	<tr>
+		<td>
+			<p class="ultralighttxt">{{chapter.name}}</p> 
+			{% if chapter.logo %}
+			<img src="{{chapter.logo}}" alt="" class="ultralight">
+			{% endif %}
+		</td>
+	</tr>
+	<tr>
+		<td><table class="community-insidetable">
+				<tr>
+					<td class="yellowbg">organizer</td>
+					<td class="graybg">{{chapter.organizer.first_name}}&nbsp;{{chapter.organizer.last_name}}</td>
+				</tr>
+				<tr>
+					<td class="yellowbg">website</td>
+					<td class="graybg"><a href="{{chapter.website}}"
+						target="_blank">{{chapter.website}}</a></td>
+				</tr>
+				<tr>
+					<td class="yellowbg">industry</td>
+					<td class="graybg">Startups</td>
+				</tr>
+			</table></td>
+	</tr>
+</table>
+

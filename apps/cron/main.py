@@ -1,5 +1,4 @@
 import django_header
-import pdb
 
 # Python libraries
 from datetime                       import  datetime, timedelta
@@ -10,6 +9,7 @@ from django.contrib.auth.models     import  User
 from django.core.urlresolvers       import  reverse
 
 # Local libraries
+from nameparser                     import  HumanName
 from eventapi                       import  EventBrite
 from base.models                    import ( Event, Profile, Survey, Interest, Deal, Expire,
                                              Organization, Connection, LeadBuyer, Invoice,
@@ -95,7 +95,7 @@ def mail_buyer ( user, event ):
                  receivers     = receivers,
                  subject       = subject,
                  template_name = 'leadbuyer.tmpl',
-                 bcc           = None, 
+                 bcc           = [sender], 
                  user          = user, 
                  url           = url,  
                  chapter       = event.chapter
@@ -136,8 +136,19 @@ def database_attendees( event, api ):
                                               email    = attendee['email'],
                                               password = password
                                             )
-            user.first_name = attendee['first_name'].strip().capitalize()
-            user.last_name  = attendee['last_name'].rstrip().capitalize()
+            
+            
+            name = attendee['first_name'].strip()+ ' '+ attendee['last_name'].rstrip()
+            try:
+                name = HumanName(name)
+                name.capitalize()
+            except:
+                user.first_name = attendee['first_name'].strip().capitalize()
+                user.last_name  = attendee['last_name'].rstrip().capitalize()
+            else:
+                user.first_name = name.first.capitalize()
+                user.last_name  = name.last.capitalize()
+            
             user.save()
             profile = Profile( user = user )
         

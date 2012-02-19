@@ -46,11 +46,11 @@ class BuyerForm(forms.Form):
                                           label = 'Password',
                                           widget = forms.PasswordInput(attrs={'size':40}, render_value = True )
                                         )
-
+    """
     pass_confirm    = forms.CharField   ( max_length = 45,
                                           widget = forms.PasswordInput(attrs={'size':40}, render_value = True )
                                         )
-
+    """
 
     title          = forms.CharField   ( required = True,
                                          max_length = 45,
@@ -113,11 +113,14 @@ APPLY_CHOICES = [('Standard', 'Standard', forms.Select(choices = STANDARD_CHOICE
 
 class ApplyForm(forms.Form):
     chapter          = forms.ChoiceField( choices=(),
-                                          widget=forms.Select(attrs={'class':"selectbox"})
+                                          widget=forms.Select(attrs={'class':"selectbox",
+                                                                     'onchange':'loadChapter(this.form)'
+                                                                     })
                                         )
 
     
-    interest         = forms.ChoiceField( choices=(),
+    interest         = forms.ChoiceField( required = False,
+                                          choices=(),
                                           widget=forms.Select(attrs={'class':"selectbox"}) 
                                         )
 
@@ -127,13 +130,14 @@ class ApplyForm(forms.Form):
                                            )
     
     """
-    custom           = forms.CharField( required = False,
+    custom           = forms.CharField( required = True,
                                         max_length = 100,
                                         widget = forms.TextInput()
                                       )
  
     deal_type        = forms.ChoiceField( required = True,
-                                          choices=DEAL_CHOICES,
+                                          initial ='Nonexclusive',
+                                          choices = DEAL_CHOICES,
                                           widget=forms.RadioSelect(attrs={'class':"termscode"})
                                         )
  

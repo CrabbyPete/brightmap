@@ -118,7 +118,7 @@ class Chapter( models.Model ):
     organizer     = models.ForeignKey( User )
     paypal        = models.CharField( default = None, null = True,  max_length = 255 )
 
-    logo          = models.URLField(            blank = True, null = True )
+    logo          = models.FileField(upload_to = 'logos') 
     letter        = models.ForeignKey('Letter', blank = True, null = True )
     website       = models.URLField(            blank = True, null = True )
     objects       = ChapterManager() 

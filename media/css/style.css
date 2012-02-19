@@ -1,4 +1,10 @@
-/* CSS Document  */
+/* CSS Document */
+* {
+	margin: 0;
+}
+html, body {
+	height: 100%;
+}
 body{
 	padding:0 0 0 0;
 	margin:0;
@@ -40,6 +46,15 @@ header, hgroup, nav, section, aside, article, footer{
 	line-height:0;
 	clear:both;
 }
+div.wraper{
+	/*width:100%;
+	height:100%;
+	overflow:hidden;*/
+	min-height: 100%;
+	height: auto !important;
+	height: 100%;
+	margin: 0 auto -38px;
+	}
 /*----------Top section----------------*/
 #topsection{
 	width:100%;
@@ -296,17 +311,28 @@ section#my-border p.lftcontent, section#my-bluecurved p.lftcontent, section#my-d
 	font-weight:bold;
 	
 }
-section#my-categories p.lftcontent-monthbudget, section#my-border p.lftcontent-monthbudget{
+section#my-categories p.lftcontent-monthbudget, section#my-border p.lftcontent-monthbudget, section#my-border p.leadprice{
 width:130px;
 float:left;	
+text-transform:uppercase;
 }
 section#my-border p.lftcontent-monthbudget{
 	min-height:111px;
 	/*width:150px;*/
 }
+section#my-border p.leadprice{
+	min-height:90px;
+	width:140px;
+}
 section#my-border p.lftcontent span, section#my-details p.lftcontent span{
 	color:#FBA61D;
 	background-color:inherit;
+}
+p.lftcontent span.dollertwenty{
+	font-size:24px;
+	line-height:24px;
+	font-weight:bold;
+	padding:0 0 0 10px;
 }
 section#my-border p.lftcontent span.optional{
 	display:block;
@@ -408,7 +434,7 @@ div.chkboxdiv ul li {
 	width:400px;
 }
 
-p.chkbox input.chkboxdiv input.checkbox, p.chkbox1 input.checkbox{
+p.chkbox input.checkbox, p.chkbox1 input.checkbox{
 	width:13px;
 	height:13px;
 	font-size:0;
@@ -455,7 +481,13 @@ input.submitbutt {
 	width:100%;
 	background:url(/media/img/footerbg.jpg) repeat-x 0 0;
 	height:38px;
+	clear: both;
 	}
+
+.push{
+	height:38px;
+	clear: both;
+}
 footer {
 	width:980px;
 	margin:0 auto;
@@ -588,13 +620,14 @@ section.leadbuyerrept h2{
 	color:#fff;
 	padding:0 0 0 11px;
 	border-bottom:solid 1px #000;
-	text-align:left;	
+	text-align:left;
+	
+	
+	
 }
-
 .latestrecived span{
 	color:red;
 }
-
 .interest, .interestright{
 	background-color:#E7E6E6; 
 	border-bottom:solid 1px #fff;
@@ -608,6 +641,9 @@ section.leadbuyerrept h2{
 	height:39px;
 	text-align:left;
 	}
+.interestcom{
+	text-align:center;
+}
 .interestright{
 	border-right:none;
 }
@@ -629,6 +665,13 @@ section.leadbuyerrept h2{
 	color:#000;
 	padding:10px 4px 10px 8px;
 	font-weight:normal;
+}
+.recivedcontentMid{
+	text-align:center;
+}
+.subtotal{
+	background-color:#FAFAFA;
+	border-bottom:solid 1px #fff;
 }
 .orgWD{
 	width:100px;
@@ -676,6 +719,24 @@ p.totaltxt span{
 	font-size:14px;
 	
 }
+p.totaltxt span.comissiontotal{
+	font-size:14px;
+	padding-left:73px;
+}
+
+p.subtotaltxt{
+	font:bold 14px/14px "Futura Md BT", Arial, Helvetica, sans-serif;
+	color:#000;
+	background-color:inherit;
+	padding:15px 18px 13px 0;
+	text-align:right;
+}
+p.subtotaltxt span{
+	font-size:14px;
+	padding-left:73px;
+	
+}
+
 p.applycommunity{
 	width:980px;
 	padding:0 0 30px 0;
@@ -1127,10 +1188,18 @@ section.finish{
 	margin:19px 0 0 17px;
 }
 section.finish p.finishtxt{
+	padding:12px 0 12px 374px;	
+}
+section.finish1{
+	width:473px;
+	margin:0 auto;
+	margin:0 0 0 17px;
+}
+section.finish p.finishtxt, section.finish1 p.finishtxt{
 padding:12px 0 12px 374px;
 	
 }
-section.finish p.finishtxt a{
+section.finish p.finishtxt a, section.finish1 p.finishtxt a{
 	/*background:url(/media/img/finish-bg.gif) no-repeat 0 0;
 	width:47px;
 	line-height:39px;*/
@@ -1544,27 +1613,50 @@ p.nextstep input.nxtstepbutt{
 	padding:33px 0 0 187px;
 	}
 .chkboxdiv{
-	padding:0 0 10px 21px;
+	padding:0 0 0 15px;
+	
+}
+.chkboxdivtable{
+	/*width:452px;*/
+	border-collapse: collapse;
+	
+	}
+.chkboxdivtable td{
+	padding:0 0 8px 6px;
+	margin:0;
+
 }
 .chkbox2div{
 	padding:0 0 10px 0;
 }
 .chkboxdiv label, .chkbox2div label{
+	width:13px;
+	display:block;
+}
+.chkboxdiv span, .chkbox2div span{
 	font-size:12px;
 	color:#000;
 	background-color:inherit;
 	padding-left:6px;
 	line-height:12px;
+	width:440px;
+	background-color:#FF0000;
+	padding:0;
+	margin:0;
+	float:left;
+	display:block;
+	
+	
 }
-
 .rightcategorydiv{
 	width:230px;
 	float:right;
 }
 
 .lftcategorydiv{
-	width:230px;
-	float:left;
+	/*width:230px;
+	float:left;*/
+	padding:0 0 0 15px;
 }
 
 section#my-categories div.lftcategorydiv input[type="text"]
@@ -1575,9 +1667,10 @@ height:27px;
 line-height:27px;
 color:#000;
 background-color:#fff;
-padding:0 0 0 11px;
-margin-bottom:9px;
-margin-left:21px;
+padding:0 0 0 9px;
+margin:0;
+/*margin-bottom:9px;
+margin-left:21px;*/
 font-size:12px;
 font-weight:normal;
 }
@@ -1909,4 +2002,85 @@ p.backdahbordbutt a{
 	font-weight:bold;
 	display:block;
 	padding:0 0 0 24px;
+}
+
+
+.table-community{
+	width:100%;
+	border-collapse: collapse;
+	padding:0;
+	margin:0;
+}
+.table-community td{
+	border-bottom:solid 1px #fff;
+}
+p.ultralighttxt{
+	font:bold 16px/22px Arial, Helvetica, sans-serif;
+	color:#000;
+	background-color:inherit;
+	width:160px;
+	float:left;
+	padding:0 0 0 21px;
+}
+img.ultralight{
+	float:right;
+	padding-right:8px;
+	padding-bottom:8px;
+	height:100px;
+}
+.community-insidetable{
+	width:100%;
+	border-collapse: collapse;
+	
+	
+}
+
+ td.yellowbg{
+	width:146px;
+	background:url(/media/img/yellow-rept.gif) repeat-x 0 100% #FCB43D;
+	color:#fff;
+	text-transform:uppercase;
+	font-weight:bold;
+	padding:0 0 0 21px;
+	height:46px;
+	border-bottom:none;
+	
+	}
+ td.graybg{
+	padding:0 0 0 13px;
+	border-left:solid 1px #fff;
+	}
+ td.graybg a{
+	color:#000;
+	background-color:inherit;
+}
+td.graybg a:hover{
+	text-decoration:underline;
+}
+.communitydiv{
+	width:100%;
+	padding:16px 0 0 0;
+	margin:0;
+}
+p.ulsboston{
+	padding-left:258px;
+	padding-top:27px;
+}
+
+p.ulsboston input.ulsbutt{
+	/* background:url(/media/img/apply-leads-ulsboston.gif) no-repeat 0 0;*/
+	background:url(/media/img/btn-submit-left.png) no-repeat 0 0;
+	width:222px;
+	height:33px;
+	cursor:pointer;
+	border:none;
+	padding:33px 0 0 222px;
+	}
+.selectcomunity{
+	background:url(/media/img/select-community.jpg) no-repeat 36px 0;
+	width:184px;
+	margin:0 0 0 281px;
+	padding:135px 0 0 0;
+	font:bold 18px/33px "Futura Md BT", Arial, Helvetica, sans-serif;
+	
 }

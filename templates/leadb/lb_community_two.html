@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block javascript %}
+<script>
+function loadChapter(form)
+{
+	var chapter = form.chapter.options[form.chapter.selectedIndex].value;
+	var url = '/leadb/ajax?chapter='+ chapter;
+	$.get(url, function(data){$('.table-community').replaceWith(data)} );
+	return;
+};
+</script>
+{% endblock %}
+
+{% block body_block %}
+<!--Body section-->
+<div id="bodysection">
+	<div class="insidesection">
+
+		<article class="profile">
+			<section class="bodybg">
+			{% if user.set_leadbuyer.deals %}
+				<nav class="step">
+				<ul>
+					<li><a href="#" class="noimg">STEP 1 of 3</a></li>
+					<li><a href="#" class="steptwothree">STEP 2 of 3</a></li>
+					<li><a href="#" class="step3">STEP 3 of 3</a></li>
+				</ul>
+				</nav>
+			{% endif %}
+			
+				<h2 class="paymethod">Connect to a Community</h2>
+				<p class="paybudgetttxt">Complete this form to purchase leads
+					from a particular community. The community organizer must review
+					and approve your application before we can send you leads. You will
+					be notified via email about the community organizer's decision.</p>
+				
+				<form id="profile" name="" method="post" action="{% url lb_apply %}">
+					{% csrf_token %}
+					
+					<section id="my-details">
+					<p class="lftcontent">What is your service?</p>
+					{{form.custom}}
+					</section>
+					
+					<section id="my-details">
+						<p class="lftcontent">Select a Community</p>
+						<p>{{form.chapter}}</p>
+					</section>
+	
+					<section id="my-border" style="padding: 10px 0 0 0;">
+						<table class="table-community">
+							<tr>
+								<td>
+									<p class="ultralighttxt">{{chapter.name}}</p> 
+									<img src="{{chapter.logo}}" alt="Logo" class="ultralight">
+								</td>
+							</tr>
+							<tr>
+								<td><table class="community-insidetable">
+										<tr>
+											<td class="yellowbg">organizer</td>
+											<td class="graybg">{{chapter.organizer.first_name}}&nbsp;{{chapter.organizer.last_name}}</td>
+										</tr>
+										<tr>
+											<td class="yellowbg">website</td>
+											<td class="graybg"><a
+												href="{{chapter.website}}" target="_blank">{{chapter.website}}</a></td>
+										</tr>
+										<tr>
+											<td class="yellowbg">industry</td>
+											<td class="graybg">Startups</td>
+										</tr>
+									</table></td>
+							</tr>
+						</table>
+						<div class="communitydiv">
+							<p class="lftcontent leadprice">
+								Lead Price:<span class="dollertwenty">$20</span>
+							</p>
+							{{form.deal_type}}					
+						</div>
+					</section>
+					{{form.deal_type.errors}}
+					<p class="applicationleads">
+						<input name="" type="submit" value="Request deal" class="submitapp">
+					<!--  
+					<p class="ulsboston">
+						<input name="" type="submit"
+							value="Apply for Leads from {{chapter.name}}" class="ulsbutt">
+					-->
+					</p>
+				</form>
+
+			</section>
+			<div class="botbg">&nbsp;</div>
+		</article>
+	</div>
+</div>
+<!--Body section-->
+{% endblock %}

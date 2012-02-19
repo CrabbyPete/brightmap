@@ -4,6 +4,12 @@ from django.utils import simplejson as json
 
 import settings
 
+import logging
+logger = logging.getLogger('paypal')
+
+
+
+
 #PAYPAL_ENDPOINT = 'https://svcs.sandbox.paypal.com/AdaptivePayments/' # sandbox
 PAYPAL_ENDPOINT = 'https://svcs.paypal.com/AdaptivePayments/' # production
 
@@ -35,12 +41,12 @@ def pay_commission( email, amount ):
         request = urllib2.Request( "%s%s" % ( PAYPAL_ENDPOINT, "Pay" ), data=raw_request, headers=headers )
         raw_response = urllib2.urlopen( request ).read() 
   
-        print  "response was: %s" % (raw_response,) 
         response = json.loads( raw_response )
         
         if response['responseEnvelope']['ack'] == 'Success':
             payKey = response['payKey'] 
             return payKey
-        
+           
+        logger.error( "Payment Error %s for %s"%(email, response['error'][0]['message']) )
         return None
 

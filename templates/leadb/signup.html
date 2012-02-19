@@ -6,7 +6,6 @@
 <div id="bodysection">
     <div class="insidesection">
         <article class="profile">
-        	
             <section class="bodybg">
             
             	{% if not user.get_profile.is_agreed %}
@@ -43,10 +42,12 @@
                         <p>{{form.password}}</p>
                         {{form.password.errors}}
 
+                        <!--  
                         <p class="lftcontent">Verify Password <span>*</span></p>
                         <p>{{form.pass_confirm}}</p>
                         {{form.pass_confirm.errors}}
-
+						-->
+						
                         <p class="lftcontent">Company <span>*</span></p>
                         <p>{{form.company}}</p>
                         {{form.company.errors}}

@@ -11,6 +11,7 @@ urlpatterns = patterns('leadb.views',
     url(r'^lb_bill/$',      login_required( BillView.as_view()    ),        name='lb_bill'        ),
     url(r'^lb_chapter/$',   login_required( ChapterView.as_view() ),        name='lb_chapter'     ),    
     url(r'^lb_cancel/$',                    'cancel_term',                  name='lb_cancel'      ),
-    url(r'^lb_term_state/$',                'term_state',                   name='lb_term_state'  ),  
+    url(r'^lb_term_state/$',                'term_state',                   name='lb_term_state'  ),
+    url(r'^ajax/$',                         'ajax',                         name='ajax'           )  
 )
 

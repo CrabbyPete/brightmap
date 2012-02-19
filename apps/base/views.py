@@ -311,7 +311,10 @@ class ChapterView( FormView ):
             chapters = Chapter.objects.all()
             return self.render_to_response( {'chapters':chapters} )
 
- 
+    def form_invalid(self,form):
+        context = self.get_context_data(form=form)
+        return self.render_to_response(context)
+    
     def form_valid(self, form):
         if 'chapter' in self.request.GET:
             if self.request.GET['chapter']:
@@ -325,7 +328,19 @@ class ChapterView( FormView ):
                 
                 chapter.letter = letter
                 chapter.website = website
-                chapter.logo    = logo
+                if logo:
+                    upload = self.request.FILES['logo']
+                    
+                    img_type = upload.name.split('.')[1]
+                    name = chapter.name + '.' + img_type
+                    
+                    file_name = settings.MEDIA_ROOT+'//logos//'+ name
+                    place = open(file_name, 'wb+')
+                    for chunk in upload.chunks():
+                        place.write(chunk)
+                    place.close()
+                    
+                    chapter.logo = '/media/logos/' + name
                 
                 chapter.save()
         

@@ -16,7 +16,7 @@
  	{% endif %}
  	
  	{% if form %}
-	<form action="{% url chapter %}?chapter={{chapter.pk}}" method="post" >
+	<form action="{% url chapter %}?chapter={{chapter.pk}}" method="post" enctype="multipart/form-data" >
        {% csrf_token %}
        	<fieldset>
  			{{form}}

@@ -1,6 +1,7 @@
 # Django Imports
 import django_header
 from django.core.urlresolvers       import  reverse
+from django.contrib.auth.models     import  User
 from google                         import  GoogleSpreadSheet
 
 # Python Imports
@@ -21,6 +22,7 @@ from base.models                    import  ( Term,
 
 from base.mail                      import  Mail 
 from accounting                     import  accounting
+from nameparser                     import  HumanName
 
 
 TODAY = datetime.today()
@@ -316,6 +318,33 @@ def metric( email, password ):
         
     return
 
+def clean_names():
+    users = User.objects.all()
+    for user in users:
+        if not user.first_name:
+            continue
+        
+        name = user.first_name + ' ' + user.last_name
+        try:
+            name = HumanName ( name )
+        except Exception,e:
+            continue
+            
+        name.capitalize()
+        if name.middle:
+            pass
+        
+        user.first_name = name.first.capitalize()
+        user.last_name  = name.last.capitalize()
+
+            
+        print unicode(name) +':'+user.first_name + ',' + user.last_name
+        try:
+            user.save()
+        except:
+            pass
+        
+
 if __name__ == '__main__':
     op = optparse.OptionParser( usage="usage: %prog " +" [options]" )
     
@@ -329,10 +358,11 @@ if __name__ == '__main__':
     op.add_option('--metric',     default = False,  action="store_true", help = "Run metrics")
     op.add_option('-e',           dest = 'email',   action="store",      help = "Email address for Google Spreadsheet")
     op.add_option('-p',           dest = 'password',action="store",      help = "Password for Google Spreadsheet")
-    
+
     
     (opts,args) = op.parse_args()
 
+    clean_names()
     # Check if options were set
     if opts.metric:
         # -e brightmap.data@gmail.com -p 8jcgjg93j
