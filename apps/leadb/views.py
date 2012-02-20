@@ -227,7 +227,9 @@ class ApplyView( FormView ):
         
         chapter = Chapter.objects.all().order_by('name')[0]
         self.form_class = ApplyForm()
-        return self.render_to_response( {'form':self.form_class, 'expire':expire, 'chapter':chapter } )
+        deals = len( self.request.user.leadbuyer_set.all()[0].deals() )
+ 
+        return self.render_to_response( {'form':self.form_class, 'expire':expire, 'deals':deals, 'chapter':chapter} )
     
     def form_invalid(self, form, chapter = None):
         context = self.get_context_data(form=form)

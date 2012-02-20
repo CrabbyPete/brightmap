@@ -17,6 +17,7 @@ from django.core.exceptions         import  ObjectDoesNotExist
 from django.views.generic.edit      import  FormView
 from django.template                import  loader, Context
 from django.core.mail               import  EmailMultiAlternatives
+from django.db.models               import  Q
 
 
 # Local imports
@@ -340,7 +341,7 @@ class ChapterView( FormView ):
                         place.write(chunk)
                     place.close()
                     
-                    chapter.logo = '/media/logos/' + name
+                    chapter.logo = settings.MEDIA_URL+ 'logos/' + name
                 
                 chapter.save()
         
@@ -535,7 +536,12 @@ class SurveyView( FormView ):
             survey = Survey.objects.get(pk = request.GET['survey'])
             form = SurveyForm( instance = survey)
             return self.render_to_response( {'form':form, 'survey': survey} )
-    
+        
+        if 'unsold' in request.GET:
+            surveys = Survey.objects.filter(event = request.GET['unsold'], mailed = 0)
+            surveys = surveys.exclude(interest = None)
+            return self.render_to_response( {'surveys': surveys} )
+        
     def form_valid(self, form):
         return HttpResponseRedirect('/')
 
@@ -589,8 +595,7 @@ class InvoiceView ( FormView):
         invoices = Invoice.objects.all().order_by('issued').reverse()
         return self.render_to_response( {'invoices':invoices} )
         
- 
-            
+         
     def form_valid(self, form ):
         invoice = Invoice.objects.get( pk = self.request.GET['invoice'] )
         if invoice.status == 'pending' and invoice.cost > 0:

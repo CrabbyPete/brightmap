@@ -28,6 +28,7 @@
     <menu>
         <li><a href='{% url survey      %}?event={{event.pk}}'>Attendees</a></li>
         <li><a href='{% url connection  %}?event={{event.pk}}'>Connections</a></li>
+        <li><a href='{% url survey      %}?unsold={{event.pk}}'>Unsold</a>
     </menu>
     {% endif %}
 {% endblock %}

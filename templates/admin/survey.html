@@ -8,6 +8,7 @@
             <td><a href='{%url survey %}?survey={{survey.pk}}'>{{survey.attendee.email}}</a></td>
             <td><a href='{%url profile%}?user={{survey.attendee.pk}}'>{{survey.attendee.first_name}} {{survey.attendee.last_name}}</a></td>
             <td>{{survey.interest}}</td>
+            <td><a href='{% url event %}?event={{survey.event.pk}}'>{{survery.event}}</a></td>
         </tr>
     	{% endfor %}
     </table>

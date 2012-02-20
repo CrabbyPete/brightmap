@@ -3,7 +3,6 @@ from difflib                                import SequenceMatcher
 from datetime                               import datetime, date, time, timedelta
 
 from django.db                              import models
-from django.db.models                       import Q
 from django.contrib.auth.models             import User
 from django.contrib.localflavor.us.models   import PhoneNumberField
 
@@ -237,10 +236,7 @@ class LeadBuyer( models.Model ):
             if term.deal.interest.interest not in interest:
                 interest.append(term.deal.interest.interest)
         return interest
-    
-        
-        
-        
+       
     def connections(self):
         return Connection.objects.for_buyer(self.user)
 

@@ -18,7 +18,7 @@ function loadChapter(form)
 
 		<article class="profile">
 			<section class="bodybg">
-			{% if user.set_leadbuyer.deals %}
+				{% if deals == 0 %}
 				<nav class="step">
 				<ul>
 					<li><a href="#" class="noimg">STEP 1 of 3</a></li>
@@ -26,7 +26,7 @@ function loadChapter(form)
 					<li><a href="#" class="step3">STEP 3 of 3</a></li>
 				</ul>
 				</nav>
-			{% endif %}
+				{% endif %}
 			
 				<h2 class="paymethod">Connect to a Community</h2>
 				<p class="paybudgetttxt">Complete this form to purchase leads
