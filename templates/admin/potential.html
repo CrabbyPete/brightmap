@@ -1,0 +1,14 @@
+{% extends "admin/admin.html" %}
+
+{% block body_block %}
+	<table id = 'leadbuyer'>
+ 	{% for lead in leads %}
+        <tr>
+            <td><a href='{%url profile%}?user={{lead.buyer.user.pk}}'>{{lead.buyer.user.email}}</td>
+            <td>{{lead.buyer.user.first_name}}</td>
+            <td>{{lead.buyer.user.last_name}}</td>
+            <td> {% for s in lead.surveys %} {{s.event.chapter.name}}: {% endfor %} </td>
+        </tr>
+    {% endfor %}
+    </table>
+{% endblock %}

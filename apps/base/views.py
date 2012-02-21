@@ -470,18 +470,7 @@ class LeadBuyerView( FormView ):
             leadbuyer = LeadBuyer.objects.get(pk = request.GET['leadbuyer'])
             form = LeadBuyerForm( instance = leadbuyer )
             return self.render_to_response( {'form': form, 'leadbuyer':leadbuyer} )
-        
-        if 'new' in request.GET:
-            buyers  = Profile.objects.filter( is_leadbuyer = True )
-            leadbuyers = []
-            for buyer in buyers:
-                try:
-                    lb = LeadBuyer.objects.get( user = buyer.user )
-                except LeadBuyer.DoesNotExist:
-                    leadbuyers.append(buyer)
-                    
-            return self.render_to_response( {'leadbuyers': leadbuyers} )   
-        
+                
         else:
             leadbuyers = LeadBuyer.objects.all().order_by('user__last_name')
             return self.render_to_response( {'leadbuyers': leadbuyers} )
@@ -676,7 +665,18 @@ class LetterView( FormView ):
         letter.save()
         return HttpResponseRedirect(reverse('homepage'))
     
-    
+def potential(request):
+    buyers  = Profile.objects.filter( is_leadbuyer = True )
+    leadbuyers = []
+    for buyer in buyers:
+        try:
+            LeadBuyer.objects.get( user = buyer.user )
+        except LeadBuyer.DoesNotExist:
+            surveys = Survey.objects.filter( attendee = buyer.user )
+            leadbuyers.append( dict(buyer = buyer, surveys=surveys) )
+    c = Context({'leads':leadbuyers})         
+    return render_to_response('admin/potential.html', c, context_instance=RequestContext(request))
+        
 
 def remind( request ):
     if 'term' in request.GET:
