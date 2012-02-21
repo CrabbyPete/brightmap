@@ -470,6 +470,18 @@ class LeadBuyerView( FormView ):
             leadbuyer = LeadBuyer.objects.get(pk = request.GET['leadbuyer'])
             form = LeadBuyerForm( instance = leadbuyer )
             return self.render_to_response( {'form': form, 'leadbuyer':leadbuyer} )
+        
+        if 'new' in request.GET:
+            buyers  = Profile.objects.filter( is_leadbuyer = True )
+            leadbuyers = []
+            for buyer in buyers:
+                try:
+                    lb = LeadBuyer.objects.get( user = buyer.user )
+                except LeadBuyer.DoesNotExist:
+                    leadbuyers.append(buyer)
+                    
+            return self.render_to_response( {'leadbuyers': leadbuyers} )   
+        
         else:
             leadbuyers = LeadBuyer.objects.all().order_by('user__last_name')
             return self.render_to_response( {'leadbuyers': leadbuyers} )

@@ -5,17 +5,18 @@
     	<div id="welcom">
     		Welcome {{user}}<br/>
 			{% if user.is_staff %}
-			<li><a href = '{% url chapter %}' 		>Chapters		</a></li>
-			<li><a href = '{% url leadbuyer %}'		>LeadBuyers	    </a></li>
-			<li><a href = '{% url term %}?pending'	>Pending Terms 	</a></li>
-			<li><a href = '{% url event %}?month'	>Monthly Events	</a></li>
-			<li><a href = '{% url invoice %}'		>Invoices		</a></li>
-			<li><a href = '{% url commission %}'	>Commissions	</a></li>
-			<li><a href = '{% url interest %}'		>Interests     	</a></li>
-			<li><a href = '{% url letter %}'		>Upload Letter  </a></li>
+			<li><a href = '{% url chapter %}' 			>Chapters		     </a></li>
+			<li><a href = '{% url leadbuyer %}'			>LeadBuyers	         </a></li>
+			<li><a href = '{% url leadbuyer %}?new'		>Potential Leadbuyers</a></li>
+			<li><a href = '{% url term %}?pending'		>Pending Terms 		 </a></li>
+			<li><a href = '{% url event %}?month'		>Monthly Events		 </a></li>
+			<li><a href = '{% url invoice %}'			>Invoices			 </a></li>
+			<li><a href = '{% url commission %}'		>Commissions		 </a></li>
+			<li><a href = '{% url interest %}'			>Interests     		 </a></li>
+			<li><a href = '{% url letter %}'			>Upload Letter  	 </a></li>
 			<!--  
-			<li><a href = '{% url meetup_api %}'		>MeetUp        	</a></li>
-			<li><a href = '{% url eventbrite_api %}'	>Eventbrite     </a></li>
+			<li><a href = '{% url meetup_api %}'		>MeetUp        		 </a></li>
+			<li><a href = '{% url eventbrite_api %}'	>Eventbrite     	 </a></li>
 			-->	
 			
 			{% endif %}

@@ -358,11 +358,11 @@ if __name__ == '__main__':
     op.add_option('--metric',     default = False,  action="store_true", help = "Run metrics")
     op.add_option('-e',           dest = 'email',   action="store",      help = "Email address for Google Spreadsheet")
     op.add_option('-p',           dest = 'password',action="store",      help = "Password for Google Spreadsheet")
-
+    op.add_option('--budget',     default = False,  action="store_true", help = "Check budgets")
     
     (opts,args) = op.parse_args()
 
-    clean_names()
+    #clean_names()
     # Check if options were set
     if opts.metric:
         # -e brightmap.data@gmail.com -p 8jcgjg93j
