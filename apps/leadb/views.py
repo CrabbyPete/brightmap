@@ -233,8 +233,10 @@ class ApplyView( FormView ):
     
     def form_invalid(self, form, chapter = None):
         context = self.get_context_data(form=form)
-        if chapter:
-            context.update(chapter=chapter)
+        if not chapter:
+            chapter = Chapter.objects.all().order_by('name')[0]
+        
+        context.update(chapter=chapter)    
         return self.render_to_response(context)
 
 

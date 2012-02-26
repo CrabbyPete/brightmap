@@ -71,7 +71,7 @@ def cronjob():
                                   bcc
                                 )
     msg.attach_alternative(html, "text/html")
-    msg.send( fail_silently = False )
+    #msg.send( fail_silently = False )
     return
 
 """

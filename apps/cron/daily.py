@@ -80,6 +80,12 @@ def warn_user( term, warning = False ):
                                 status = 'approved'
                              )
             new_term.save()
+            
+            # Create duplicates for exist free trials. So emails duplicate emails are not sent
+            connections = Connection.objects.filter( term = term )
+            for connection in connections:
+                Connection( term = new_term, survey= connection.survey, status='duplicate')
+            
         
     return
 
@@ -309,7 +315,7 @@ def metric( email, password ):
         
         found = False
         for index, cell in enumerate(cells):
-            if row['organization'] == cell['organization']:
+            if 'organization' in cell and row['organization'] == cell['organization']:
                 spreadsheet.editRow( index, row )
                 found = True
                 break
@@ -317,6 +323,39 @@ def metric( email, password ):
             spreadsheet.addRow( row )
         
     return
+
+def budget_check():
+    
+    for leadbuyer in LeadBuyer.objects.all():
+    
+        if not leadbuyer.budget:
+            continue
+           
+        connections = Connection.objects.for_buyer( leadbuyer.user, days_of_month() )
+        total = sum( connection.term.cost for connection in connections if connection.status == 'sent' )
+ 
+        if total >= leadbuyer.budget:
+            print leadbuyer.user.first_name + ' ' + leadbuyer.user.last_name
+            msg = Mail( 'notice@brightmap.com',
+                        [leadbuyer.user.email], 
+                        subject = "Brightmap Budget", 
+                        template_name = 'budget_notice.tmpl', 
+                        bcc = None, 
+                        buyer = leadbuyer.user,
+                        connections = connections,
+                        total = total,
+                        budget = leadbuyer.budget,
+                        url   = reverse('lb_budget')
+                      )
+        
+            ans = raw_input('Send Notice? (y/n)')
+            if ans == 'y':
+                msg.send()
+            
+            
+            
+    
+
 
 def clean_names():
     users = User.objects.all()
@@ -369,6 +408,9 @@ if __name__ == '__main__':
         email = 'brightmap.data@gmail.com'
         password = '8jcgjg93j'
         metric( email, password )
+        
+    if opts.budget:
+        budget_check()
         
     if opts.accounting:
         if opts.month:

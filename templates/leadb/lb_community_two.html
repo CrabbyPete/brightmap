@@ -40,6 +40,7 @@ function loadChapter(form)
 					<section id="my-details">
 					<p class="lftcontent">What is your service?</p>
 					{{form.custom}}
+					{{form.custom.errors}}
 					</section>
 					
 					<section id="my-details">
@@ -82,14 +83,10 @@ function loadChapter(form)
 						</div>
 					</section>
 					{{form.deal_type.errors}}
+					
 					<p class="applicationleads">
 						<input name="" type="submit" value="Request deal" class="submitapp">
-					<!--  
-					<p class="ulsboston">
-						<input name="" type="submit"
-							value="Apply for Leads from {{chapter.name}}" class="ulsbutt">
-					-->
-					</p>
+					</p>			
 				</form>
 
 			</section>

@@ -149,18 +149,7 @@
 <div id="bodysection">
 		<div class="insidesection">
         			
-                  <section class="videobg">
-                  	<!--  
-                  	<video width="480" height="386" controls="controls" class="new">
-                    	<img src="/media/img/video-img.gif" alt="">
-                    </video>
-                    -->
-                    <!--  Don't load video if error it loads late and cover the javascript -->
-                    {% if not login.username.errors %}
-                    <iframe class ="new" type="text/html" width="480" height="385" src="http://www.youtube.com/embed/YG8og6Zc9og" frameborder="0">
-				    </iframe> 	                    
-                    {% endif %}
-                  </section>
+                  
                   
                   <article class="orgprovides">
 					  <div class="floating">
@@ -234,6 +223,18 @@
                         </div>	
 						</div>
                   </article>
+                  <section class="videobg">
+                  	<!--  
+                  	<video width="480" height="386" controls="controls" class="new">
+                    	<img src="/media/img/video-img.gif" alt="">
+                    </video>
+                    -->
+                    <!--  Don't load video if error it loads late and cover the javascript -->
+                    {% if not login.username.errors %}
+                    <iframe class ="new" type="text/html" width="480" height="385" src="http://www.youtube.com/embed/YG8og6Zc9og" frameborder="0">
+				    </iframe> 	                    
+                    {% endif %}
+                  </section>
 				  <br /><br />
 				  
                   
