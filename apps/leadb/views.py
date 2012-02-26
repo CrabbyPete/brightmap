@@ -13,12 +13,11 @@ from django.views.generic.edit      import  FormView
 from django.template                import  RequestContext, loader, Context
 from django.contrib                 import  auth
 from django.contrib.auth.models     import  User
-from django.contrib.auth.decorators import  login_required
 from django.http                    import  HttpResponseRedirect, HttpResponse
 from django.shortcuts               import  render_to_response
 from django.forms.util              import  ErrorList
 from django.core.urlresolvers       import  reverse
-
+from django.contrib.auth.decorators import login_required
 
 #Authorize imports
 from authorize                      import cim

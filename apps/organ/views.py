@@ -250,6 +250,7 @@ class CategoryView( FormView ):
                 
         return HttpResponseRedirect( reverse('or_setup') )
 
+@login_required
 def leadb( request ):
     template_name = 'organ/or_leadbuyer.html'
     
@@ -340,6 +341,7 @@ def commissions( request ):
         if leadbuyer in report:
             history = report
 """
+@login_required
 def events( request ):
     chapter = Chapter.objects.get(organizer = request.user )
     events  = Event.objects.filter( chapter = chapter).order_by('date').reverse()
