@@ -66,7 +66,11 @@ class OrganizerForm( forms.Form ):
                                             required = False,
                                             widget = forms.CheckboxInput(attrs={})
                                          )
-
+class InviteForm( forms.Form ):
+    chapter     = forms.CharField ( required = True, widget = forms.HiddenInput() )
+    
+    invites     = forms.CharField ( required = False, widget = forms.Textarea(attrs={'cols':40, 'rows':4}) )
+    
 class CategoryForm( forms.Form ):
     chapter     = forms.CharField ( required = True, widget = forms.HiddenInput() )
     
@@ -100,3 +104,4 @@ class CategoryForm( forms.Form ):
         """ To initialize checked data ...
         self.fields['standard'].initial = [ i.interest for i in Interest.objects.filter( status = 'standard')]
         """
+

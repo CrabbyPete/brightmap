@@ -22,7 +22,7 @@ from base.models                    import  ( Term,
 
 from base.mail                      import  Mail 
 from accounting                     import  accounting
-from nameparser                     import  HumanName
+#from nameparser                     import  HumanName
 
 
 TODAY = datetime.today()
@@ -84,8 +84,8 @@ def warn_user( term, warning = False ):
             # Create duplicates for exist free trials. So emails duplicate emails are not sent
             connections = Connection.objects.filter( term = term )
             for connection in connections:
-                Connection( term = new_term, survey= connection.survey, status='duplicate')
-            
+                clone = Connection( term = new_term, survey= connection.survey, status='duplicate')
+                clone.save()
         
     return
 
@@ -283,7 +283,7 @@ def metric( email, password ):
             
             for connect in event.connections():
                 total_connections += 1
-                if connect.term.cost > 0:
+                if connect.term.cost > 0 and connect.status == 'sent':
                     paid_connections += 1
                     months[month] += 1
    
@@ -356,7 +356,7 @@ def budget_check():
             
     
 
-
+"""
 def clean_names():
     users = User.objects.all()
     for user in users:
@@ -382,7 +382,7 @@ def clean_names():
             user.save()
         except:
             pass
-        
+"""        
 
 if __name__ == '__main__':
     op = optparse.OptionParser( usage="usage: %prog " +" [options]" )

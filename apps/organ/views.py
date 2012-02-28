@@ -20,7 +20,7 @@ from base.models                    import ( Profile,       Organization,   Chap
                                              Interest,      Deal,           Event,
                                              Eventbrite,    Term,           TERM_STATUS
                                             )
-from forms                          import OrganizerForm, CategoryForm
+from forms                          import OrganizerForm, CategoryForm, InviteForm
 
 
 class SignUpView( FormView ):
@@ -205,7 +205,7 @@ class SignUpView( FormView ):
         else: 
             profile.is_organizer = True
             profile.save()
-            return HttpResponseRedirect( reverse('or_category')+'?chapter='+str(chapter.id) )
+            return HttpResponseRedirect( reverse('or_invite')+'?chapter='+str(chapter.id) )
         
 class CategoryView( FormView ):
     template_name = 'organ/or_category.html'
@@ -250,6 +250,38 @@ class CategoryView( FormView ):
                 
         return HttpResponseRedirect( reverse('or_setup') )
 
+class InviteView(FormView):
+    template_name = 'organ/or_invite.html'
+    form_class = InviteForm
+    
+    def get_initial(self):
+        if self.request.method == 'GET':
+            if 'chapter' in self.request.GET:
+                chapter = self.request.GET['chapter']
+                return dict ( chapter = chapter )
+    
+    
+    def form_valid( self, form ):
+        chapter = Chapter.objects.get(pk = form.cleaned_data['chapter'])
+
+        emails  = form.cleaned_data['invites']
+        emails.replace('\r\n',',')
+        emails  = emails.split(',')
+        
+        template_name = 'invite.tmpl'
+        subject       = 'Become a preferred service provider for %s'%( chapter.name, )
+        
+        for email in emails:
+            mail = Mail( chapter.organizer.email,
+                         email, 
+                         subject, 
+                         template_name = template_name 
+                       )
+            mail.send()
+        
+        return HttpResponseRedirect( reverse('or_setup') )
+  
+   
 @login_required
 def leadb( request ):
     template_name = 'organ/or_leadbuyer.html'

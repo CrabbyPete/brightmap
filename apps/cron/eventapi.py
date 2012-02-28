@@ -80,7 +80,9 @@ class EventBrite(object):
         for answer in answers:
             if 'Check this box' in answer['answer']['question']:
                 leadbuyer = True
-    
+            elif 'Become a preferred service provider' in answer['answer']['question']:
+                leadbuyer = True
+                
         # Did they ask for help Note: two pass because never know where the answer is. 
         for answer in answers:
             if 'Do you need help' in answer['answer']['question']:

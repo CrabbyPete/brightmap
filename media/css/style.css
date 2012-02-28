@@ -1,4 +1,4 @@
-/* CSS Document for everything */
+/* CSS Document */
 * {
 	margin: 0;
 }
@@ -52,7 +52,6 @@ div.wraper{
 	overflow:hidden;*/
 	min-height: 100%;
 	height: auto !important;
-	height: 100%;
 	margin: 0 auto -38px;
 	}
 /*----------Top section----------------*/
@@ -482,6 +481,7 @@ input.submitbutt {
 	background:url(/media/img/footerbg.jpg) repeat-x 0 0;
 	height:38px;
 	clear: both;
+	margin-top:15px;
 	}
 
 .push{
@@ -550,8 +550,7 @@ p.profileupdate{
 	background:url(/media/img/pattern.jpg) repeat-x 0 0;
 	width:160px;
 	height:39px;
-	
-}
+	}
 p.profileupdate span{
 	background:url(/media/img/green-arrow.gif) no-repeat 12px 50%;
 	font-size:12px;
@@ -559,6 +558,55 @@ p.profileupdate span{
 	font-weight:bold;
 	display:block;
 	padding:0 0 0 50px;
+}
+p.profileupdate1{
+	background:url(/media/img/pattern.jpg) repeat-x 0 0;
+	width:160px;
+	height:39px;
+	float:left;
+	}
+p.profileupdate1 span{
+	background:url(/media/img/green-arrow.gif) no-repeat 12px 50%;
+	font-size:12px;
+	line-height:39px;
+	font-weight:bold;
+	display:block;
+	padding:0 0 0 50px;
+}
+p.eventeupdate{
+	background:url(/media/img/pattern.jpg) repeat-x 0 0;
+	width:284px;
+	height:39px;
+	float:right;
+	}
+p.eventeupdate span{
+	background:url(/media/img/green-arrow.gif) no-repeat 12px 50%;
+	font-size:12px;
+	line-height:39px;
+	font-weight:bold;
+	display:block;
+	padding:0 0 0 50px;
+}
+p.eventeupdate1{
+	background:url(/media/img/pattern.jpg) repeat-x 0 0;
+	width:306px;
+	height:39px;
+	float:right;
+	}
+p.eventeupdate1 span{
+	background:url(/media/img/red-cross.png) no-repeat 12px 65%;
+	font-size:12px;
+	line-height:14px;
+	font-weight:bold;
+	display:block;
+	padding:6px 0 0 50px;
+}
+p.eventeupdate1 a{
+	color:#FCA619;
+	background-color:inherit;
+}
+p.eventeupdate1 a:hover{
+	text-decoration:underline;
 }
 h2.leadbuyer{
 	font:bold 24px/24px "Futura Md BT", Arial, Helvetica, sans-serif;
@@ -827,7 +875,7 @@ form.monthlybudget input[type="text"]{
 	
 } 
 
-form.monthlybudget input[type="button"],input[type="submit"] {
+.form.monthlybudget input[type="button"],input[type="submit"] {
 	background:url(/media/img/updatemonthly-butt.jpg) no-repeat 0 0;
 	width:165px;
 	height:33px;
@@ -1130,7 +1178,7 @@ p.onlymethod{
 }
 
 input.paymentonly {
-	padding-top 34px;
+	padding-top: 34px;
 	background:url(/media/img/update_payment_method.gif) no-repeat 0 0;
 	width:168px;
 	height:34px;
@@ -1140,7 +1188,7 @@ input.paymentonly {
 	}
 	
 input.budgetonly {
-	padding-top 10px;
+	padding-top: 10px;
 	background:url(/media/img/update_budget.gif) no-repeat 0 0;
 	width:113px;
 	height:34px;
@@ -1629,11 +1677,7 @@ p.nextstep input.nxtstepbutt{
 .chkbox2div{
 	padding:0 0 10px 0;
 }
-.chkboxdiv label{
-	display:block;
-}
-
-.chkbox2div label{
+.chkboxdiv label, .chkbox2div label{
 	width:13px;
 	display:block;
 }
@@ -2030,7 +2074,6 @@ img.ultralight{
 	float:right;
 	padding-right:8px;
 	padding-bottom:8px;
-	height:100px;
 }
 .community-insidetable{
 	width:100%;
@@ -2067,19 +2110,31 @@ td.graybg a:hover{
 	margin:0;
 }
 p.ulsboston{
-	padding-left:258px;
+	padding-left:266px;
 	padding-top:27px;
+
 }
 
-p.ulsboston input.ulsbutt{
-	/* background:url(/media/img/apply-leads-ulsboston.gif) no-repeat 0 0;*/
-	background:url(/media/img/btn-submit-left.png) no-repeat 0 0;
+form#profile input[type=button]{
+	background:url(/media/img/apply-leads-ulsboston.gif) no-repeat 0 0 !important;
 	width:222px;
 	height:33px;
 	cursor:pointer;
 	border:none;
-	padding:33px 0 0 222px;
+	color:#fff;
+	font-size:12px;
+	margin:0;
+	display:block;
+	line-height:30px;
+	text-indent:0 !important;
+	font-weight:bold;
+	padding:0 0 0 15px;
+	font-family:Arial, Helvetica, sans-serif;
+	
+	
 	}
+	
+
 .selectcomunity{
 	background:url(/media/img/select-community.jpg) no-repeat 36px 0;
 	width:184px;
@@ -2087,4 +2142,154 @@ p.ulsboston input.ulsbutt{
 	padding:135px 0 0 0;
 	font:bold 18px/33px "Futura Md BT", Arial, Helvetica, sans-serif;
 	
+}
+
+/*------add as on 18-02-12------------*/
+section.leadbuyer1{
+	width:577px;
+	float:left;
+	margin-bottom:25px;
+	
+}
+.leadbuyrtop1{
+	background:url(/media/img/lead-organizertop.gif) no-repeat 0 0;
+	width:577px;
+	height:5px;
+}
+.leadbuyerrept1{
+	background:url(/media/img/organizertab-rept.gif) repeat-y 0 0;
+	padding:12px 22px 15px 22px;
+	height:100%;
+	overflow:hidden;
+	}
+.leadbuyerrept1 p{
+	padding-bottom:12px;
+}
+.leadbuyerrept1 p.emailtxt{
+	font-size:11px;
+	line-height:16px;
+	padding:10px 0 18px 0;
+	}
+.leadbuyerrept1 p.emailtxt a{
+	color:#FCB43E;
+	background-color:inherit;
+	text-decoration:underline;
+}
+.leadbuyerrept1 p.emailtxt a:hover{
+	text-decoration:none;
+}
+	
+.leadbuyrbottom1{
+	background:url(/media/img/organizer-tabbottom.gif) no-repeat 0 100%;
+	width:577px;
+	height:9px;
+}
+.leadbuyerrept1 textarea{
+	width:533px;
+	height:90px;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:12px;
+	line-height:14px;
+}
+.leadbuyerrept1 input.sendinvitationbutt{
+	background:url(/media/img/send-invitation-butt.gif) no-repeat 0 0;
+	width:125px!important;
+	height:33px;
+	cursor:pointer;
+	border:none;
+	float:right;
+	padding:0;
+	margin:0;
+	
+
+}
+a.becomeeventorg{
+	background:url(/media/img/add-updatecategories-butt.gif) no-repeat 0 0;
+	width:172px;
+	height:33px;
+	color:#fff;
+	display:block;
+	font-size:12px;
+	font-weight:bold;
+	line-height:33px;
+	padding:0 0 0 24px;
+	float:right;
+}
+p.serviceprovides{
+	width:473px;
+	margin:0 0 0 17px;
+	padding:22px 0 0 0;
+	}
+section.finish p.commatxt{
+	font-size:11px;
+	line-height:16px;
+	padding:14px 0 8px 0;
+}
+
+section.finish textarea.commaarea{
+	width:473px;
+	height:90px;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:12px;
+	line-height:14px;
+}
+section.finish input.sendinvitationbutt{
+	background:url(/media/img/send-invitation-butt.gif) no-repeat 0 0;
+	width:125px!important;
+	height:33px;
+	cursor:pointer;
+	border:none;
+	float:right;
+	padding:0;
+	margin:15px 0 0 0;
+	text-indent:20000px;
+}
+.grayboxnew{
+padding: 2px 0;
+text-align: left; width: 510px;
+/*-webkit-border-radius: 5px;
+-moz-border-radius: 5px;*/
+border-radius: 5px;
+background: #F6F6F7;
+behavior: url(/PIE.htc);
+
+}
+h2.paymethod2{
+	font:bold 18px/33px "Futura Md BT", Arial, Helvetica, sans-serif;
+	color:#FCB43D;
+	background-color:inherit;
+	margin:0 0 0 0;
+	padding:0 0 8px 0;
+}
+table.comissionhistory{
+	width:490px;
+	border-collapse: collapse;
+	margin:16px auto;
+	}
+.viewmonth{
+	font-size:12px;
+	font-weight:bold;
+	width:123px;
+}
+select.historybox{
+	width:244px;
+	height:21px;
+	}
+input.viewmonthbutt{
+	background:url(/media/img/view-monthbutt.gif) no-repeat 0 0;
+	width:102px;
+	height:33px;
+	cursor:pointer;
+	border:none;
+	text-indent:20000px;
+	margin-bottom:5px;
+	}
+	
+input.eventbutt{
+	background:url(/media/img/view-eventbutt.gif) no-repeat 0 0;
+	width:102px;
+	height:33px;
+	cursor:pointer;
+	border:none;
+	text-indent:20000px;
 }

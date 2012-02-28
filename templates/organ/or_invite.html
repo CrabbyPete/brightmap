@@ -1,0 +1,47 @@
+{% extends 'base.html' %} {% block body_block %}
+<!--Body section-->
+<div id="bodysection">
+	<div class="insidesection">
+		<h2 class="comunityorganizer">BrightMap - Invite Service Providers</h2>
+		<article class="profile">
+			<section class="bodybg">
+				<nav class="step">
+                	<nav class="step">
+                    	<ul>
+                        	<li><a href="#" class="noimg">STEP 1 of 3</a></li>
+                            <li><a href="#" class="steptwothree">STEP 2 of 3</a></li>
+                            <li><a href="#" class="step3">STEP 3 of 3</a></li>
+                         </ul>
+                 	</nav>
+                 </nav>
+			
+				<p class="serviceprovides">
+					Enter the email addresses of service providers you know and work
+					with.<br> These people will receive an email notifying them
+					that you use BrightMap. <br> They will be invited to sponsor
+					your organization by purchasing leads from BrightMap.<br> This
+					is how you get paid.
+				</p>
+
+
+				<section class="finish">
+					<form id="profile" name="" method="post" action="{% url or_invite %}">
+						{% csrf_token %}
+						{{form.chapter}}
+						<p class="commatxt">Enter email addresses here. Separate each
+							address by a comma.</p>
+						{{form.invites}}{{form.invites.errors}}
+						<input type="submit" value="sendinvitation" class="sendinvitationbutt">
+						<div class="spacer"></div>
+					</form>
+				</section>
+
+			</section>
+			<div class="botbg">&nbsp;</div>
+		</article>
+
+	</div>
+
+</div>
+<!--Body section-->
+{% endblock %}
