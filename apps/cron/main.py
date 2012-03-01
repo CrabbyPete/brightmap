@@ -1,4 +1,5 @@
 import django_header
+import settings
 
 # Python libraries
 from datetime                       import  datetime, timedelta
