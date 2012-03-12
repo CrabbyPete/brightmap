@@ -12,17 +12,19 @@ from base.radio                             import  ChoiceWithOtherField
 from creditfields                           import  CreditCardField
 
 class BuyerForm(forms.Form):
+    invite          = forms.CharField   ( required = False, widget = forms.HiddenInput() )
+    
     email           = forms.EmailField  ( required = True,
                                           max_length = 60,
                                           widget= forms.TextInput()
                                         )
-
+    """
     email_verify   = forms.EmailField  ( required = True,
                                          max_length = 60,
                                          widget= forms.TextInput()
                                        )
-
-    phone           = USPhoneNumberField( required = True,
+    """
+    phone           = USPhoneNumberField( required = False,
                                           label = 'Phone:',
                                           widget = forms.TextInput(attrs={'class':'row','size':16})
                                          )
@@ -52,12 +54,12 @@ class BuyerForm(forms.Form):
                                         )
     """
 
-    title          = forms.CharField   ( required = True,
+    title          = forms.CharField   ( required = False,
                                          max_length = 45,
                                          widget = forms.TextInput()
                                        )
 
-    company         = forms.CharField  ( required = True,
+    company         = forms.CharField  ( required = False,
                                          max_length = 45,
                                          widget = forms.TextInput(attrs={'class':'row','size':40})
                                         )

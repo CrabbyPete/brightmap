@@ -1,0 +1,138 @@
+{% extends 'baseR.html' %} 
+{% block body_section %}
+<!--Body section-->
+<div id="bodysection">
+		<div class="insidesection">
+            <div style="padding: 24px 0;">
+                <h1 class="orange">Become a Preferred Provider for Under30CEO</h1>
+                <!-- <p>Get referrals from Matt to Under30CEO members in the market for your service</p> -->
+            </div>
+        			
+              <section class="videobg clearfix">
+                
+                <div class="new-vid">
+                    <!-- Change the video ID below: Dr0NNmRZ9cc by doing a find and replace to catch all occurrences -->
+                    <div id="the-video" style="display: none">
+                    	<object width="480" height="385">
+                            <param name="movie" value="http://www.youtube.com/v/Dr0NNmRZ9cc?version=3&amp;rel=0&amp;fs=1&amp;autoplay=1" />
+                            <param name="allowFullScreen" value="true" />
+                            <param name="allowscriptaccess" value="always" />
+                            <embed src="http://www.youtube.com/v/Dr0NNmRZ9cc?version=3&amp;rel=0&amp;fs=1&amp;autoplay=1" type="application/x-shockwave-flash" width="480" height="385" allowscriptaccess="always" allowfullscreen="true" />
+                        </object>
+                    </div>
+                </div>
+                <div id="under-30">
+                    <div>
+                        <img src="/media/img/logo-under-30.png" alt="Under 30 CEO - Live the Dream" />
+                    </div>
+                    <div id="ceo-holder" class="clearfix">
+                        <div id="ceo">
+                            <img src="/media/img/img-ceo-30.jpg" alt="Matt Wilson" />
+                            <p class="futura">Matt Wilson</p>
+                            <p><strong>Founder, Under30CEO</strong></p>
+                        </div>
+                        <section id="ceo-info">
+                            <header>
+                                Under30CEO
+                            </header>
+                            <div>
+                                <p>Attendees/month      125</p>
+                                <p>Event ticket price     $20</p>
+                                <br />
+                                <p><strong>Existing Preferred Providers:</strong></p>
+                                <ul class="squares">
+                                    <li>Oxford Valuation Partners</li>
+                                    <li>Mintz Levin</li>
+                                    <li>Datagram</li>
+                                </ul>
+                            </div>
+                        </section>
+                    </div>
+                    <a href="{% url lb_signup %}?invite={{invite.pk}}" class="btn-humungus-yellow">
+                        Become a<br />
+                        Preferred Provider<br />
+                        for Under30CEO
+                    </a>
+                </div>
+              </section>
+                  
+                <div id="steps">
+                    <div class="info">
+                        <section id="connect">
+                            <div class="clearfix">
+                                <span class="black-circle floating">1</span>
+                                <h2 class="section-title floating" style="margin-top: 4px;">Sign Up on BrightMap</h2>
+                            </div>
+                            <ul class="goldbullet">
+                                <li>Setup your account and tell BrightMap which service you provide<br />(e.g. legal, accounting, web design, PR, marketing, etc.)</li>
+                            </ul>
+                        </section>					
+                        <section id="approve">
+                            <div class="clearfix">
+                                <span class="black-circle floating">2</span>
+                                <h2 class="section-title floating" style="margin-top: 4px;">Receive Email Referrals from Matt to Active Leads</h2>
+                            </div>
+                            <ul class="goldbullet">
+                                <li>Under30CEO members request introductions to the group's preferred service providers</li>
+                                <li>BrightMap sends email referrals, from Matt, introducing you to these qualiﬁed leads</li>
+                            </ul>
+                        </section>						
+                        <section id="get-paid">
+                            <div class="clearfix">
+                                <span class="black-circle floating">3</span>
+                                <h2 class="section-title floating" style="margin-top: 4px;">Get New Business</h2>
+                            </div>
+                            <ul class="goldbullet">
+                                <li>Connect with your leads at events, via email, or on the phone</li>
+                                <li>Pay per lead - starting at $20</li>
+                            </ul>
+                        </section>	
+                        <a id="gmail-example" href="#">
+                            <h3>Example Email Referral</h3>
+                            <strong>Click to view</strong>
+                        </a>
+                    </div>
+                    <div class="buttons clearfix">
+                        <a href="#" class="btn-humungus-yellow right">
+                            <strong>Sign Up Now</strong>
+                            <p>Free Trial</p>
+                        </a>                        
+                        <a href="{% url lb_signup %}" class="right" style="padding: 22px 22px 0 0; display: block"><img src="/media/img/logo-authorize.gif" alt="Authorize.net" /></a>
+                    </div>
+                </div>				  
+                  
+             </div> 
+         
+</div>
+<!--Body section-->
+{% endblock %}
+
+{% block script_section %}
+{% if pop %}
+<!-- Pop-up -->
+<div id="pop-up-wrapper">
+    <section id="actual-popup">
+        <div>
+            <img style="display: inline" src="/media/img/logo-under-30-small.jpg" alt="Under 30 CEO - Live the Dream" />
+        </div>
+        <h1 class="orange">What service do you provide?</h1>
+        <!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            We recommend using Ajax to place the user`s option into the browser session (check out js/site.js)
+            Else uncomment the <form> and the <button>
+        ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+        <form method="post" action="{% url or_landing %}">
+        	{% csrf_token %}
+        	{{form.invite}}
+            <div class="">
+ 				{{form.service}}
+            </div>
+            <p id="service-error"></p>
+            <div class="">
+                <!-- <a id="select-service" href="{% url or_landing %}" class="btn-humungus-yellow smaller">Learn More</a>-->
+                <button type="submit" class="btn-humungus-yellow">Learn More</button> 
+            </div>
+        <!-- </form> -->
+    </section>
+</div>
+{% endif %}
+{% endblock %}

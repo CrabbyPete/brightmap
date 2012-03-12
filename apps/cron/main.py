@@ -14,7 +14,7 @@ from nameparser                     import  HumanName
 from eventapi                       import  EventBrite
 from base.models                    import ( Event, Profile, Survey, Interest, Deal, Expire,
                                              Organization, Connection, LeadBuyer, Invoice,
-                                             Cancel
+                                             Cancel, Invite
                                             )
 
 from social.models                  import AuthToken
@@ -83,14 +83,14 @@ def database_events( ticket, api ):
     # Return the events list
     return event_list
 
-def mail_buyer ( user, event ):
+def mail_buyer ( user, invite ):
     """ 
     Send email to potential leadbuyer asking them to join 
     """
-    sender   = event.chapter.organizer.email
+    sender   = invite.chapter.organizer.email
     receivers = [ user.email ]
-    subject  = 'Become a preferred provider for '+ event.chapter.name
-    url      = reverse('learn')+'?service'
+    subject  = 'Become a preferred provider for '+ invite.chapter.name
+    url      = reverse('or_landing')+'?invite='+ str(invite.pk)
 
     mail = Mail( sender        = sender, 
                  receivers     = receivers,
@@ -99,7 +99,7 @@ def mail_buyer ( user, event ):
                  bcc           = [sender], 
                  user          = user, 
                  url           = url,  
-                 chapter       = event.chapter
+                 chapter       = invite.chapter
                )
     
     if PROMPT:
@@ -131,7 +131,7 @@ def database_attendees( event, api ):
         except User.DoesNotExist:
 
             # Create a temporary password and username which is 30 chars max
-            password = gen()
+            password = 'pamthgirb'   # brightmap backwards
             username = attendee['email'][0:30]
             user = User.objects.create_user(  username = username,
                                               email    = attendee['email'],
@@ -177,14 +177,20 @@ def database_attendees( event, api ):
         # Return attendees who answered the survey
         interests, leadbuyer = api.check_survey( attendee )
 
-        # If they checked they want leads they are a leadbuyer
-        if leadbuyer:
-            print user.email+':leadbuyer'
-            
+        # If they checked they want leads they are a leadbuyer           
         if leadbuyer and not profile.is_leadbuyer:
-            mail_buyer( user, event )
-            profile.is_leadbuyer = True
-            profile.save()
+            try:
+                invite = Invite.objects.get( user = user, chapter = event.chapter )
+            except Invite.DoesNotExist:
+                invite = Invite( user = user, 
+                                 chapter = event.chapter
+                               )
+                invite.sent = 1
+                invite.save() 
+                
+                mail_buyer( user, invite )
+                profile.is_leadbuyer = True
+                profile.save()
             
         # Add the attendee with or with out interests to the event
         if len(interests) == 0:
@@ -339,11 +345,10 @@ def make_contact( survey, deal, letter ):
         # Check if the leadbuyer is the organizer and if they have a letter
         if sponser == organizer:
             letter = 'self_referral.tmpl'
-
   
         # Render the message and log it
         print_connection( attendee, sponser, interest )
-        subject = deal.chapter.organization.name + ' Intro: '+ interest.interest
+        subject = deal.chapter.organization.name + ' Intro: '+ interest.interest + ' for ' + attendee.first_name + ' ' + attendee.last_name
         recipients = [ '%s %s <%s>'% ( attendee.first_name, attendee.last_name, attendee.email ),
                        '%s %s <%s>'% ( sponser.first_name, sponser.last_name, sponser.email )
                      ]

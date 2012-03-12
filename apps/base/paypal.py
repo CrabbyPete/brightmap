@@ -17,7 +17,7 @@ PAYPAL_ENDPOINT = 'https://svcs.paypal.com/AdaptivePayments/' # production
 #PAYPAL_APPLICATION_ID = 'APP-80W284485P519543T' # sandbox only
 PAYPAL_APPLICATION_ID = 'APP-3FY99092X0259451U'
 
-def pay_commission( email, amount ):
+def pay_commission( email, amount, memo = None ):
         headers = {
                    'X-PAYPAL-SECURITY-USERID': settings.PAYPAL['USERID'], 
                    'X-PAYPAL-SECURITY-PASSWORD': settings.PAYPAL['PASSWORD'], 
@@ -37,6 +37,9 @@ def pay_commission( email, amount ):
         data['actionType'] = 'PAY'
         data['receiverList'] = { 'receiver': [ { 'email': email, 'amount': '%f' % amount } ] }  
         data['senderEmail'] = 'paypal@brightmap.com'
+        if memo:
+            data['memo'] = memo
+            
         raw_request = json.dumps(data)
         request = urllib2.Request( "%s%s" % ( PAYPAL_ENDPOINT, "Pay" ), data=raw_request, headers=headers )
         raw_response = urllib2.urlopen( request ).read() 

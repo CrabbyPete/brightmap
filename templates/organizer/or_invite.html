@@ -4,7 +4,10 @@
 	<div class="insidesection">
 		<h2 class="comunityorganizer">BrightMap - Invite Service Providers</h2>
 		<article class="profile">
+		
 			<section class="bodybg">
+				{{deals}}
+			   {% if not deals %}
 				<nav class="step">
                 	<nav class="step">
                     	<ul>
@@ -14,7 +17,7 @@
                          </ul>
                  	</nav>
                  </nav>
-			
+				{% endif %} 
 				<p class="serviceprovides">
 					Enter the email addresses of service providers you know and work
 					with.<br> These people will receive an email notifying them

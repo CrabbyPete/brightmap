@@ -8,7 +8,7 @@ urlpatterns = patterns('',
     url(r'^$',          'base.views.homepage',  name='homepage'    ),
     (r'^base/',         include('base.urls')                       ),
     (r'^leadb/',        include('leadb.urls')                      ),
-    (r'^organ/',        include('organ.urls')                      ),
+    (r'^organizer/',    include('organizer.urls')                  ),
     (r'^api/',          include('api.urls')                        ),
     (r'^social/',       include('social.urls')                     ),
 

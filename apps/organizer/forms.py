@@ -9,14 +9,14 @@ class OrganizerForm( forms.Form ):
                                             max_length = 60,
                                             widget= forms.TextInput(attrs={'size':40})
                                          )
-
+    """
     email_verify   = forms.EmailField  ( required = False,
                                             label = 'Confirm Email Address:',
                                             max_length = 60,
                                             widget= forms.TextInput(attrs={'size':40})
                                          )
 
-
+    """
     first_name      = forms.RegexField  ( required = False,
                                             label = 'First Name:',
                                             max_length =45, regex=r'^[a-zA-Z]+$',
@@ -37,13 +37,14 @@ class OrganizerForm( forms.Form ):
                                             widget = forms.PasswordInput(attrs={'size':40}, render_value = True )
                                         )
 
+    """
     pass_confirm    = forms.CharField   (  required = False, 
                                            max_length = 45,
                                            label = 'Confirm Password',
                                            widget = forms.PasswordInput(attrs={'size':40}, render_value = True )
                                         )
 
-
+    """
     organization    = forms.CharField  ( required = False,
                                             label = 'Organization Name',
                                             max_length =100,
@@ -71,6 +72,22 @@ class InviteForm( forms.Form ):
     
     invites     = forms.CharField ( required = False, widget = forms.Textarea(attrs={'cols':40, 'rows':4}) )
     
+
+class ServiceForm( forms.Form):
+    invite  = forms.CharField( widget = forms.HiddenInput() )
+
+    service = forms.ChoiceField( required = False,
+                                 choices=(),
+                                 widget=forms.Select(attrs={'class':"selectbox"}) 
+                                )
+
+       
+    def __init__(self, *args, **kwargs):
+        super( ServiceForm, self).__init__(*args, **kwargs)
+        self.fields['service'].choices = [(i.interest,i.interest) for i in Interest.objects.filter( status = 'standard')]
+        
+        
+        
 class CategoryForm( forms.Form ):
     chapter     = forms.CharField ( required = True, widget = forms.HiddenInput() )
     

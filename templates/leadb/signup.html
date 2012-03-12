@@ -21,6 +21,7 @@
 				<h2 class='number'>Service Provider Profile</h2>
                 <form id="profile" name="" method="post" action="{% url lb_signup %}">
                 {% csrf_token %}
+                	{{form.invite}}
                     <section id="my-border">
                         <p class="lftcontent">First Name <span>*</span></p>
                         <p>{{form.first_name}}</p>
@@ -33,11 +34,11 @@
                         <p class="lftcontent">Email <span>*</span></p>
                         <p>{{form.email}}</p>
                         {{form.email.errors}}
-
+						<!--  
                         <p class="lftcontent">Verify Email <span>*</span></p>
                         <p>{{form.email_verify}}</p>
                         {{form.email_verify.errors}}
-
+						-->
                         <p class="lftcontent">Password <span>*</span></p>
                         <p>{{form.password}}</p>
                         {{form.password.errors}}

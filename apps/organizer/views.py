@@ -18,13 +18,15 @@ from django.contrib.auth.decorators import  login_required
 from base.mail                      import Mail
 from base.models                    import ( Profile,       Organization,   Chapter, 
                                              Interest,      Deal,           Event,
-                                             Eventbrite,    Term,           TERM_STATUS
+                                             Eventbrite,    Term,           Invite,
+                                             TERM_STATUS
                                             )
-from forms                          import OrganizerForm, CategoryForm, InviteForm
+
+from forms                          import OrganizerForm, CategoryForm, InviteForm, ServiceForm
 
 
 class SignUpView( FormView ):
-    template_name = 'organ/signup.html'
+    template_name = 'organizer/signup.html'
     form_class    = OrganizerForm
     password      ='2434&)%*%%^$#@' 
     
@@ -79,13 +81,14 @@ class SignUpView( FormView ):
       
         # Check the passwords match
         password     = form.cleaned_data['password']
+        """
         pass_confirm = form.cleaned_data['pass_confirm']
         
         if password != self.password:
             if  password != pass_confirm:
                 form._errors['password'] = ErrorList(["The passwords do not match"])
                 return self.form_invalid(form)
-
+        """
         # Make sure they agree
         if not form.cleaned_data['agree']:
             form._errors['agree'] = ErrorList(["Please check agreement"])
@@ -208,7 +211,7 @@ class SignUpView( FormView ):
             return HttpResponseRedirect( reverse('or_invite')+'?chapter='+str(chapter.id) )
         
 class CategoryView( FormView ):
-    template_name = 'organ/or_category.html'
+    template_name = 'organizer/or_category.html'
     form_class    = CategoryForm
     
     def get_initial( self ):
@@ -251,7 +254,7 @@ class CategoryView( FormView ):
         return HttpResponseRedirect( reverse('or_setup') )
 
 class InviteView(FormView):
-    template_name = 'organ/or_invite.html'
+    template_name = 'organizer/or_invite.html'
     form_class = InviteForm
     
     def get_initial(self):
@@ -270,12 +273,14 @@ class InviteView(FormView):
         
         template_name = 'invite.tmpl'
         subject       = 'Become a preferred service provider for %s'%( chapter.name, )
-        
+        url = reverse( 'leadbuyer')
         for email in emails:
             mail = Mail( chapter.organizer.email,
                          email, 
                          subject, 
-                         template_name = template_name 
+                         template_name = template_name,
+                         chapter = chapter,
+                         url =  url
                        )
             mail.send()
         
@@ -284,7 +289,7 @@ class InviteView(FormView):
    
 @login_required
 def leadb( request ):
-    template_name = 'organ/or_leadbuyer.html'
+    template_name = 'organizer/or_leadbuyer.html'
     
     if 'term' in request.GET:
         term  = Term.objects.get( pk = request.GET['term'])
@@ -304,7 +309,7 @@ def setup( request ):
         else: 
             context = { 'header':True }
             
-    return render_to_response('organ/or_setup.html',context, context_instance=RequestContext(request) )
+    return render_to_response('organizer/or_setup.html',context, context_instance=RequestContext(request) )
 
 
 @login_required
@@ -337,7 +342,7 @@ def dashboard( request ):
             elif term.status == 'canceled':
                 canceled.append(term)
     today = date.today()      
-    return render_to_response( 'organ/or_dash.html', 
+    return render_to_response( 'organizer/or_dash.html', 
                                {'chapter':chapter,'state':state, 'today':today, 'active':active, 'pending':pending, 'canceled':canceled }, 
                                context_instance=RequestContext(request) 
                              )
@@ -406,12 +411,12 @@ def events( request ):
                                 )
                           )
     total = "%.2f" % ( float(total) *.45 )    
-    return render_to_response( 'organ/or_events.html', 
+    return render_to_response( 'organizer/or_events.html', 
                                {'chapter':chapter,'events':event_list, 'total':total}, 
                                context_instance=RequestContext(request) 
                              )
 
-   
+  
 def cancel(request):
     # Cancel Terms of a Deal
     if request.method == 'GET' and 'term' in request.GET:
@@ -420,3 +425,22 @@ def cancel(request):
         term.save()
     return HttpResponseRedirect(reverse('or_dash'))
 
+
+def landing(request):
+    if request.method == 'GET':
+        if 'invite' in request.GET:
+            invite = Invite.objects.get( pk = request.GET['invite'] )
+            form = ServiceForm( initial = {'invite': str(invite.pk)} )
+            data = dict( invite = invite, pop = True, form = form )
+
+    elif request.method == 'POST':
+        invite = Invite.objects.get(pk = request.POST['invite'])
+        invite.category = request.POST['service']
+        invite.save()
+        data = dict( invite = invite, pop = False )    
+    
+    return render_to_response( 'organizer/or_landing.html', 
+                                data, 
+                                context_instance=RequestContext(request) 
+                              )
+        

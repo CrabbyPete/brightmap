@@ -26,7 +26,8 @@ from authorize.responses            import AuthorizeError #, _cim_response_codes
 
 #Local imports
 from base.models                    import ( LeadBuyer, Chapter, Expire, Cancel, Connection, Authorize,
-                                             Deal, Term, Interest, Profile, Invoice, TERM_STATUS, Expire
+                                             Deal, Term, Interest, Profile, Invoice, TERM_STATUS, Expire,
+                                             Invite
                                             )
 from base.forms                     import LoginForm
 from base.mail                      import Mail 
@@ -83,7 +84,22 @@ class  SignUpView( FormView ):
         
                 # A new user is signing up
             else:
-                return {}
+                if 'invite' in self.request.GET:
+                    invite = Invite.objects.get(pk = self.request.GET['invite'] )
+                    profile = invite.user.get_profile()
+                    self.initial = {
+                                    'invite':       str(invite.pk),
+                                    'first_name':   invite.user.first_name,
+                                    'last_name':    invite.user.last_name,
+                                    'email':        invite.user.email,
+                                    'phone':        profile.phone,
+                                    'title':        profile.title,
+                                    'company':      profile.company,
+                                   }
+
+                    return self.initial
+                else:
+                    return {}
 
             # Check if they have a LinkedIn profile
             """
@@ -116,11 +132,12 @@ class  SignUpView( FormView ):
 
         # Get the email address and see if they are in the database
         email          = form.cleaned_data['email']
+        """
         email_verify   = form.cleaned_data['email_verify']
         if email != email_verify:
             form._errors['email'] = ErrorList(["The emails do not match"])
             return self.form_invalid(form)
-    
+        """
         # Check the passwords match
         password     = form.cleaned_data['password']
         """
@@ -129,6 +146,9 @@ class  SignUpView( FormView ):
             form._errors['password'] = ErrorList(["The passwords do not match"])
             return self.form_invalid(form)
         """
+        # Invite is a hiddenfield to carry the invitation
+        invite = form.cleaned_data['invite']
+        
         # Make sure they agree
         if not form.cleaned_data['agree']:
             form._errors['agree'] = ErrorList(["Please check agreement"])
@@ -151,7 +171,7 @@ class  SignUpView( FormView ):
                 profile.save()
             else:
                 # Is an existing user signing up as a leadbuyer
-                if not user.check_password(password):
+                if not user.check_password(password) and not invite:
                     form._errors['email'] = ErrorList(["This email already exists"])
                     return self.form_invalid( form )
                     
@@ -161,6 +181,7 @@ class  SignUpView( FormView ):
             except User.DoesNotExist:
                 user.email = email
             else:
+                invite = form.cleaned_data['invite']
                 if not user.check_password(password):
                     form._errors['email'] = ErrorList(["This email already exists"])
                     return self.form_invalid( form )
@@ -203,6 +224,8 @@ class  SignUpView( FormView ):
         if profile.is_ready:
             return HttpResponseRedirect ( reverse('lb_dash')+"?state=profile" )
         else:
+            if invite:
+                return HttpResponseRedirect ( reverse('lb_apply')+'?invite='+invite )
             return HttpResponseRedirect ( reverse('lb_apply') )
 
 
@@ -224,8 +247,15 @@ class ApplyView( FormView ):
         else:
             expire = False
         
-        chapter = Chapter.objects.all().order_by('name')[0]
-        self.form_class = ApplyForm()
+        if 'invite' in request.GET:
+            invite = Invite.objects.get(pk = request.GET['invite'])
+            chapter = invite.chapter
+            data = dict(chapter = chapter, custom = invite.category)
+            self.form_class = ApplyForm(initial=data)
+        else: 
+            chapter = Chapter.objects.all().order_by('name')[0]
+            self.form_class = ApplyForm()
+        
         deals = len( self.request.user.leadbuyer_set.all()[0].deals() )
  
         return self.render_to_response( {'form':self.form_class, 'expire':expire, 'deals':deals, 'chapter':chapter} )

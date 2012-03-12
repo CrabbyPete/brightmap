@@ -85,7 +85,7 @@ def homepage( request ):
         
         start_url = reverse('or_dash')
     else:
-        start_url = '/'
+        start_url = reverse('lb_signup')
     
     return HttpResponseRedirect(start_url)
 
@@ -631,7 +631,11 @@ class CommissionView ( FormView ):
         commission = Commission.objects.get( pk = self.request.GET['commission'] )
         paypal = commission.chapter.paypal
         if paypal:
-            if  pay_commission( paypal, cost ):
+            memo = ' %s commission payment for leads generated for %s %s'%(commission.chapter.name,
+                                                                              commission.invoice.user.first_name,
+                                                                              commission.invoice.user.last_name 
+                                                                          )
+            if  pay_commission( paypal, cost, memo ):
                 commission.status = 'paid'
                 commission.save()
         return HttpResponseRedirect(reverse('commission'))

@@ -36,6 +36,7 @@ function loadChapter(form)
 				
 				<form id="profile" name="" method="post" action="{% url lb_apply %}">
 					{% csrf_token %}
+					{{form.invite}}
 					
 					<section id="my-details">
 					<p class="lftcontent">What is your service?</p>

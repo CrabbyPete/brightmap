@@ -5,6 +5,7 @@ from datetime                               import datetime, date, time, timedel
 from django.db                              import models
 from django.contrib.auth.models             import User
 from django.contrib.localflavor.us.models   import PhoneNumberField
+from django.template.defaultfilters         import slugify 
 
 
 class Profile( models.Model ):
@@ -113,6 +114,7 @@ class Chapter( models.Model ):
     Base for each Organization chapter
     """
     name          = models.CharField( default = None, max_length = 255 )
+    slug          = models.SlugField( default = None )
     organization  = models.ForeignKey( Organization, default = None, blank = True, null = True )
     organizer     = models.ForeignKey( User )
     paypal        = models.CharField( default = None, null = True,  max_length = 255 )
@@ -120,9 +122,17 @@ class Chapter( models.Model ):
     logo          = models.FileField(upload_to = 'logos') 
     letter        = models.ForeignKey('Letter', blank = True, null = True )
     website       = models.URLField(            blank = True, null = True )
+    category      = models.CharField( default = None, blank = True, null = True,  max_length = 255 )
+ 
+    
     objects       = ChapterManager() 
     
+    def save(self):         
+        if not self.id:             
+            self.slug = slugify(self.name)          
+        super(Chapter, self).save() 
 
+    
     def deals( self ):
         # Get all the deals for this chapter
         return self.deal_set.all()
@@ -182,6 +192,18 @@ class Chapter( models.Model ):
     def __unicode__(self):
         return self.name
 
+class Invite( models.Model ):
+    chapter       = models.ForeignKey( Chapter )
+    user          = models.ForeignKey( User    )
+    
+    category      = models.CharField( blank = True, null = True, max_length = 255 )
+    sent          = models.IntegerField( default = 0 )
+    did_reply     = models.BooleanField( default = False )
+    date          = models.DateTimeField( auto_now_add = True )
+    
+    def __unicode__(self):
+        return self.chapter.name +'-'+self.email
+    
 class Eventbrite( models.Model ):
     """
     Information needed to access Eventbrite API
