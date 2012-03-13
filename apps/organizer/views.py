@@ -431,13 +431,16 @@ def landing(request):
         if 'invite' in request.GET:
             invite = Invite.objects.get( pk = request.GET['invite'] )
             form = ServiceForm( initial = {'invite': str(invite.pk)} )
+            
             data = dict( invite = invite, pop = True, form = form )
+        else:
+            data = {}
 
     elif request.method == 'POST':
         invite = Invite.objects.get(pk = request.POST['invite'])
         invite.category = request.POST['service']
         invite.save()
-        data = dict( invite = invite, pop = False )    
+        data = dict( invite = invite, pop = False, chapter = invite.chapter )    
     
     return render_to_response( 'organizer/or_landing.html', 
                                 data, 

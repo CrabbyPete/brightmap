@@ -123,6 +123,8 @@ class Chapter( models.Model ):
     letter        = models.ForeignKey('Letter', blank = True, null = True )
     website       = models.URLField(            blank = True, null = True )
     category      = models.CharField( default = None, blank = True, null = True,  max_length = 255 )
+    average_attend= models.IntegerField( default = 0 )
+    ticket_price  = models.DecimalField ( max_digits = 10, decimal_places = 2, default = 0.00 )
  
     
     objects       = ChapterManager() 
@@ -154,7 +156,17 @@ class Chapter( models.Model ):
             return True
         return False
     
-    
+    def providers(self):
+        providers = []
+        deals = Deal.objects.filter ( chapter = self )
+        for deal in deals:
+            terms = Term.objects.filter( deal = deal, 
+                                         status = 'approved' )
+            for term in terms:
+                providers.append(term.buyer)
+        return providers
+        
+        
     def sponsors(self):
         sponsors = []
         deals = Deal.objects.filter ( chapter = self )

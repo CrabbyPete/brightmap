@@ -1,0 +1,44 @@
+#landing-wrapper {
+	padding-top: 16px;
+}
+
+.demo-box {
+	width: 482px;
+}
+	.demo-box header {
+		cursor: pointer;
+		height: 46px;
+		line-height: 46px;
+		padding-left: 48px;
+		border-bottom: 1px solid #c6c6c6;
+		margin-bottom: 3px;
+		background: url(/media/img/ico-yellow-arrow.png) no-repeat 8px 50% #010101;
+	}
+	.demo-box header:hover {
+		background-color: #888888;
+	}
+		.demo-box header h1 {
+			color: white;
+			text-transform: uppercase;
+		}
+	.demo-box .link-list {
+		padding: 18px 48px 48px 48px;
+		border: 1px solid #dfdfde;
+		border-bottom-width: 12px;
+		background: url(/media/img/ico-mean-arrow.png) no-repeat 97% 90% white;
+	}
+		.demo-box .link-list ul {
+			list-style-type: none;
+			margin-bottom: 12px;
+		}
+			.demo-box .link-list ul li {
+				color: #010101;
+				font-size: 12px;
+				font-weight: bold;
+				margin: 2px 0;
+			}
+				.demo-box .link-list ul li a, .demo-box .link-list ul li a:link, .demo-box .link-list ul li a:visited {
+					color: #010101;
+					font-size: 11px;
+					font-weight: normal;
+				}

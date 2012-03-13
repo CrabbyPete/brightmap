@@ -32,9 +32,7 @@ h1.orange {
         background: #f0f1f1;
 	}
     #under-30 {
-        float: right;
-        width: 434px;
-        padding-top: 23px;
+		width: 406px;
     }
     
 /* Edit #3 */
@@ -55,7 +53,6 @@ body{
     
 /* Edit #5 <- these just need to be added at the end of style.css */
 #ceo-holder {
-    margin-top: 8px;
 }
     #ceo {
         float: left;
@@ -72,7 +69,7 @@ body{
     #ceo-info {
         float: left;
         width: 206px;
-        margin-left: 6px;
+        margin-left: 16px;
     }
         #ceo-info header {
             font-size: 16px;
@@ -96,6 +93,14 @@ ul.squares {
         background: url(/media/img/ico-square.gif) no-repeat 0 6px;
     }
     
+.humungus-holder {
+	text-align: center;
+	padding-right: 48px;
+}
+	.humungus-holder .btn-humungus-yellow {
+		margin-left: auto;
+		margin-right: auto;
+	}
 .btn-humungus-yellow {
     display: block;
     text-align: center;
@@ -106,10 +111,17 @@ ul.squares {
     font-weight: bold;
     letter-spacing: -1px;
     width: 196px;
-    height: 78px;
-    margin-top: 11px;
-    padding-top: 11px;
+    height: 58px;
+    margin-top: 16px;
+	padding: 6px 0 0 48px;
+   /*  padding-top: 11px; */
     background: url(/media/img/btn-humungus-yellow.png) no-repeat top left;
+}
+.btn-humungus-yellow.no-play {
+	width: 177px;
+	height: 78px;
+	padding: 6px 0 0 0;
+	background-image: url(/media/img/btn-humungus-yellow-no-play.png);
 }
 .btn-humungus-yellow.smaller {
     letter-spacing: 0;
@@ -120,6 +132,12 @@ ul.squares {
 }
 .btn-humungus-yellow:hover {
     color: black;
+}
+
+.border-right {
+	padding-right: 18px;
+	margin-right: 18px;
+	border-right: 1px solid #d9dada;
 }
 
 #steps {

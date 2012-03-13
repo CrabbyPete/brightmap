@@ -2,58 +2,67 @@
 {% block body_section %}
 <!--Body section-->
 <div id="bodysection">
-		<div class="insidesection">
-            <div style="padding: 24px 0;">
-                <h1 class="orange">Become a Preferred Provider for Under30CEO</h1>
-                <!-- <p>Get referrals from Matt to Under30CEO members in the market for your service</p> -->
-            </div>
+		<div class="insidesection" style="padding-top: 16px">
         			
-              <section class="videobg clearfix">
+		    <section class="videobg clearfix">
+			
+				<div class="clearfix" style="margin-bottom: 14px">				
+					<h1 class="orange left">Become a Preferred Provider<br />for {{chapter.name}}</h1>
+					
+					<div id="under-30" class="right">
+						<img src="{{chapter.logo}}" alt="{{chapter.name}}" />
+					</div>
+				</div>
                 
-                <div class="new-vid">
-                    <!-- Change the video ID below: Dr0NNmRZ9cc by doing a find and replace to catch all occurrences -->
-                    <div id="the-video" style="display: none">
-                    	<object width="480" height="385">
-                            <param name="movie" value="http://www.youtube.com/v/Dr0NNmRZ9cc?version=3&amp;rel=0&amp;fs=1&amp;autoplay=1" />
-                            <param name="allowFullScreen" value="true" />
-                            <param name="allowscriptaccess" value="always" />
-                            <embed src="http://www.youtube.com/v/Dr0NNmRZ9cc?version=3&amp;rel=0&amp;fs=1&amp;autoplay=1" type="application/x-shockwave-flash" width="480" height="385" allowscriptaccess="always" allowfullscreen="true" />
-                        </object>
-                    </div>
-                </div>
-                <div id="under-30">
-                    <div>
-                        <img src="/media/img/logo-under-30.png" alt="Under 30 CEO - Live the Dream" />
-                    </div>
-                    <div id="ceo-holder" class="clearfix">
-                        <div id="ceo">
-                            <img src="/media/img/img-ceo-30.jpg" alt="Matt Wilson" />
-                            <p class="futura">Matt Wilson</p>
-                            <p><strong>Founder, Under30CEO</strong></p>
-                        </div>
-                        <section id="ceo-info">
-                            <header>
-                                Under30CEO
-                            </header>
-                            <div>
-                                <p>Attendees/month      125</p>
-                                <p>Event ticket price     $20</p>
-                                <br />
-                                <p><strong>Existing Preferred Providers:</strong></p>
-                                <ul class="squares">
-                                    <li>Oxford Valuation Partners</li>
-                                    <li>Mintz Levin</li>
-                                    <li>Datagram</li>
-                                </ul>
-                            </div>
-                        </section>
-                    </div>
-                    <a href="{% url lb_signup %}?invite={{invite.pk}}" class="btn-humungus-yellow">
-                        Become a<br />
-                        Preferred Provider<br />
-                        for Under30CEO
-                    </a>
-                </div>
+				<div class="clearfix">
+					<div class="left border-right">
+						<div class="new-vid">
+							<a href="#" id="play-video"><img src="/media/img/video-splash.jpg" alt=""></a>
+							<!-- Change the video ID below: Dr0NNmRZ9cc by doing a find and replace to catch all occurrences -->
+							<div id="the-video" style="display: none">
+								<object width="480" height="317">
+									<param name="movie" value="http://www.youtube.com/v/Dr0NNmRZ9cc?version=3&amp;rel=0&amp;fs=1&amp;autoplay=1" />
+									<param name="allowFullScreen" value="true" />
+									<param name="allowscriptaccess" value="always" />
+									<embed src="http://www.youtube.com/v/Dr0NNmRZ9cc?version=3&amp;rel=0&amp;fs=1&amp;autoplay=1" type="application/x-shockwave-flash" width="480" height="317" allowscriptaccess="always" allowfullscreen="true" />
+								</object>
+							</div>
+						</div>
+					</div>
+				
+					<div class="right">
+						<div id="ceo-holder" class="clearfix">
+							<div id="ceo">
+								<img src="/media/img/img-ceo-30.jpg" alt="{{chapter.organizer.first_name}} &nbsp;{{chapter.organizer.last_name}}" />
+								<p class="futura">{{chapter.organizer.first_name}} &nbsp;{{chapter.organizer.last_name}}</p>
+								<p><strong>{{chapter.organizer.get_profile.title}}</strong></p>
+							</div>
+							<section id="ceo-info">
+								<header>
+									{{chapter.name}}
+								</header>
+								<div>
+									<p>Attendees/month      {{chapter.average_attend}}</p>
+									<p>Event ticket price   {{chapter.ticket_price}}</p>
+									<br />
+									<p><strong>Existing Preferred Providers:</strong></p>
+									<ul class="squares">
+										{% for provider in chapter.providers %}
+										<li>{{provider.get_profile.company}}</li>
+										{% endfor %}
+									</ul>
+								</div>
+							</section>
+						</div>
+						<div class="humungus-holder">
+							<a href="{% url lb_signup %}?invite={{invite.pk}}" class="btn-humungus-yellow">
+								Become a<br />
+								Preferred Provider<br />
+								for {{chapter.name}}
+							</a>
+						</div>
+					</div>
+				</div>
               </section>
                   
                 <div id="steps">
@@ -70,11 +79,11 @@
                         <section id="approve">
                             <div class="clearfix">
                                 <span class="black-circle floating">2</span>
-                                <h2 class="section-title floating" style="margin-top: 4px;">Receive Email Referrals from Matt to Active Leads</h2>
+                                <h2 class="section-title floating" style="margin-top: 4px;">Receive Email Referrals from {{chapter.organizer.first_name}} to Active Leads</h2>
                             </div>
                             <ul class="goldbullet">
                                 <li>Under30CEO members request introductions to the group's preferred service providers</li>
-                                <li>BrightMap sends email referrals, from Matt, introducing you to these qualiﬁed leads</li>
+                                <li>BrightMap sends email referrals, from Matt, introducing you to these qualified leads</li>
                             </ul>
                         </section>						
                         <section id="get-paid">
@@ -93,11 +102,11 @@
                         </a>
                     </div>
                     <div class="buttons clearfix">
-                        <a href="#" class="btn-humungus-yellow right">
+                        <a href="{% url lb_signup %}?invite={{invite.pk}}" class="btn-humungus-yellow no-play right">
                             <strong>Sign Up Now</strong>
                             <p>Free Trial</p>
                         </a>                        
-                        <a href="{% url lb_signup %}" class="right" style="padding: 22px 22px 0 0; display: block"><img src="/media/img/logo-authorize.gif" alt="Authorize.net" /></a>
+                        <a href="#" class="right" style="padding: 22px 22px 0 0; display: block"><img src="/media/img/logo-authorize.gif" alt="Authorize.net" /></a>
                     </div>
                 </div>				  
                   
