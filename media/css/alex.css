@@ -34,6 +34,9 @@ h1.orange {
     #under-30 {
 		width: 406px;
     }
+    #under-30 img {
+    	height:75px;
+    }
     
 /* Edit #3 */
 body{
@@ -221,7 +224,7 @@ ul.goldbullet {
     width: 100%;
     height: 100%;
     text-align: center;
-    padding-top: 190px;
+    padding-top: 100px;
     background: url(/media/img/bg-popup.png);
 }
     #actual-popup {

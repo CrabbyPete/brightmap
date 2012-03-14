@@ -42,7 +42,6 @@ class LoginForm(forms.Form):
                                           widget = forms.PasswordInput( attrs={} )
                                         )
 
-
 class UserForm( ModelForm ):
     class Meta:
         model = User
@@ -51,7 +50,7 @@ class UserForm( ModelForm ):
 class UserProfileForm( ModelForm ):     
     class Meta:         
         model = Profile 
-        exclude = ('user',)
+        #exclude = ('user',)
 
 class UserAndProfileForm( UserForm, UserProfileForm ):
     class Meta ( UserForm.Meta, UserProfileForm.Meta ):
@@ -80,6 +79,7 @@ class LeadBuyerForm( ModelForm ):
 class ChapterForm(ModelForm):
     class Meta:
         model = Chapter
+        exclude = ('slug',)
     
 class EventbriteForm(ModelForm):
     class Meta:

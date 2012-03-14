@@ -1,7 +1,7 @@
 {% extends "admin/admin.html" %}
 
 {% block body_block %}
-	<form action="{% url profile %}" method="post" >
+	<form action="{% url profile %}" method="post", enctype="multipart/form-data" >
        {% csrf_token %}
  		{{uform}}
  		{{pform}}

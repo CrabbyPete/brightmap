@@ -33,7 +33,7 @@
 					<div class="right">
 						<div id="ceo-holder" class="clearfix">
 							<div id="ceo">
-								<img src="/media/img/img-ceo-30.jpg" alt="{{chapter.organizer.first_name}} &nbsp;{{chapter.organizer.last_name}}" />
+								<img src="{{chapter.organizer.get_profile.photo}}" width=191px; alt="{{chapter.organizer.first_name}} &nbsp;{{chapter.organizer.last_name}}" />
 								<p class="futura">{{chapter.organizer.first_name}} &nbsp;{{chapter.organizer.last_name}}</p>
 								<p><strong>{{chapter.organizer.get_profile.title}}</strong></p>
 							</div>
@@ -122,7 +122,7 @@
 <div id="pop-up-wrapper">
     <section id="actual-popup">
         <div>
-            <img style="display: inline" src="/media/img/logo-under-30-small.jpg" alt="Under 30 CEO - Live the Dream" />
+            <img style="display: inline" src="{{chapter.logo}}" alt="{{chapter.name}}" height='75px' />
         </div>
         <h1 class="orange">What service do you provide?</h1>
         <!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

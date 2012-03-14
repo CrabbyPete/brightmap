@@ -432,7 +432,7 @@ def landing(request):
             invite = Invite.objects.get( pk = request.GET['invite'] )
             form = ServiceForm( initial = {'invite': str(invite.pk)} )
             
-            data = dict( invite = invite, pop = True, form = form )
+            data = dict( invite = invite, pop = True, form = form, chapter=invite.chapter )
         else:
             data = {}
 

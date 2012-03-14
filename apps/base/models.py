@@ -22,8 +22,9 @@ class Profile( models.Model ):
     website    = models.URLField(                    blank = True, null = True )
     twitter    = models.URLField(                    blank = True, null = True )
     linkedin   = models.URLField(                    blank = True, null = True )
-    photo      = models.URLField(                    blank = True, null = True )
-
+    photo      = models.ImageField(upload_to = 'photos', blank = True, null = True )
+  
+  
     is_ready      = models.BooleanField( default = False )
     is_active     = models.BooleanField( default = True  )
     is_organizer  = models.BooleanField( default = False )

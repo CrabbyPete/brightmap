@@ -7,7 +7,7 @@ from datetime                       import datetime, timedelta, time
 # Django imports
 from django.contrib                 import  auth
 from django.contrib.auth.models     import  User
-from django.http                    import  HttpResponseRedirect, HttpResponse
+from django.http                    import  HttpResponseRedirect
 from django.forms.util              import  ErrorList
 from django.shortcuts               import  render_to_response
 from django.template                import  RequestContext
@@ -17,7 +17,6 @@ from django.core.exceptions         import  ObjectDoesNotExist
 from django.views.generic.edit      import  FormView
 from django.template                import  loader, Context
 from django.core.mail               import  EmailMultiAlternatives
-from django.db.models               import  Q
 
 
 # Local imports
@@ -232,12 +231,18 @@ class ProfileView( FormView ):
             uform = UserForm(instance = user)
             pform = UserProfileForm( instance = profile )
             
-            return self.render_to_response( {'uform':uform, 'pform':pform} )
+            return self.render_to_response( {'pform':pform, 'uform':uform} )
         
         return HttpResponseRedirect('/')   
    
+    def form_invalid(self,form):
+        context = self.get_context_data(form=form)
+        return self.render_to_response(context)
+    
     def form_valid(self, form):
-        """
+        user = form.cleaned_data['user']
+        profile = user.get_profile()
+        
         profile.address       = form.cleaned_data['address']
         profile.phone         = form.cleaned_data['phone']
         profile.company       = form.cleaned_data['company']
@@ -245,7 +250,6 @@ class ProfileView( FormView ):
         profile.website       = form.cleaned_data['website']
         profile.twitter       = form.cleaned_data['twitter']
         profile.linkedin      = form.cleaned_data['linkedin']
-        profile.photo         = form.cleaned_data['photo']
         profile.is_ready      = form.cleaned_data['is_ready']
         profile.is_active     = form.cleaned_data['is_active']
         profile.is_organizer  = form.cleaned_data['is_organizer']
@@ -253,7 +257,18 @@ class ProfileView( FormView ):
         profile.is_attendee   = form.cleaned_data['is_attendee']
         profile.is_agreed     = form.cleaned_data['is_agreed']
         profile.newsletter    = form.cleaned_data['newsletter']
-        """
+        if form.cleaned_data['photo']:
+            upload = self.request.FILES['photo'] 
+            name = upload.name       
+            #img_type = upload.name.split('.')[1]        
+            file_name = settings.MEDIA_ROOT+'//photos//'+ name
+            place = open(file_name, 'wb+')
+            for chunk in upload.chunks():
+                place.write(chunk)
+            place.close()
+            profile.photo = settings.MEDIA_URL+ 'photos/' + name
+        
+        profile.save()
         return HttpResponseRedirect('/')         
 
 
@@ -323,12 +338,12 @@ class ChapterView( FormView ):
             
                 #organization  = form.cleaned_data['organization']
                 #organizer     = form.cleaned_data['organizer']
-                logo          = form.cleaned_data['logo']
-                letter        = form.cleaned_data['letter']
-                website       = form.cleaned_data['website']
+                logo                  = form.cleaned_data['logo']
+                chapter.letter        = form.cleaned_data['letter']
+                chapter.website       = form.cleaned_data['website']
+                chapter.average_attend= form.cleaned_data['average_attend']
+                chapter.ticket_price  = form.cleaned_data['ticket_price']
                 
-                chapter.letter = letter
-                chapter.website = website
                 if logo:
                     upload = self.request.FILES['logo']
                     
