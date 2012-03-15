@@ -23,22 +23,23 @@
 	    </section>
 	    <nav class="topmenu">
 		   <!--tabpanel -->
-		   <form id="login" name="" method="post" action="login.php">			
+		   <form id="login" name="" method="post" action="{% url login %}">
+		   		{% csrf_token %}			
 				<fieldset>
 					<div class="inline-holder">
 						<label>Email Address</label>
-						<input type="text" value="">
+						{{login.username}}
 					</div>
 					<div class="inline-holder">
 						<label>Password</label>
-						<input name="" type="password">
+						{{login.password}}
 					</div>
 					<div class="inline-holder last">
 						<button type="submit" class="button submit"><span>Login</span></button>
 						<a href="#errorPop" class="fancypop errorPop" style="display: none">(error)</a>
 					</div>
 				</fieldset>
-			</form>
+		   </form>
 		   <!--tabpanel -->	  
         </nav>
 	</header>

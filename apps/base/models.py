@@ -130,9 +130,8 @@ class Chapter( models.Model ):
     
     objects       = ChapterManager() 
     
-    def save(self):         
-        if not self.id:             
-            self.slug = slugify(self.name)          
+    def save(self):          
+        self.slug = slugify(self.name)          
         super(Chapter, self).save() 
 
     

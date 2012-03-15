@@ -9,6 +9,7 @@ urlpatterns = patterns('',
     (r'^base/',         include('base.urls')                       ),
     (r'^leadb/',        include('leadb.urls')                      ),
     (r'^organizer/',    include('organizer.urls')                  ),
+    (r'^sponsor/',      include('sponsor.urls')                    ),
     (r'^api/',          include('api.urls')                        ),
     (r'^social/',       include('social.urls')                     ),
 
