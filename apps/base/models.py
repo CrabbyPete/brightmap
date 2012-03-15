@@ -120,7 +120,7 @@ class Chapter( models.Model ):
     organizer     = models.ForeignKey( User )
     paypal        = models.CharField( default = None, null = True,  max_length = 255 )
 
-    logo          = models.FileField(upload_to = 'logos') 
+    logo          = models.FileField(upload_to = 'logos', blank = True, null = True) 
     letter        = models.ForeignKey('Letter', blank = True, null = True )
     website       = models.URLField(            blank = True, null = True )
     category      = models.CharField( default = None, blank = True, null = True,  max_length = 255 )

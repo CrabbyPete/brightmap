@@ -338,13 +338,12 @@ class ChapterView( FormView ):
             
                 #organization  = form.cleaned_data['organization']
                 #organizer     = form.cleaned_data['organizer']
-                logo                  = form.cleaned_data['logo']
                 chapter.letter        = form.cleaned_data['letter']
                 chapter.website       = form.cleaned_data['website']
                 chapter.average_attend= form.cleaned_data['average_attend']
                 chapter.ticket_price  = form.cleaned_data['ticket_price']
                 
-                if logo:
+                if form.cleaned_data['logo']:
                     upload = self.request.FILES['logo']
                     
                     img_type = upload.name.split('.')[1]
