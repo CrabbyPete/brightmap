@@ -115,10 +115,10 @@ class Chapter( models.Model ):
     Base for each Organization chapter
     """
     name          = models.CharField( default = None, max_length = 255 )
-    slug          = models.SlugField( default = None )
+    slug          = models.SlugField( blank = True, null = True )
     organization  = models.ForeignKey( Organization, default = None, blank = True, null = True )
     organizer     = models.ForeignKey( User )
-    paypal        = models.CharField( default = None, null = True,  max_length = 255 )
+    paypal        = models.CharField( blank= True, null = True,  max_length = 255 )
 
     logo          = models.FileField(upload_to = 'logos', blank = True, null = True) 
     letter        = models.ForeignKey('Letter', blank = True, null = True )
@@ -127,7 +127,6 @@ class Chapter( models.Model ):
     average_attend= models.IntegerField( default = 0 )
     ticket_price  = models.DecimalField ( max_digits = 10, decimal_places = 2, default = 0.00 )
  
-    
     objects       = ChapterManager() 
     
     def save(self):          
@@ -206,7 +205,7 @@ class Chapter( models.Model ):
 
 class Invite( models.Model ):
     chapter       = models.ForeignKey( Chapter )
-    user          = models.ForeignKey( User    )
+    user          = models.ForeignKey( User, blank = True, null = True  )
     
     category      = models.CharField( blank = True, null = True, max_length = 255 )
     sent          = models.IntegerField( default = 0 )

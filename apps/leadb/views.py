@@ -242,6 +242,7 @@ class ApplyView( FormView ):
         Handle GET for apply form, Limit trials to one
         """
         expire = Expire.objects.filter( buyer = request.user, status = 'approved')
+        data = dict()
         if len ( expire ) > 0:
             expire = True
         else:
@@ -250,15 +251,18 @@ class ApplyView( FormView ):
         if 'invite' in request.GET:
             invite = Invite.objects.get(pk = request.GET['invite'])
             chapter = invite.chapter
-            data = dict(chapter = chapter, custom = invite.category)
+            data.update( chapter = chapter, custom = invite.category )
             self.form_class = ApplyForm(initial=data)
         else: 
+            if 'chapter' in request.GET:
+                data.update( chapter = Chapter.objects.get(pk = request.GET['chapter']) )
+ 
             chapter = Chapter.objects.all().order_by('name')[0]
-            self.form_class = ApplyForm()
+            self.form_class = ApplyForm(initial=data)
         
         deals = len( self.request.user.leadbuyer_set.all()[0].deals() )
  
-        return self.render_to_response( {'form':self.form_class, 'expire':expire, 'deals':deals, 'chapter':chapter} )
+        return self.render_to_response( {'ajax_chapter':True, 'form':self.form_class, 'expire':expire, 'deals':deals, 'chapter':chapter} )
     
     def form_invalid(self, form, chapter = None):
         context = self.get_context_data(form=form)

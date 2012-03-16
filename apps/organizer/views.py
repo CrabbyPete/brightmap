@@ -273,7 +273,7 @@ class InviteView(FormView):
         
         template_name = 'invite.tmpl'
         subject       = 'Become a preferred service provider for %s'%( chapter.name, )
-        url = reverse( 'leadbuyer')
+        url = '/sponsor/' + chapter.slug
         for email in emails:
             mail = Mail( chapter.organizer.email,
                          email, 
@@ -428,7 +428,7 @@ def cancel(request):
 
 def landing(request):
     if request.method == 'GET':
-        if 'invite' in request.GET:
+        if 'invite' in request.GET and request.GET['invite']:
             invite = Invite.objects.get( pk = request.GET['invite'] )
             form = ServiceForm( initial = {'invite': str(invite.pk)} )
             
