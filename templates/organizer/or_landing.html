@@ -55,11 +55,23 @@
 							</section>
 						</div>
 						<div class="humungus-holder">
+							{% if invite.pk %}
 							<a href="{% url lb_signup %}?invite={{invite.pk}}" class="btn-humungus-yellow">
+							{% else %}
+							<a href=
+							{% if user.is_authenticated %}
+                            "{% url lb_apply %}?chapter={{chapter.pk}}"
+                            {% else %}
+                            "{% url lb_signup %}?chapter={{chapter.pk}}" 
+                            {% endif %}
+							class="btn-humungus-yellow">
+							{% endif %}
 								Become a<br />
 								Preferred Provider<br />
 								for {{chapter.name}}
 							</a>
+							
+							
 						</div>
 					</div>
 				</div>
@@ -98,11 +110,23 @@
                         </section>	
                         <a id="gmail-example" href="#">
                             <h3>Example Email Referral</h3>
+                            <!--  
                             <strong>Click to view</strong>
+                            -->
                         </a>
                     </div>
                     <div class="buttons clearfix">
+                    	{% if invite.pk %}
                         <a href="{% url lb_signup %}?invite={{invite.pk}}" class="btn-humungus-yellow no-play right">
+                        {% else %}
+                        <a href=
+                        	{% if user.is_authenticated %}
+                            "{% url lb_apply %}?chapter={{chapter.pk}}"
+                            {% else %}
+                            "{% url lb_signup %}?chapter={{chapter.pk}}" 
+                            {% endif %}
+                            class="btn-humungus-yellow no-play right">
+                        {% endif %}
                             <strong>Sign Up Now</strong>
                             <p>Free Trial</p>
                         </a>                        

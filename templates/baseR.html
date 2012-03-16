@@ -23,6 +23,7 @@
 	    </section>
 	    <nav class="topmenu">
 		   <!--tabpanel -->
+		   {% if login %}
 		   <form id="login" name="" method="post" action="{% url login %}">
 		   		{% csrf_token %}			
 				<fieldset>
@@ -40,6 +41,7 @@
 					</div>
 				</fieldset>
 		   </form>
+		   {% endif %}
 		   <!--tabpanel -->	  
         </nav>
 	</header>

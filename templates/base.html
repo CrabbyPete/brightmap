@@ -17,8 +17,20 @@
 	<script src="/media/js/html5.js" type="text/javascript"></script>
 <![endif]-->
 <script type="text/javascript" src="/media/js/Eventbrite.jquery.js"></script>
+<script>
+function loadChapter(form)
+{
+	if ( form.chapter )
+		var chapter = form.chapter.options[form.chapter.selectedIndex].value;
+	else
+		var chapter = form[0].chapter.options[form[0].chapter.selectedIndex].value;
+	var url = '/leadb/ajax?chapter='+ chapter;
+	$.get(url, function(data){$('.table-community').replaceWith(data)} );
+	return;
+};
+</script>
 
-<body lang=EN-US>
+<body lang=EN-US {% if ajax_chapter %} onload="loadChapter($('#profile'))" {% endif %}]>
 {% block javascript %}
 {% endblock %}
 	<!--Top section-->

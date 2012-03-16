@@ -1,13 +1,7 @@
 {% extends 'base.html' %}
 {% block javascript %}
 <script>
-function loadChapter(form)
-{
-	var chapter = form.chapter.options[form.chapter.selectedIndex].value;
-	var url = '/leadb/ajax?chapter='+ chapter;
-	$.get(url, function(data){$('.table-community').replaceWith(data)} );
-	return;
-};
+loadChapter($(.table-community))
 </script>
 {% endblock %}
 
@@ -50,11 +44,12 @@ function loadChapter(form)
 					</section>
 	
 					<section id="my-border" style="padding: 10px 0 0 0;">
-						<table class="table-community">
+						<table class="table-community" onload='loadChapter(this.form)'>
+						    <!--  
 							<tr>
 								<td>
 									<p class="ultralighttxt">{{chapter.name}}</p> 
-									<img src="{{chapter.logo}}" alt="Logo" class="ultralight">
+									<img src="{{chapter.logo}}" height = 100px; alt="Logo" class="ultralight">
 								</td>
 							</tr>
 							<tr>
@@ -75,6 +70,7 @@ function loadChapter(form)
 										</tr>
 									</table></td>
 							</tr>
+							-->
 						</table>
 						<div class="communitydiv">
 							<p class="lftcontent leadprice">
