@@ -260,8 +260,13 @@ class ApplyView( FormView ):
             chapter = Chapter.objects.all().order_by('name')[0]
             self.form_class = ApplyForm(initial=data)
         
-        deals = len( self.request.user.leadbuyer_set.all()[0].deals() )
- 
+        try:
+            lb = LeadBuyer.objects.get( user = request.user )
+        except LeadBuyer.DoesNotExist:
+            deals = 0
+        else:
+            deals = lb.deals()
+
         return self.render_to_response( {'ajax_chapter':True, 'form':self.form_class, 'expire':expire, 'deals':deals, 'chapter':chapter} )
     
     def form_invalid(self, form, chapter = None):

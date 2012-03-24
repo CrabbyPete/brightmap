@@ -17,16 +17,8 @@
 				<div class="clearfix">
 					<div class="left border-right">
 						<div class="new-vid">
-							<a href="#" id="play-video"><img src="/media/img/video-splash.jpg" alt=""></a>
-							<!-- Change the video ID below: Dr0NNmRZ9cc by doing a find and replace to catch all occurrences -->
-							<div id="the-video" style="display: none">
-								<object width="480" height="317">
-									<param name="movie" value="http://www.youtube.com/v/Dr0NNmRZ9cc?version=3&amp;rel=0&amp;fs=1&amp;autoplay=1" />
-									<param name="allowFullScreen" value="true" />
-									<param name="allowscriptaccess" value="always" />
-									<embed src="http://www.youtube.com/v/Dr0NNmRZ9cc?version=3&amp;rel=0&amp;fs=1&amp;autoplay=1" type="application/x-shockwave-flash" width="480" height="317" allowscriptaccess="always" allowfullscreen="true" />
-								</object>
-							</div>
+							<iframe class ="new" type="text/html" width="480" height="375" src="http://www.youtube.com/embed/VcUQJJf6g8g" frameborder="0">
+				    		</iframe> 
 						</div>
 					</div>
 				
@@ -42,8 +34,10 @@
 									{{chapter.name}}
 								</header>
 								<div>
+								    <!--  
 									<p>Attendees/month      {{chapter.average_attend}}</p>
 									<p>Event ticket price   {{chapter.ticket_price}}</p>
+									-->
 									<br />
 									<p><strong>Existing Preferred Providers:</strong></p>
 									<ul class="squares">
@@ -69,9 +63,7 @@
 								Become a<br />
 								Preferred Provider<br />
 								for {{chapter.name}}
-							</a>
-							
-							
+							</a>	
 						</div>
 					</div>
 				</div>

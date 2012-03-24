@@ -1364,13 +1364,18 @@ nav.topmenu form .inline-holder.last {
 		}
 
 /* Edit #2 goes here: */        
-/*.videobg {
+.videohm {
 	border: 1px solid #d9dada;
 	padding: 23px 0;
+	margin-left: 250px;
 }
+
+/*
 video.new, .videobg img{
 	margin-left: 250px;
-	}*/
+}
+*/
+
 article.orgprovides{
 	margin:20px 0 0 0;
 	height:100%;
