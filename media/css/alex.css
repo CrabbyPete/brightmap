@@ -82,7 +82,7 @@ body{
             background: black;
         }
         #ceo-info div {
-            height: 142px;
+            min-height: 142px;
             padding: 22px 15px;
             line-height: 140%;
             border: 1px solid #dfdfde;

@@ -133,10 +133,15 @@ def database_attendees( event, api ):
             # Create a temporary password and username which is 30 chars max
             password = 'pamthgirb'   # brightmap backwards
             username = attendee['email'][0:30]
-            user = User.objects.create_user(  username = username,
-                                              email    = attendee['email'],
-                                              password = password
-                                            )
+            try:
+                user = User.objects.create_user(  username = username,
+                                                  email    = attendee['email'],
+                                                  password = password
+                                                )
+            except Exception, e:
+                message = "Exception creating user:" + str(e)
+                logger.error( message )
+                continue
             
             
             name = attendee['first_name'].strip()+ ' '+ attendee['last_name'].rstrip()
@@ -390,23 +395,28 @@ def print_event(event):
     """
     delta = event.date - datetime.today()
     date  = event.date.strftime("%Y-%m-%d %H:%M")
-    print log('Chapter: '+ event.chapter.name  + ' Event: ' +  event.describe + ' ' + date + ' ' + str(delta.days) )
-
-
+    try:
+        print log('Chapter: '+ event.chapter.name  + ' Event: ' +  event.describe + ' ' + date + ' ' + str(delta.days) )
+    except:
+        logger.error( "Error printing event %s",event.chapter.name )
+        
 def print_connection( attendee, sponser, interest ):
     """
     Print Connection details
     """
-    print log(
-               " Connecting: " +             \
-               attendee.first_name + ' ' +   \
-               attendee.last_name +  ' - ' + \
-               attendee.email + ' with ' +   \
-               sponser.first_name + ' ' +    \
-               sponser.last_name + ' - ' +   \
-               sponser.email +' for ' +      \
-               interest.interest
-              )
+    try:
+        print log(
+                  " Connecting: " +             \
+                  attendee.first_name + ' ' +   \
+                  attendee.last_name +  ' - ' + \
+                  attendee.email + ' with ' +   \
+                  sponser.first_name + ' ' +    \
+                  sponser.last_name + ' - ' +   \
+                  sponser.email +' for ' +      \
+                  interest.interest
+                 )
+    except:
+        logger.error( "Error printing connection")
 
 
 def get_ticket(chapter):
@@ -492,7 +502,10 @@ def main():
                 # Check if any active surveys
                 leads = event.surveys(True)
                 if len( leads ) == 0:
-                    print log( "%s:%s  has no surveys"%(chapter.name, event.describe),'green')
+                    try:
+                        print log( "%s:%s  has no surveys"%(chapter.name, event.describe),'green')
+                    except:
+                        pass
 
 
          
