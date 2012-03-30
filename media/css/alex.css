@@ -32,10 +32,10 @@ h1.orange {
         background: #f0f1f1;
 	}
     #under-30 {
-		width: 420px;
+		width: 406px;
     }
     #under-30 img {
-    	height:75px;
+    	width:191px;
     }
     
 /* Edit #3 */
@@ -82,7 +82,7 @@ body{
             background: black;
         }
         #ceo-info div {
-            min-height: 142px;
+            /* min-height: 142px; */
             padding: 22px 15px;
             line-height: 140%;
             border: 1px solid #dfdfde;
@@ -224,13 +224,12 @@ ul.goldbullet {
     width: 100%;
     height: 100%;
     text-align: center;
-    padding-top: 100px;
     background: url(/media/img/bg-popup.png);
 }
     #actual-popup {
         display: block;
         width: 719px;
-        height: 406px;
+        height: 312px;
         margin: 0 auto;
         padding: 47px 0;
         background: url(/media/img/pop-up-select.png) no-repeat top left;

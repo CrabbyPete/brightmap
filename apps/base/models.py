@@ -20,7 +20,7 @@ class Profile( models.Model ):
     title      = models.CharField( max_length = 100, blank = True, null = True )
 
     website    = models.URLField(                    blank = True, null = True )
-    twitter    = models.URLField(                    blank = True, null = True )
+    twitter    = models.CharField( max_length = 200, blank = True, null = True )
     linkedin   = models.URLField(                    blank = True, null = True )
     photo      = models.ImageField(upload_to = 'photos', blank = True, null = True )
   
