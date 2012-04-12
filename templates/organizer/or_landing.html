@@ -114,11 +114,18 @@
                         </a>
                     </div>
                     <div class="buttons clearfix">
-                        <a href="#" class="btn-humungus-yellow no-play right">
+                        <a href="{% url lb_signup %}" class="btn-humungus-yellow no-play right">
                             <strong>Sign Up Now</strong>
                             <p>Free Trial</p>
-                        </a>                        
-                        <a href="{% url lb_signup %}" class="right" style="padding: 22px 22px 0 0; display: block"><img src="/media/img/logo-authorize.gif" alt="Authorize.net" /></a>
+                        </a>
+                        <!-- (c) 2005, 2011. Authorize.Net is a registered trademark of CyberSource Corporation -->
+						<div class="AuthorizeNetSeal"> 
+							<script type="text/javascript" language="javascript">
+								var ANS_customer_id="337f151e-e08e-429e-9182-f8deeceba94a";
+							</script> 
+							<script type="text/javascript" language="javascript" src="//verify.authorize.net/anetseal/seal.js" >
+							</script>
+						</div>	                      
                     </div>
                 </div>				  
                   

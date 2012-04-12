@@ -58,10 +58,10 @@ $(document).ready(function() {
     
     var pn = $('#under-30-info .pic.name').outerHeight();
     var bq = $('#under-30-info blockquote').outerHeight();
-    if(pn > bq) $('#under-30-info blockquote').height(pn-106);
-    else $('#under-30-info .pic.name').height(bq-6);
-    
-    //$('#ceo').height($('#ceo-info').innerHeight() - 6);
+    if(pn > bq) 
+    	$('#under-30-info blockquote').height(pn-106);
+    else 
+    	$('#under-30-info .pic.name').height(bq-6);
     
 });
 

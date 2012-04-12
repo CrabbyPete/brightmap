@@ -159,7 +159,7 @@ def login(request):
     # Login users
 
     def submit_form(form, pop = False ):
-        c = {'login':form, 'homepage':True, 'loginerror': True }
+        c = {'login':form, 'homepage':True }
         return render_to_response('homepage.html', c, context_instance=RequestContext(request))
 
     if request.method == 'GET':
