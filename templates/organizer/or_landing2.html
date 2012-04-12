@@ -1,0 +1,176 @@
+{% extends 'baseR.html' %} 
+{% block body_section %}
+<!--Body section-->
+<div id="bodysection">
+		<div class="insidesection" style="padding-top: 16px">
+        			
+		    <section class="videobg clearfix">
+			
+				<div class="clearfix" style="margin-bottom: 14px">				
+					<h1 class="orange left">Become a Preferred Provider<br />for {{chapter.name}}</h1>
+					
+					<div id="under-30" class="right">
+						<img src="{{chapter.logo}}" alt="{{chapter.name}}" />
+					</div>
+				</div>
+                
+				<div class="clearfix">
+					<div class="left border-right">
+						<div class="new-vid">
+							
+							<a href="#" id="play-video"><img src="/media/img/video-splash.jpg" alt=""></a>
+							<div id="the-video" style="display: none">
+								<!--  
+								<iframe class ="new" type="text/html" width="480" height="375" src="http://www.youtube.com/embed/0kVnI-6l0EY" frameborder="0"></iframe> 
+								-->
+								<object width="480" height="274">
+									<param name="movie" value="http://www.youtube.com/v/DqLFgSBtWpY?version=3&amp;hl=en_US&amp;rel=0"></param>
+									<param name="allowFullScreen" value="true"></param>
+									<param name="allowscriptaccess" value="always"></param>
+									<embed src="http://www.youtube.com/v/0kVnI-6l0EY?version=3&amp;hl=en_US&amp;rel=0&amp;autoplay=1" type="application/x-shockwave-flash" width="480" height="274" allowscriptaccess="always" allowfullscreen="true"></embed>
+								</object>
+								
+							</div>
+						</div>
+					</div>
+				
+					<div class="right">
+						<div id="ceo-holder" class="clearfix">
+							<div id="ceo">
+								<img src="{{chapter.organizer.get_profile.photo}}" alt="{{chapter.organizer.first_name}} &nbsp;{{chapter.organizer.last_name}}" />
+								<p class="futura">{{chapter.organizer.first_name}} &nbsp;{{chapter.organizer.last_name}}</p>
+								<p><strong>{{chapter.organizer.get_profile.title}}</strong></p>
+							</div>
+							<section id="ceo-info">
+								<header>
+									{{chapter.name}}
+								</header>
+								<div>
+								    <!--  
+									<p>Attendees/month      {{chapter.average_attend}}</p>
+									<p>Event ticket price   {{chapter.ticket_price}}</p>
+									-->
+									<br />
+									<p><strong>Existing Preferred Providers:</strong></p>
+									<ul class="squares">
+										{% for provider in chapter.providers %}
+										<li>{{provider.get_profile.company}}</li>
+										{% endfor %}
+									</ul>
+								</div>
+							</section>
+						</div>
+						<div class="humungus-holder">
+							{% if invite.pk %}
+							<a href="{% url lb_signup %}?invite={{invite.pk}}" class="btn-humungus-yellow">
+							{% else %}
+							<a href=
+							{% if user.is_authenticated %}
+                            "{% url lb_apply %}?chapter={{chapter.pk}}"
+                            {% else %}
+                            "{% url lb_signup %}?chapter={{chapter.pk}}" 
+                            {% endif %}
+							class="btn-humungus-yellow">
+							{% endif %}
+								Become a<br />
+								Preferred Provider<br />
+								for {{chapter.name}}
+							</a>	
+						</div>
+					</div>
+				</div>
+              </section>
+                  
+                <div id="steps">
+                    <div class="info">
+                        <section id="connect">
+                            <div class="clearfix">
+                                <span class="black-circle floating">1</span>
+                                <h2 class="section-title floating" style="margin-top: 4px;">Sign Up on BrightMap</h2>
+                            </div>
+                            <ul class="goldbullet">
+                                <li>Setup your account and tell BrightMap which service you provide<br />(e.g. legal, accounting, web design, PR, marketing, etc.)</li>
+                            </ul>
+                        </section>					
+                        <section id="approve">
+                            <div class="clearfix">
+                                <span class="black-circle floating">2</span>
+                                <h2 class="section-title floating" style="margin-top: 4px;">Receive Email Referrals from {{chapter.organizer.first_name}} to Active Leads</h2>
+                            </div>
+                            <ul class="goldbullet">
+                                <li>Under30CEO members request introductions to the group's preferred service providers</li>
+                                <li>BrightMap sends email referrals, from Matt, introducing you to these qualified leads</li>
+                            </ul>
+                        </section>						
+                        <section id="get-paid">
+                            <div class="clearfix">
+                                <span class="black-circle floating">3</span>
+                                <h2 class="section-title floating" style="margin-top: 4px;">Get New Business</h2>
+                            </div>
+                            <ul class="goldbullet">
+                                <li>Connect with your leads at events, via email, or on the phone</li>
+                                <li>Pay per lead - starting at $20</li>
+                            </ul>
+                        </section>	
+                        <a id="gmail-example" href="#">
+                            <h3>Example Email Referral</h3>
+                            <!--  
+                            <strong>Click to view</strong>
+                            -->
+                        </a>
+                    </div>
+                    <div class="buttons clearfix">
+                    	{% if invite.pk %}
+                        <a href="{% url lb_signup %}?invite={{invite.pk}}" class="btn-humungus-yellow no-play right">
+                        {% else %}
+                        <a href=
+                        	{% if user.is_authenticated %}
+                            "{% url lb_apply %}?chapter={{chapter.pk}}"
+                            {% else %}
+                            "{% url lb_signup %}?chapter={{chapter.pk}}" 
+                            {% endif %}
+                            class="btn-humungus-yellow no-play right">
+                        {% endif %}
+                            <strong>Sign Up Now</strong>
+                            <p>Free Trial</p>
+                        </a>                        
+                        <a href="#" class="right" style="padding: 22px 22px 0 0; display: block"><img src="/media/img/logo-authorize.gif" alt="Authorize.net" /></a>
+                    </div>
+                </div>				  
+                  
+             </div> 
+         
+</div>
+<!--Body section-->
+{% endblock %}
+
+{% block script_section %}
+{% if pop %}
+<!-- Pop-up -->
+
+<div id="pop-up-wrapper">&nbsp;</div>
+    <section id="actual-popup" style="display: block" class="popup">
+        <div>
+            <img style="display: inline" src="{{chapter.logo}}" alt="{{chapter.name}}" height='75px' />
+        </div>
+        <h1 class="orange">What service do you provide?</h1>
+        <!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            We recommend using Ajax to place the user`s option into the browser session (check out js/site.js)
+            Else uncomment the <form> and the <button>
+        ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+        <form method="post" action="{% url or_landing %}">
+        	{% csrf_token %}
+        	{{form.invite}}
+            <div class="">
+ 				{{form.service}}
+            </div>
+            <p id="service-error"></p>
+            <div class="">
+                <!-- <a id="select-service" href="{% url or_landing %}" class="btn-humungus-yellow smaller">Learn More</a>-->
+                <button type="submit" class="btn-humungus-yellow">Learn More</button> 
+                <!-- <input  type="submit" class="btn-humungus-yellow" value="Learn More"/> -->
+            </div>
+        <!-- </form> -->
+    </section>
+{% endif %}
+{% endblock %}
