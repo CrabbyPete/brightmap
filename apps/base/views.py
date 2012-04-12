@@ -151,7 +151,7 @@ def forgot( request, username ):
     except:
         pass
  
-    return
+    return password
 
     
 @csrf_protect
@@ -176,10 +176,11 @@ def login(request):
 
     # Is this from the javascript pop up
     if form.cleaned_data['forgot']:
-        forgot(request, username)
+        password = forgot(request, username)
         
+        form = LoginForm(initial={'forgot':False, 'username':username})
         # Force an error so the javascript pops up 
-        form._errors['username']  = ErrorList(["pop"])
+        form._errors.update({'username': ErrorList(["pop"])})
         return submit_form(form, pop = True)
     
     try:

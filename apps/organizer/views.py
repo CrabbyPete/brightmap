@@ -23,7 +23,7 @@ from base.models                    import ( Profile,       Organization,   Chap
                                             )
 
 from forms                          import OrganizerForm, CategoryForm, InviteForm, ServiceForm
-
+from base.forms                     import LoginForm
 
 class SignUpView( FormView ):
     template_name = 'organizer/signup.html'
@@ -438,17 +438,23 @@ def landing(request):
     if request.method == 'GET':
         if 'invite' in request.GET and request.GET['invite']:
             invite = Invite.objects.get( pk = request.GET['invite'] )
-            form = ServiceForm( initial = {'invite': str(invite.pk)} )
+            form  = ServiceForm( initial = {'invite': str(invite.pk)} )
+            login = LoginForm(initial={'forgot':False})
             
-            data = dict( invite = invite, pop = True, form = form, chapter=invite.chapter )
+            data = dict( invite = invite, 
+                         pop = True, 
+                         form = form,
+                         login = login, 
+                         chapter=invite.chapter )
         else:
-            data = {}
+            data = {'login':login}
 
     elif request.method == 'POST':
         invite = Invite.objects.get(pk = request.POST['invite'])
         invite.category = request.POST['service']
         invite.save()
-        data = dict( invite = invite, pop = False, chapter = invite.chapter )    
+        login = LoginForm(initial={'forgot':False})
+        data = dict( invite = invite, pop = False, login = login, chapter = invite.chapter )    
     
     return render_to_response( 'organizer/or_landing.html', 
                                 data, 

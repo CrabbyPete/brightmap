@@ -4,6 +4,7 @@ from django.http                    import  HttpResponseRedirect
 from django.core.urlresolvers       import  reverse
 
 from base.models                    import Chapter, Invite
+from base.forms                     import LoginForm
 #from organizer.forms                import ServiceForm
 
 
@@ -18,7 +19,8 @@ def sponsor(request, slug ):
     form = ServiceForm( initial = {'invite': str(invite.pk)} )
     data = dict(chapter = chapter, pop = True, invite = invite, form = form )
     """
-    data = dict( chapter = chapter, pop = False )
+    form = LoginForm(initial={'forgot':False})
+    data = dict( chapter = chapter, pop = False, login = form  )
     return render_to_response( 'organizer/or_landing.html', 
                                 data, 
                                 context_instance=RequestContext(request) 
