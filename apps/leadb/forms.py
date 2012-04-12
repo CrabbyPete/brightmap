@@ -148,7 +148,7 @@ class ApplyForm(forms.Form):
         self.fields['interest'].choices = [(i.interest,i.interest) 
                                            for i in Interest.objects.filter(status='standard').order_by('interest')
                                           ]
-        self.fields['chapter'].choices = [(i.name,i.name) for i in Chapter.objects.all().order_by('name')]
+        self.fields['chapter'].choices = [(i.name,i.name) for i in Chapter.objects.all().order_by('name') if i.configured()]
 
 
 

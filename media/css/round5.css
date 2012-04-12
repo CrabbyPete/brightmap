@@ -1,0 +1,497 @@
+/* Edit #1 <- these just need to bwe added at the end of style.css */
+.left {
+    float: left;
+}
+.right {
+    float: right;
+}
+    
+h1.orange {
+    font-size: 24px;
+}
+.orange {
+    color: #fcb43e;
+}
+.futura {
+    font-family: FuturaMdBTMedium;
+}
+
+/* Edit #2 */
+.videobg {
+	border: 1px solid #d9dada;
+	padding: 16px;
+}
+    .videobg .new-vid {
+        float: left;
+        padding: 4px;
+        border: 1px solid #cdcccd;
+        border-radius: 5px;
+        -moz-box-shadow: 0 0 6px #d8d8d8;
+        -webkit-box-shadow: 0 0 6px #d8d8d8;
+        box-shadow: 0 0 6px #d8d8d8;
+        background: #f0f1f1;
+	}
+    #under-30 {
+		width: 406px;
+    }
+        #under-30 img {
+            max-height: 60px;
+        }
+    
+/* Edit #3 */
+body{
+	padding:0 0 0 0;
+	margin:0;
+	font:normal 12px Arial, Helvetica, sans-serif;
+	color:#000;
+}
+
+/* Edit #4 */
+#bodysection{
+	width:100%;
+	background:url(/media/img/bodybg.jpg) repeat-x 0 0 #F7F7F7;
+	padding:0 0 0 0;
+	
+	}
+    
+/* Edit #5 <- these just need to be added at the end of style.css */
+#ceo-holder {
+}
+    #ceo {
+        float: left;
+        padding: 2px;
+        border: 1px solid #dfdfde;
+    }
+        #ceo p.futura {
+            padding-top: 2px;
+            font-size: 18px;
+        }
+        #ceo p {
+            padding: 0 8px;
+        }    
+    #ceo-info {
+        float: left;
+        width: 206px;
+        margin-left: 16px;
+    }
+        #ceo-info header {
+            font-size: 16px;
+            color: white;
+            font-weight: bold;
+            padding: 14px 16px;
+            background: black;
+        }
+        #ceo-info div {
+            /* min-height: 142px; */
+            padding: 22px 15px;
+            line-height: 140%;
+            border: 1px solid #dfdfde;
+        }
+        #ceo img {
+        	width:191px;
+        }
+    
+ul.squares {
+    list-style-type: none;
+}
+    ul.squares li {
+        padding-left: 9px;
+        background: url(/media/img/ico-square.gif) no-repeat 0 6px;
+    }
+    
+.humungus-holder {
+	text-align: center;
+	padding-right: 48px;
+}
+	.humungus-holder .btn-humungus-yellow {
+		margin-left: auto;
+		margin-right: auto;
+	}
+.btn-humungus-yellow {
+    display: block;
+    text-align: center;
+    text-shadow: #c18017 0 2px 2px;
+    line-height: 1.1em;
+    font-size: 16px;
+    color: white;
+    font-weight: bold;
+    letter-spacing: -1px;
+    width: 196px;
+    height: 58px;
+    margin-top: 16px;
+	padding: 6px 0 0 48px;
+   /*  padding-top: 11px; */
+    background: url(/media/img/btn-humungus-yellow.png) no-repeat top left;
+}
+.btn-humungus-yellow.no-play {
+	width: 177px;
+	height: 78px;
+	padding: 6px 0 0 0;
+	background-image: url(/media/img/btn-humungus-yellow-no-play.png);
+}
+.btn-humungus-yellow.smaller {
+    letter-spacing: 0;
+    width: 177px;
+    height: 58px;    
+    line-height: 58px;    
+    background: url(/media/img/btn-humungus-yellow-smaller.png) no-repeat top left;
+}
+.btn-humungus-yellow:hover {
+    color: black;
+}
+
+.border-right {
+	padding-right: 18px;
+	margin-right: 18px;
+	border-right: 1px solid #d9dada;
+}
+
+#steps-homepage {
+    margin-top: 44px;
+    height: 285px;
+}
+    #steps-homepage section {
+        position: relative;
+        float: left;
+        width: 290px;
+        height: 132px;
+        padding: 138px 18px 0;
+        background: url(/media/img/img-plug.png) no-repeat top center;
+    }
+    #steps-homepage section#connect {
+        background-image: url(/media/img/img-plug.png);
+    }
+    #steps-homepage section#approve {
+        background-image: url(/media/img/img-envelope.png);    
+    }
+    #steps-homepage section#get-paid {
+        background-image: url(/media/img/img-cash.png);        
+    }
+        #steps-homepage section .separator {
+            position: absolute;
+            top: 24px;
+            left: 0;
+            z-index: 0;
+            width: 30px;
+            height: 231px;
+            background: url(/media/img/bg-section-separator.png) no-repeat top left;
+        }
+        #steps-homepage section span {
+            position: relative;
+            float: left;
+            display: block;
+            z-index: 5;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 32px;
+            text-align: center;
+            width: 33px;
+            height: 33px;
+            background: url(/media/img/ico-circle-step.png) no-repeat top left;
+        }
+        #steps-homepage section h1 {
+            float: left;
+            font-size: 22px;
+            line-height: 1em;
+            margin: 6px 0 0 4px;
+        }
+        #steps-homepage section p {
+            font-size: 13px;
+            width: 236px;
+            padding-left: 36px;
+            margin: 8px 0;
+        }
+        #steps-homepage section a {
+            position: absolute;
+            bottom: 0;
+            right: 26px;
+            color: black;
+            font-size: 11px;
+            text-decoration: underline;
+        }
+        #steps-homepage section a:hover {
+            text-decoration: none;
+        }
+        
+#steps {
+    margin-top: 26px;
+    -moz-box-shadow: 0 2px 5px #dfdede;
+    -webkit-box-shadow: 0 2px 5px #dfdede;
+    box-shadow: 0 2px 5px #dfdede;  
+}
+    #steps .info {
+        padding: 16px;
+        background: white;
+        position: relative;
+    }
+        #steps .info #connect,
+        #steps .info #approve,
+        #steps .info #get-paid {
+            width: 650px;
+        }
+        #steps .info #approve {
+            background-image: url(/media/img/ico-envelope.png);
+        }
+        #gmail-example {
+            display: block;
+            position: absolute;
+            top: 56px;
+            right: 41px;
+            color: black;
+            width: 214px;
+            height: 47px;
+            padding: 156px 0 0 45px;
+            background: url(/media/img/gmail-example.gif) no-repeat center center;
+        }
+            #gmail-example h3 {
+                letter-spacing: -1px;
+                font-family: FuturaMdBTMedium;
+                font-size: 18px;
+                color: black;
+            }
+            #gmail-example strong {
+                color: black;
+            }
+        #gmail-example:hover {
+            text-decoration: underline;
+        }
+    #steps .buttons {
+        padding: 22px 44px;
+        background: #f5f6f6;
+    }
+        #steps .buttons .btn-humungus-yellow {
+            line-height: 130%;
+            padding-top: 18px;
+        }
+            #steps .buttons .btn-humungus-yellow strong {
+                font-size: 18px;
+            }
+            #steps .buttons .btn-humungus-yellow p {
+                font-size: 13px;
+                font-style: italic;
+                font-weight: normal;
+            }
+            
+    
+ul.goldbullet {
+	padding: 0;
+	margin: 0;
+	margin-top: 12px;
+    margin-left: 35px;
+}
+    ul.goldbullet li {
+        background:url(/media/img/ico-good-gold.png) no-repeat 0 0;
+        color: #000;
+        padding: 0 0 0 25px;
+        margin: 4px 0;
+    }
+    
+
+/* Pop-up: */
+#pop-up-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 899;
+    width: 100%;
+    height: 100%;
+    background: url(/media/img/bg-popup.png);
+}
+    #actual-popup {  
+        position: absolute;
+        top: 40%;
+        left: 50%;
+        z-index: 900;  
+        display: block;
+        text-align: center;
+        width: 719px;
+        height: 312px;
+        margin: 0 auto;
+        margin-top: -156px;
+        margin-left: -360px;
+        padding: 47px 0;
+        background: url(/media/img/pop-up-select.png) no-repeat top left;        
+    }
+    #popup-connect {  
+        position: absolute;
+        top: 10%;
+        left: 50%;
+        z-index: 901;  
+        display: block;
+        width: 616px;
+        height: 829px;
+        /* margin-top: -443px; */
+        margin-left: -358px;
+        padding: 28px 50px;
+        background: url(/media/img/bg-popup-contact.png) no-repeat top left;        
+    }
+        .popup .btn-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: block;
+            text-decoration: none;
+            width: 25px;
+            height: 25px;
+            background: url(/media/img/btn-popup-close.png) no-repeat top left;
+        }
+        .popup .btn-close:hover {
+            opacity: .7;
+            filter: alpha(opacity=70);
+            text-decoration: none;            
+        }
+        #popup-connect h1 {  
+            font-size: 20px;
+            padding-bottom: 14px;
+            margin-bottom: 18px;
+            background: url(/media/img/ico-border-pop.gif) repeat-x bottom left;
+        }
+        #popup-connect p {  
+            font-size: 14px;
+            line-height: 1.5em;
+        }
+        
+        #popup-connect form {  
+            margin-top: 24px;
+            padding: 14px 30px;
+        }
+            #popup-connect form h2 {          
+                font-size: 24px;
+                color: #c75e47;
+                font-weight: bold;
+                padding-bottom: 12px;
+                margin-bottom: 18px;
+                border-bottom: 1px solid #dddddb;
+            }
+            #popup-connect form .ctrlHolder {  
+                margin: 14px 0;
+            }
+                #popup-connect form em {  
+                    font-weight: bold;
+                    color: #ff0800;
+                    font-size: 14px;
+                }
+                #popup-connect form label {  
+                    float: left;
+                    text-align: right;
+                    font-size: 13px;
+                    width: 100px;
+                    margin-right: 8px;
+                    padding: 4px 0;
+                }
+                #popup-connect form .textInput {  
+                    float: left;
+                    width: 220px;
+                }
+            #popup-connect form p {  
+                margin: 26px 0;
+            }   
+            #popup-connect .checkbox-list {  
+                list-style-type: none;
+                padding-left: 86px;
+            }
+                #popup-connect .checkbox-list li {  
+                    display: block;
+                    margin: 18px 0;
+                }
+                    #popup-connect .checkbox-list .checkbox {  
+                        float: left;
+                    }
+                    #popup-connect .checkbox-list label {  
+                        float: left;
+                        text-align: left;
+                        padding: 0;
+                        margin-left: 6px;
+                        font-size: 14px;
+                        width: auto;
+                    }
+            #popup-connect form .btn-attend {  
+                display: block;
+                text-align: center;
+                font-size: 20px;
+                color: white;
+                font-weight: bold;
+                font-family: FuturaMdBTMedium;
+                width: 166px;
+                height: 52px;
+                margin: 18px 32px 0 0;
+                background: url(/media/img/btn-attend.jpg) no-repeat top left;
+            }
+            #popup-connect form .btn-attend:hover {  
+                color: black;
+            }
+        #popup-connect .ok-holder {  
+            margin-top: 16px;
+            text-align: center;
+            padding-top: 11px;
+            background: url(/media/img/ico-border-pop.gif) repeat-x top left;
+        }
+            #popup-connect .ok-holder .btn-pop-ok,  
+            .btn-ok-orange {  
+                display: block;
+                font-size: 18px;
+                color: white;
+                font-weight: bold;
+                text-align: center;
+                text-shadow: #c07f17 0 1px 1px;
+                width: 147px;
+                height: 44px;
+                line-height: 44px;
+                margin: 0 auto;
+                background: url(/media/img/bg-btn-ok.png) no-repeat top left;
+            }
+            #popup-connect .ok-holder .btn-pop-ok:hover,
+            .btn-ok-orange:hover {  
+                color: black;
+            }
+        #actual-popup h1 {
+            font-size: 36px;
+            margin: 26px 0;
+        }
+        #actual-popup select {
+            width: 309px;
+            height: 47px;
+            border: 0;
+            padding: 14px;
+            font-size: 14px;
+            background: url(/media/img/bg-select.png) no-repeat top left transparent;
+        }
+        #actual-popup .btn-humungus-yellow {
+            display: inline-block;
+            font-size: 18px;
+            font-family: FuturaMdBTMedium;
+            font-weight: normal;
+            line-height: 58px;
+            padding: 0;
+            margin-top: 20px;
+        }
+    
+    #service-error {
+        color: #C70003;
+        font-size: 12px;
+        text-align: center;
+        font-weight: bold;
+        margin-top: 8px;
+    }
+/* End Edit #5 */
+
+
+/* Edit #6: need to replace lines 1717-1728 in style.css */
+#errorPop,
+#loginPop {
+	border: 3px solid black;
+	padding: 8px;
+}
+	#errorPop a,
+	#loginPop a {
+		color: #0ba7d4;
+		font-weight: bold;
+	}
+	#errorPop a:hover,
+	#loginPop a:hover {
+		text-decoration: underline;
+	}
+/* End Edit #6 */
+    
+    

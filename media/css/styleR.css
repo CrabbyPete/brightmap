@@ -1,13 +1,12 @@
 /* CSS Document */
 /* Edit #3 goes here: */
-body{
+/*body{
 	padding:0 0 0 0;
 	margin:0;
 	font:normal 12px Arial, Helvetica, sans-serif;
 	color:#000;
 	background-color:#FBFBFB;
-}
-
+}*/
 header, hgroup, nav, section, article, aside, footer, td, th, img, p, a, ul, h1, h2, h3, h4, h5, h6, form, input, label, select, textarea, object, iframe{
 	padding:0;
 	margin:0;
@@ -1364,18 +1363,13 @@ nav.topmenu form .inline-holder.last {
 		}
 
 /* Edit #2 goes here: */        
-.videohm {
+/*.videobg {
 	border: 1px solid #d9dada;
 	padding: 23px 0;
-	margin-left: 250px;
 }
-
-/*
 video.new, .videobg img{
 	margin-left: 250px;
-}
-*/
-
+	}*/
 article.orgprovides{
 	margin:20px 0 0 0;
 	height:100%;
@@ -1720,15 +1714,18 @@ ul.orange-bullet.inside {
 	text-decoration: underline;
 }
 
-#errorPop {
+#errorPop,
+#loginPop {
 	border: 3px solid black;
 	padding: 8px;
 }
-	#errorPop a {
+	#errorPop a,
+	#loginPop a {
 		color: #0ba7d4;
 		font-weight: bold;
 	}
-	#errorPop a:hover {
+	#errorPop a:hover,
+	#loginPop a:hover {
 		text-decoration: underline;
 	}	
 		
@@ -1895,11 +1892,11 @@ button::-moz-focus-inner, input::-moz-focus-inner { border: 0; padding: 0; }
 /* FONTS: */
 @font-face {
     font-family: 'FuturaMdBTMedium';
-    src: url('/media/fonts/futuram-webfont.eot');
-    src: url('/media/fonts/futuram-webfont.eot?#iefix') format('embedded-opentype'),
-         url('/media/fonts/futuram-webfont.woff') format('woff'),
-         url('/media/fonts/futuram-webfont.ttf') format('truetype'),
-         url('/media/fonts/futuram-webfont.svg#FuturaMdBTMedium') format('svg');
+    src: url('../fonts/futuram-webfont.eot');
+    src: url('../fonts/futuram-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/futuram-webfont.woff') format('woff'),
+         url('../fonts/futuram-webfont.ttf') format('truetype'),
+         url('../fonts/futuram-webfont.svg#FuturaMdBTMedium') format('svg');
     font-weight: normal;
     font-style: normal;
 }
@@ -1915,3 +1912,226 @@ button::-moz-focus-inner, input::-moz-focus-inner { border: 0; padding: 0; }
 .clearfix { zoom: 1; }
 
 /* Edit #2 goes here: */ 
+
+
+body.not-logged-in #bodysection {
+    background: url(/media/img/bodybg.jpg) repeat-x top left #f7f7f7;
+}
+body.homepage #bodysection {
+    background: url(/media/img/bodybg-index.jpg) repeat-x top left #f7f7f7;
+}
+
+nav.topmenu a.reg {
+    display: block;
+    color: #7a7a7a;
+    font-size: 11px;
+    text-align: right;
+    text-decoration: underline;
+    margin-top: 4px;
+}
+nav.topmenu a.reg:hover {
+    text-decoration: none;
+}
+
+.button.submit.orange,
+.button.submit.gray {
+	padding-right: 4px;
+	background: url(/media/img/btn-submit-right-orange.png) top right no-repeat; 
+}
+	.button.submit.orange span,
+	.button.submit.gray span {
+		font-size: 12px; 
+		font-family: Arial, Helvetica, sans-serif;
+		color: white; 
+		font-weight: bold;
+		height: 30px; 
+		line-height: 28px;
+		padding-left: 26px;
+		padding-right: 8px;
+		background: url(/media/img/btn-submit-left-orange.png) top left no-repeat;
+	}
+	.button.submit.orange:hover span,
+	.button.submit.gray:hover span {
+		color: black;
+	}
+.button.submit.gray {
+    background-image: url(/media/img/btn-submit-right-gray.png);
+}
+    .button.submit.gray span {
+        background-image: url(/media/img/btn-submit-left-gray.png);    
+    }
+    
+#easy-title {
+    font-size: 48px; 
+    letter-spacing: -1px;
+    text-align: center;
+    text-shadow: #fdc635 1px 1px 0; 
+}
+
+@font-face {
+    font-family: 'FuturaLtBTLightItalic';
+    src: url('../fonts/futultit-webfont.eot');
+    src: url('../fonts/futultit-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/futultit-webfont.woff') format('woff'),
+         url('../fonts/futultit-webfont.ttf') format('truetype'),
+         url('../fonts/futultit-webfont.svg#FuturaLtBTLightItalic') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+.futura-italic {
+	font-face: FuturaLtBTLightItalic;
+	font-weight: normal;
+	font-style: normal;
+}
+.gold {
+    color: #faa61e;
+}
+
+#features {
+    margin-top: 19px;
+}
+    #features ul {
+        list-style-type: none;
+        padding-left: 15px;
+    }
+        #features li {
+            color: white;   
+            font-size: 18px;
+            font-family: FuturaMdBTMedium;
+            line-height: 24px;
+            padding-left: 36px;
+            margin: 8px 0;
+            background: url(/media/img/ico-ok-gold.png) no-repeat left center;
+        }
+            #features li a {
+                font-size: 16px;
+                font-family: FuturaLtBTLightItalic;
+                text-decoration: none;
+            }
+            #features li a:hover {
+                text-decoration: underline;
+            }
+            
+    #learn-more {
+        float: left;
+        display: block;
+        text-align: center;
+        font-family: FuturaMdBTMedium;
+        font-size: 20px;
+        color: #faa61e;
+        width: 299px;
+        height: 143px;
+        padding: 16px 0 0 0;
+        background: url(/media/img/ico-video.png) no-repeat top left;
+    }
+    #learn-more:hover {
+        color: white;
+    }
+    
+    .button-big-green {
+        float: right;
+        display: block;
+        color: white;
+        text-align: center;
+        text-shadow: #5a872d 1px 1px 1px;
+        width: 177px;
+        height: 62px;
+        margin: 15px 0 0 11px;
+        padding: 16px 0 0 0;
+        background: url(/media/img/btn-green-big.png) no-repeat top left;
+    }
+    .button-big-green:hover {
+        color: black;
+    }
+        .button-big-green strong {
+            font-size: 22px;
+        }
+        .button-big-green span {
+            font-size: 13px;
+            font-style: italic;
+        }
+        
+        
+    #event-organizers {
+        margin-top: 6px;
+    }
+        #event-organizers h1 {
+            font-size: 22px;
+            padding-left: 24px;
+            margin-bottom: 28px;
+        }   
+        
+    #under-30-info {
+        padding: 25px;
+        border: 1px solid #d9dada;
+    }
+        #under-30-info .pic {
+            float: left;
+            padding: 2px;
+            border: 1px solid #d9dada;
+            background: white;
+        }
+            #under-30-info .pic img {
+                display: block;
+                width: 191px;
+            }
+            .name p {
+                padding: 0 8px;
+            }
+            .name p.futura {
+                font-size: 18px;
+                line-height: 1em;
+                padding: 10px 8px 0 8px;
+            }
+            
+            #under-30-info blockquote {
+                float: right;
+                display: block;
+                overflow: visible;
+                position: relative;
+                width: 572px;
+                padding: 0;
+                margin: 0;
+                padding: 70px 32px 34px 86px;
+                border: 1px solid #d9dada;
+                background: url(/media/img/ico-quotes.gif) no-repeat 16px 18px white;
+            }
+                #under-30-info blockquote .corner {
+                    position: absolute;
+                    top: 22px;
+                    left: -33px;
+                    display: block;
+                    width: 33px;
+                    height: 32px;
+                    background: url(/media/img/ico-blockquote-corner.gif) no-repeat top left;
+                }
+                #under-30-info blockquote .text {
+                    font-size: 14px;
+                    margin-bottom: 42px;
+                }
+                #under-30-info blockquote .name p {
+                    padding: 0;
+                }
+                
+    .pop-up-learnmore {
+        width: 600px;
+        padding: 24px;
+        font-size: 13px;
+        text-align: justify;
+        border: 3px solid black;
+    }
+        .pop-up-learnmore h1 {
+            font-family: FuturaMdBTMedium;
+            font-size: 28px;
+            margin-bottom: 24px;
+        }
+        .pop-up-learnmore img {
+            float: left;
+            margin: 0 12px 12px 0;
+        }
+        .pop-up-learnmore .ok-holder {
+            padding-top: 18px;
+            margin-top: 18px;
+            border-top: 1px solid #D9DADA;
+        }

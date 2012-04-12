@@ -2,8 +2,7 @@
 {% block body_section %}
 <!--Body section-->
 <div id="bodysection">
-		<div class="insidesection" style="padding-top: 16px">
-        			
+		<div class="insidesection" style="padding-top: 16px">	
 		    <section class="videobg clearfix">
 			
 				<div class="clearfix" style="margin-bottom: 14px">				
@@ -17,46 +16,43 @@
 				<div class="clearfix">
 					<div class="left border-right">
 						<div class="new-vid">
-							
 							<a href="#" id="play-video"><img src="/media/img/video-splash.jpg" alt=""></a>
+							<!-- Change the video ID below: Dr0NNmRZ9cc by doing a find and replace to catch all occurrences -->
 							<div id="the-video" style="display: none">
-								<!--  
-								<iframe class ="new" type="text/html" width="480" height="375" src="http://www.youtube.com/embed/0kVnI-6l0EY" frameborder="0"></iframe> 
-								-->
-								<object width="480" height="274">
-									<param name="movie" value="http://www.youtube.com/v/DqLFgSBtWpY?version=3&amp;hl=en_US&amp;rel=0"></param>
-									<param name="allowFullScreen" value="true"></param>
-									<param name="allowscriptaccess" value="always"></param>
-									<embed src="http://www.youtube.com/v/0kVnI-6l0EY?version=3&amp;hl=en_US&amp;rel=0&amp;autoplay=1" type="application/x-shockwave-flash" width="480" height="274" allowscriptaccess="always" allowfullscreen="true"></embed>
+								<object width="480" height="317">
+									<param name="movie" value="http://www.youtube.com/v/Dr0NNmRZ9cc?version=3&amp;rel=0&amp;fs=1&amp;autoplay=1" />
+									<param name="allowFullScreen" value="true" />
+									<param name="allowscriptaccess" value="always" />
+									<embed src="http://www.youtube.com/v/Dr0NNmRZ9cc?version=3&amp;rel=0&amp;fs=1&amp;autoplay=1" type="application/x-shockwave-flash" width="480" height="317" allowscriptaccess="always" allowfullscreen="true" />
 								</object>
-								
 							</div>
 						</div>
 					</div>
 				
-					<div class="right">
+					<div class="left">
 						<div id="ceo-holder" class="clearfix">
 							<div id="ceo">
-								<img src="{{chapter.organizer.get_profile.photo}}" width=191px; alt="{{chapter.organizer.first_name}} &nbsp;{{chapter.organizer.last_name}}" />
+								<img src="{{chapter.organizer.get_profile.photo}}" alt="{{chapter.organizer.first_name}} &nbsp;{{chapter.organizer.last_name}}"/>
 								<p class="futura">{{chapter.organizer.first_name}} &nbsp;{{chapter.organizer.last_name}}</p>
-								<p><strong>{{chapter.organizer.get_profile.title}}</strong></p>
+								<p><strong>Founder, Under30CEO</strong></p>
 							</div>
 							<section id="ceo-info">
 								<header>
-									{{chapter.name}}
+									Under30CEO
 								</header>
 								<div>
-								    <!--  
-									<p>Attendees/month      {{chapter.average_attend}}</p>
-									<p>Event ticket price   {{chapter.ticket_price}}</p>
-									-->
+								   <!--  
+									<p>Attendees/month      125</p>
+									<p>Event ticket price     $20</p>
 									<br />
+									-->
 									<p><strong>Existing Preferred Providers:</strong></p>
 									<ul class="squares">
 										{% for provider in chapter.providers %}
 										<li>{{provider.get_profile.company}}</li>
 										{% endfor %}
 									</ul>
+									
 								</div>
 							</section>
 						</div>
@@ -95,11 +91,11 @@
                         <section id="approve">
                             <div class="clearfix">
                                 <span class="black-circle floating">2</span>
-                                <h2 class="section-title floating" style="margin-top: 4px;">Receive Email Referrals from {{chapter.organizer.first_name}} to Active Leads</h2>
+                                <h2 class="section-title floating" style="margin-top: 4px;">Receive Email Referrals from Matt to Active Leads</h2>
                             </div>
                             <ul class="goldbullet">
                                 <li>Under30CEO members request introductions to the group's preferred service providers</li>
-                                <li>BrightMap sends email referrals, from Matt, introducing you to these qualified leads</li>
+                                <li>BrightMap sends email referrals, from Matt, introducing you to these qualiﬁed leads</li>
                             </ul>
                         </section>						
                         <section id="get-paid">
@@ -114,27 +110,15 @@
                         </section>	
                         <a id="gmail-example" href="#">
                             <h3>Example Email Referral</h3>
-                            <!--  
                             <strong>Click to view</strong>
-                            -->
                         </a>
                     </div>
                     <div class="buttons clearfix">
-                    	{% if invite.pk %}
-                        <a href="{% url lb_signup %}?invite={{invite.pk}}" class="btn-humungus-yellow no-play right">
-                        {% else %}
-                        <a href=
-                        	{% if user.is_authenticated %}
-                            "{% url lb_apply %}?chapter={{chapter.pk}}"
-                            {% else %}
-                            "{% url lb_signup %}?chapter={{chapter.pk}}" 
-                            {% endif %}
-                            class="btn-humungus-yellow no-play right">
-                        {% endif %}
+                        <a href="#" class="btn-humungus-yellow no-play right">
                             <strong>Sign Up Now</strong>
                             <p>Free Trial</p>
                         </a>                        
-                        <a href="#" class="right" style="padding: 22px 22px 0 0; display: block"><img src="/media/img/logo-authorize.gif" alt="Authorize.net" /></a>
+                        <a href="{% url lb_signup %}" class="right" style="padding: 22px 22px 0 0; display: block"><img src="/media/img/logo-authorize.gif" alt="Authorize.net" /></a>
                     </div>
                 </div>				  
                   
@@ -143,12 +127,11 @@
 </div>
 <!--Body section-->
 {% endblock %}
-
 {% block script_section %}
 {% if pop %}
 <!-- Pop-up -->
-<div id="pop-up-wrapper">
-    <section id="actual-popup">
+	<div id="pop-up-wrapper"></div>
+    <section id="actual-popup" style="display: block" class="popup">
         <div>
             <img style="display: inline" src="{{chapter.logo}}" alt="{{chapter.name}}" height='75px' />
         </div>
@@ -167,9 +150,9 @@
             <div class="">
                 <!-- <a id="select-service" href="{% url or_landing %}" class="btn-humungus-yellow smaller">Learn More</a>-->
                 <button type="submit" class="btn-humungus-yellow">Learn More</button> 
+                <!-- <input  type="submit" class="btn-humungus-yellow" value="Learn More"/> -->
             </div>
         <!-- </form> -->
     </section>
-</div>
 {% endif %}
 {% endblock %}

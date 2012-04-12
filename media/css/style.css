@@ -1220,7 +1220,7 @@ p.applicationleads{
 	padding-top:18px;
 }
 input.submitapp {
-	background:url(/media/img/submit-applicationbutt.gif) no-repeat 0 0;
+	background:url(/media/img/save_and_continue.gif) no-repeat 0 0;
 	width:242px;
 	height:33px;
 	cursor:pointer;
@@ -1653,7 +1653,7 @@ p.nextstep{
 	padding-left:294px;
 }
 p.nextstep input.nxtstepbutt{
-	background:url(/media/img/next-stepbutt.jpg) no-repeat 0 0;
+	background:url(/media/img/save_and_continue.gif) no-repeat 0 0;
 	width:187px;
 	height:33px;
 	cursor:pointer;

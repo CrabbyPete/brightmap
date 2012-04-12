@@ -1,7 +1,11 @@
 # Django Imports
 import django_header
+
 from django.core.urlresolvers       import  reverse
 from django.contrib.auth.models     import  User
+from django.template.defaultfilters import  slugify
+from nameparser                     import  HumanName 
+ 
 from google                         import  GoogleSpreadSheet
 
 # Python Imports
@@ -353,10 +357,13 @@ def budget_check():
                 msg.send()
             
             
-            
-    
-
-"""
+def create_slugs():
+    """
+    Create a slug for every organization
+    """
+    for chapter in Chapter.objects.all():
+        chapter.save()
+        
 def clean_names():
     users = User.objects.all()
     for user in users:
@@ -382,7 +389,7 @@ def clean_names():
             user.save()
         except:
             pass
-"""        
+       
 
 if __name__ == '__main__':
     op = optparse.OptionParser( usage="usage: %prog " +" [options]" )
@@ -398,6 +405,7 @@ if __name__ == '__main__':
     op.add_option('-e',           dest = 'email',   action="store",      help = "Email address for Google Spreadsheet")
     op.add_option('-p',           dest = 'password',action="store",      help = "Password for Google Spreadsheet")
     op.add_option('--budget',     default = False,  action="store_true", help = "Check budgets")
+    op.add_option('--slug',       default = False,  action="store_true", help = "Create slugs for all chapters")
     
     (opts,args) = op.parse_args()
 
@@ -432,7 +440,8 @@ if __name__ == '__main__':
         convert_pending_deals()
         
  
-
+    if opts.slug:
+        create_slugs()
 
     
 

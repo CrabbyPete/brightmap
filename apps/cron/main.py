@@ -111,6 +111,58 @@ def mail_buyer ( user, invite ):
         print log( "New lead buyer: " + user.email )
 
 
+
+def attendee_user( attendee ):
+    """
+    Return a user record for the attendee, if non exists create a new one
+    """
+    # Check if they are a user
+    try:
+        user = User.objects.get( email = attendee['email'] )
+
+    # If not create a new user
+    except User.DoesNotExist:
+
+        # Create a temporary password and username which is 30 chars max
+        password = 'pamthgirb'   # brightmap backwards
+        username = attendee['email'][0:30]
+        try:
+            user = User.objects.create_user(  username = username,
+                                              email    = attendee['email'],
+                                              password = password
+                                            )
+        except Exception, e:
+            message = "Exception creating user:" + str(e)
+            print "Exception:" + str(e)
+            logger.error( message )
+            return None
+            
+            
+        name = attendee['first_name'].strip()+ ' '+ attendee['last_name'].rstrip()
+        try:
+            name = HumanName(name)
+            name.capitalize()
+        except:
+            user.first_name = attendee['first_name'].strip().capitalize()
+            user.last_name  = attendee['last_name'].rstrip().capitalize()
+        else:
+            user.first_name = name.first.capitalize()
+            user.last_name  = name.last.capitalize()
+            
+            user.save()
+            profile = Profile( user = user )
+            profile.save()
+        
+    except KeyError:
+        if 'email' in attendee:
+            print log("No email address for:%s %s"%(attendee['email'],))
+        else:
+            print log("No Attendee information recieved",'red')
+            return None
+ 
+    return user
+
+
 def database_attendees( event, api ):
     """
     Generator to put the attendees in the database, returns attendees who
@@ -123,50 +175,14 @@ def database_attendees( event, api ):
     # Add all attendees to the database
     for attendee in attendees:
 
-        # Check if they are a user
-        try:
-            user = User.objects.get( email = attendee['email'] )
-
-        # If not create a new user
-        except User.DoesNotExist:
-
-            # Create a temporary password and username which is 30 chars max
-            password = 'pamthgirb'   # brightmap backwards
-            username = attendee['email'][0:30]
-            try:
-                user = User.objects.create_user(  username = username,
-                                                  email    = attendee['email'],
-                                                  password = password
-                                                )
-            except Exception, e:
-                message = "Exception creating user:" + str(e)
-                logger.error( message )
-                continue
-            
-            
-            name = attendee['first_name'].strip()+ ' '+ attendee['last_name'].rstrip()
-            try:
-                name = HumanName(name)
-                name.capitalize()
-            except:
-                user.first_name = attendee['first_name'].strip().capitalize()
-                user.last_name  = attendee['last_name'].rstrip().capitalize()
-            else:
-                user.first_name = name.first.capitalize()
-                user.last_name  = name.last.capitalize()
-            
-            user.save()
-            profile = Profile( user = user )
-        
-        except KeyError:
-            if 'email' in attendee:
-                print log("No email address for:%s %s"%(attendee['email'],))
-            else:
-                print log("No Attendee information recieved",'red')
+        user = attendee_user( attendee )
+        if not user:
             continue
-        
-        else:
+        #print user.first_name + ' ' + user.last_name
+        try:
             profile = user.get_profile()
+        except:
+            continue
 
         # Update any profile changes
         profile.is_attendee = True
@@ -202,7 +218,7 @@ def database_attendees( event, api ):
             query = Survey.objects.filter( event = event,
                                            attendee = user
                                          )
-            if query.count() == 0:
+            if len(query) == 0:
                 survey  = Survey( event    = event,
                                   attendee = user
                                 )
@@ -244,7 +260,8 @@ def database_attendees( event, api ):
                                   interest = normal_interest,
                                   attendee = user
                                  )
-                survey.save()
+            
+            survey.save()
             surveys.append(survey)
 
         # Yield all the surveys for this user
@@ -508,7 +525,7 @@ def main():
                         pass
 
 
-         
+#import cProfile        
 import optparse
 if __name__ == '__main__':
     op = optparse.OptionParser( usage="usage: %prog " +" [options]" )
@@ -532,6 +549,8 @@ if __name__ == '__main__':
         PROMPT = False
     
     # Got and check for new events
+    #cProfile.run('main()')
     main()
+    
     
  

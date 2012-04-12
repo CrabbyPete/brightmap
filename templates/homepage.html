@@ -1,0 +1,167 @@
+{% extends 'baseR.html' %} 
+{% block body_section %}
+<!--Body section-->
+<div id="bodysection">
+
+    <div class="insidesection" style="padding-top: 26px">
+    
+        <h1 id="easy-title">Easy Sponsorship for Business Events</h1>
+                
+        
+        <div id="steps-homepage" class="clearfix">
+            <section id="connect">
+                <div class="clearfix">
+                    <span>1</span>
+                    <h1>Connect BrightMap to<br />your Eventbrite</h1>
+                </div>
+                <p>So that your attendees can request introductions when registering for your events.</p>
+                <a href="/media/html/pop_learnmore1.html" class="fancypop">Learn more</a>
+            </section>					
+            <section id="approve">
+                <div class="separator">&nbsp;</div>
+                <div class="clearfix">
+                    <span>2</span>
+                    <h1>BrightMap makes<br />introductions</h1>
+                </div>
+                <p>Attendees that request them get introductions to the service providers you select. It's a free, opt-in service for attendees.</p>
+                <a href="/media/html/pop_learnmore2.html" class="fancypop">Learn more</a>                    
+            </section>						
+            <section id="get-paid">
+                <div class="separator">&nbsp;</div>
+                <div class="clearfix">
+                    <span>3</span>
+                    <h1>You make money<br />&nbsp;</h1>
+                </div>
+                <p>Service providers pay per introduction. You earn cash - every month. It's that easy.</p>
+                <a href="/media/html/pop_learnmore3.html" class="fancypop">Learn more</a>
+            </section>	
+        </div>
+        
+        <div id="features" class="clearfix">
+            <div class="left">
+                <ul>
+                    <li>Earn <span class="gold">$500/month</span> for an average event <a href="/media/html/pop_details.html" class="gold fancypop" class="fancypop">(see details)</a></li>
+                    <li><span class="gold">Attendees love it</span> and will thank you <a href="/media/html/pop_example.html" class="gold fancypop" class="fancypop">(see examples)</a></li>
+                    <li><span class="gold">Build loyalty</span> and keep people coming back!</li>
+                </ul>
+            </div>
+            <div class="right">
+                <a href="#bm-video" id="learn-more" class="fancypop-video">Learn more...</a>
+                <a href="{% url or_signup %}" class="button-big-green"><strong>Sign Up Now</strong><br /><span class="italic">Start Making Money!</span></a>
+                <!-- Change the video ID below: opAYt6W4KAI by doing a find and replace to catch all occurrences -->
+                <div style="display: none">
+                    <div id="bm-video">
+                        <object width="480" height="317">
+                            <param name="movie" value="http://www.youtube.com/v/opAYt6W4KAI?version=3&amp;rel=0&amp;fs=1&amp;autoplay=1" />
+                            <param name="allowFullScreen" value="true" />
+                            <param name="allowscriptaccess" value="always" />
+                            <embed src="http://www.youtube.com/v/opAYt6W4KAI?version=3&amp;rel=0&amp;fs=1&amp;autoplay=1" type="application/x-shockwave-flash" width="480" height="317" allowscriptaccess="always" allowfullscreen="true" />
+                        </object>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <section id="event-organizers">
+            <h1>Featured Event Organizers</h1>
+            
+            <div id="under-30-info" class="clearfix">
+                <div class="pic name">
+                    <img src="/media/img/img-ceo-30.jpg" alt="Under 30 CEO - Live the Dream" />
+                    <p class="futura">Matt Wilson</p>
+                    <p><strong>Founder, Under30CEO</strong></p>
+                </div>
+                <blockquote>
+                    <span class="corner">&nbsp;</span>
+                    <p class="text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vehicula enim sit amet libero condimentum sit amet sodales nisl sollicitudin. Phasellus non tortor nisl, ac gravida velit. Sed turpis lectus, venenatis et placerat a, varius id augue. Ut ac est sed felis elementum elementum eu et urna.</p>
+                    <div class="clearfix">
+                        <div class="name left">
+                            <p class="futura">Matt Wilson</p>
+                            <p><strong>Founder, Under30CEO</strong></p>
+                        </div>
+                        <div class="right">
+                            <img src="/media/img/logo-under30.jpg" alt="Under 30 CEO - Live the Dream" />
+                        </div>
+                    </div>
+                </blockquote>
+            </div>
+        </section>                 
+                		
+    </div> 
+         
+</div>
+<!--Body section-->
+{% endblock %}
+
+{% block script_section %}
+<!-- Pop-ups -->
+<div id="pop-up-wrapper" style="display: none">&nbsp;</div>
+
+<section id="popup-connect" class="popup" style="display: none">
+    <div class=""><a href="#" class="btn-close">&nbsp;</a></div>
+    <h1>Connect BrightMap to your Eventbrite</h1>
+    
+    <p class="futura"><strong>BrightMap</strong> requires that you use Eventbrite for ticketing your events.<br />
+    When you setup <strong>BrightMap</strong>, you will connect it to your Eventbrite account.<br />
+    <strong>BrightMap</strong> will add a question to your Eventbrite registration page, something like this:</p>
+    
+    <form action="#" method="post">
+        <h2>Register for TechDrinkup</h2>
+        
+        <div class="ctrlHolder clearfix">
+            <label for="fname">First Name: <em>*</em></label>
+            <input class="textInput" type="text" id="fname" value="" name="fname" />
+        </div>
+        <div class="ctrlHolder clearfix">
+            <label for="lname">Last Name: <em>*</em></label>
+            <input class="textInput" type="text" id="lname" value="" name="lname" />
+        </div>
+        <div class="ctrlHolder clearfix">
+            <label for="email">Email Address: <em>*</em></label>
+            <input class="textInput" type="text" id="email" value="" name="email" />
+        </div>
+        <div class="ctrlHolder clearfix">
+            <label for="company">Company: <em>*</em></label>
+            <input class="textInput" type="text" id="company" value="" name="company" />
+        </div>
+        
+        <p class="futura">Do you need help with your startup?<br />Check a box below for an introduction to TechDrinkups` preferred service providers</p>
+        
+        <ul class="checkbox-list">
+            <li class="clearfix">
+                <input class="checkbox" type="checkbox" name="legal" value="1" id="legal" />
+                <label for="legal">Legal</label>
+            </li>
+            <li class="clearfix">
+                <input class="checkbox" type="checkbox" name="legal" value="1" id="legal" />
+                <label for="legal">Accounting</label>
+            </li>
+            <li class="clearfix">
+                <input class="checkbox" type="checkbox" name="legal" value="1" id="legal" />
+                <label for="legal">Office Space</label>
+            </li>
+            <li class="clearfix">
+                <input class="checkbox" type="checkbox" name="legal" value="1" id="legal" />
+                <label for="legal">Public Relations (PR)</label>
+            </li>
+            <li class="clearfix">
+                <input class="checkbox" type="checkbox" name="legal" value="1" id="legal" />
+                <label for="legal">Web Design / Development</label>
+            </li>
+            <li class="clearfix">
+                <input class="checkbox" type="checkbox" name="legal" value="1" id="legal" />
+                <label for="legal">Internet Hosting / ISP</label>
+            </li>
+        </ul>
+        
+        <div class="ctrlHolder clearfix">
+            <button type="submit" name="submit" class="btn-attend right">Attend Event</button>
+        </div>
+    </form>
+    
+    <div class="ok-holder">
+        <a href="#" class="btn-pop-ok">OK</a>
+    </div>
+    
+</section>
+{% endblock %}

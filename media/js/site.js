@@ -5,6 +5,12 @@ $(document).ready(function() {
 		'margin': 0,
 		'padding': 0
 	});
+    $('.fancypop-video').fancybox({
+		'overlayColor': '#000000',
+		'overlayOpacity': .5,
+		'margin': 0,
+		'padding': 10
+	});
 	$('.fancy-close').click(function() {
 		$.fancybox.close();
 		return false;
@@ -12,10 +18,10 @@ $(document).ready(function() {
 	
 	clearInputs('form input');
     
-	// Place pop-up in middle:
-	var pwh = $('#pop-up-wrapper').height();
-	var aph = $('#actual-popup').outerHeight();
-	$('#pop-up-wrapper').css('padding-top', (pwh/2 - aph/2) + 'px');
+    $('.form-popup').click(function() {
+        $('#pop-up-wrapper').fadeIn(600);
+        $('#popup-connect').delay(200).fadeIn(300);
+    });
 	
     $('#select-service').click(function () {
         if($('#service-select').val() == 0) {
@@ -32,13 +38,17 @@ $(document).ready(function() {
                 service: value
             }
         });*/
-        $('#pop-up-wrapper').fadeTo(620, 0, function() {
+        $('#pop-up-wrapper, #actual-popup').fadeOut(620);/* , 0, function() {
             $(this).css('display', 'none');
-        });
+        }); */
         return false;
-    });$('#pop-up-wrapper').fadeTo(620, 0, function() {
-            $(this).css('display', 'none');
-        });
+    });
+    $('.popup .btn-close, .btn-pop-ok').click(function() {
+        $(this).parent().parent().fadeOut(620);        
+        $('#pop-up-wrapper').fadeOut(620);
+        
+        return false;
+    });
     
     $('#play-video').click(function() {
         $(this).hide();
@@ -46,11 +56,12 @@ $(document).ready(function() {
         return false;
     });
     
-    var ch = $('#ceo').outerHeight();
-    var cidh = $('#ceo-info div').outerHeight();
-    var cihh = $('#ceo-info header').outerHeight();
-    if(ch>cidh+cihh) $('#ceo-info div').height(ch-cihh-45);
-    else $('#ceo').height(cidh+cihh-6);
+    var pn = $('#under-30-info .pic.name').outerHeight();
+    var bq = $('#under-30-info blockquote').outerHeight();
+    if(pn > bq) $('#under-30-info blockquote').height(pn-106);
+    else $('#under-30-info .pic.name').height(bq-6);
+    
+    //$('#ceo').height($('#ceo-info').innerHeight() - 6);
     
 });
 

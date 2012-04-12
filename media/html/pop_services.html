@@ -1,0 +1,25 @@
+<div id="pop-up-wrapper">
+    <section id="actual-popup">
+        <div>
+            <img style="display: inline" src="{{chapter.logo}}" alt="{{chapter.name}}" height='75px' />
+        </div>
+        <h1 class="orange">What service do you provide?</h1>
+        <!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            We recommend using Ajax to place the user`s option into the browser session (check out js/site.js)
+            Else uncomment the <form> and the <button>
+        ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+        <form method="post" action="{% url or_landing %}">
+        	{% csrf_token %}
+        	{{form.invite}}
+            <div class="">
+ 				{{form.service}}
+            </div>
+            <p id="service-error"></p>
+            <div class="">
+                <!-- <a id="select-service" href="{% url or_landing %}" class="btn-humungus-yellow smaller">Learn More</a>-->
+                <button type="submit" class="btn-humungus-yellow">Learn More</button> 
+                <!-- <input  type="submit" class="btn-humungus-yellow" value="Learn More"/> -->
+            </div>
+        <!-- </form> -->
+    </section>
+</div>

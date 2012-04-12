@@ -55,11 +55,15 @@ from base.mail                      import Mail
 def homepage( request ):
     # Homepage
     if not request.user.is_authenticated():
-            return render_to_response( 'indexR.html', 
+        """
+        return render_to_response( 'indexR.html', 
                                        {'login':LoginForm()}, 
                                        context_instance=RequestContext(request)
                                      )
-
+        """
+        return render_to_response( 'homepage.html', {'login':LoginForm(), 'homepage': True}, 
+                                       context_instance=RequestContext(request)
+                                 )
     # Check if they are a Lead Buyer, and make sure they have a valid profile
     user = request.user
 
@@ -92,12 +96,12 @@ def learn(request):
     if request.method == 'GET':
         if 'organizer' in request.GET:
             return render_to_response( 'learn_more_organizers.html', 
-                                       {'login':LoginForm()}, 
+                                       {'login':LoginForm(),'learn_more':True}, 
                                        context_instance=RequestContext(request)
                                      )
         if 'service' in request.GET:
             return render_to_response( 'learn_more_providers.html', 
-                                       {'login':LoginForm()}, 
+                                       {'login':LoginForm(),'learn_more':True}, 
                                        context_instance=RequestContext(request)
                                      )
         return homepage(request)
@@ -155,8 +159,8 @@ def login(request):
     # Login users
 
     def submit_form(form, pop = False ):
-        c = {'login':form, 'pop': pop }
-        return render_to_response('indexR.html', c, context_instance=RequestContext(request))
+        c = {'login':form, 'homepage':True, 'loginerror': True }
+        return render_to_response('homepage.html', c, context_instance=RequestContext(request))
 
     if request.method == 'GET':
         form = LoginForm(initial={'forgot':False})

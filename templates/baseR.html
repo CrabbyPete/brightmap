@@ -4,7 +4,7 @@
 <title>Welcome To Brightmap</title>
 <link href="/media/css/styleR.css" rel="stylesheet" type="text/css"/>
 <link href="/media/css/basic.css" rel="stylesheet" type="text/css"/>
-<link href="/media/css/alex.css" rel="stylesheet" type="text/css"/>
+<link href="/media/css/round5.css" rel="stylesheet" type="text/css"/>
 <link rel="stylesheet" href="/media/js/jquery.fancybox/jquery.fancybox-1.3.4.css" type="text/css" media="screen" />
 <script type="text/javascript" src="/media/js/jquery-1.6.2.min.js"></script>
 <script type="text/javascript" src="/media/js/jquery.fancybox/jquery.fancybox-1.3.4.pack.js"></script>
@@ -14,56 +14,59 @@
 <![endif]-->
 </head>
 
-<body class="not-logged-in">
+<body class="{% if homepage %}homepage{% endif %} not-logged-in">
 <!--Top section-->
 <div id="topsection">
 	<header class="tophdr">
         <section class="logo left">
-			<a href="#"><img src="/media/img/logo.gif" alt="Brightmap" width="220" height="93" title="Brightmap"></a> 
+			<a href="http://brightmap.com"><img src="/media/img/logo.gif" alt="Brightmap" width="220" height="93" title="Brightmap"></a> 
 	    </section>
 	    <nav class="topmenu">
 		   <!--tabpanel -->
-		   {% if login %}
-		   <form id="login" name="" method="post" action="{% url login %}">
-		   		{% csrf_token %}			
-				<fieldset>
-					<div class="inline-holder">
-						<label>Email Address</label>
-						{{login.username}}
-					</div>
-					<div class="inline-holder">
-						<label>Password</label>
-						{{login.password}}
-					</div>
-					<div class="inline-holder last">
-						<button type="submit" class="button submit"><span>Login</span></button>
-						<a href="#errorPop" class="fancypop errorPop" style="display: none">(error)</a>
-					</div>
-				</fieldset>
-		   </form>
-		   {% endif %}
+            <div class="clearfix">
+                <a href="#loginPop" class="button submit gray left fancypop" style="margin-right: 6px"><span>Sign In</span></a>
+                <a href="{% url or_signup %}" class="button submit orange left"><span>Sign Up</span></a>
+            </div>
+            <a href="{% url lb_signup %}" class="reg">Register as a service provider</a>
 		   <!--tabpanel -->	  
         </nav>
 	</header>
+	{% if loginerror %}
+		<script type="text/javascript">
+		$("#loginPop").click();
+		</script>
+	{% endif %}
+	<script>
+		function forgot()
+		{
+			check = document.forms['login-pop'];
+			check.elements["forgotten"].value = true;
+			document.getElementById('login-pop').submit();
+		}
+	</script>
+	
 	<div style="display: none">
-		<div id="errorPop">
+		<div id="loginPop">
 			<header style="padding: 12px; background: #f5f6f6; margin-bottom: 12px;">
-				<h2 class="section-title">Invalid user or wrong password. Please try again.</h2>
+				<h2 class="section-title">Fill in your Email Address and Password</h2>
 			</header>
-			<form id="login-pop" name="" method="post" action="login.php">			
+			<form id="login-pop" name="" method="post" action="{% url login %}">			
+				{% csrf_token %}
 				<fieldset>
-					<div class="block-holder clearfix" style="width: 262px;">
-						<input type="text" name="user" value="Email Address" title="Email Address">
-					</div>
-					<div class="block-holder clearfix" style="width: 262px;">
-						<input name="" type="password" value="password" title="password">
-					</div>
+				<div class="block-holder clearfix" style="width: 262px;">
+					{{login.forgot}}
+					{{login.username}}
+				</div>
+				<div class="block-holder clearfix" style="width: 262px;">
+					{{login.password}}
+				</div>
 					<div class="block-holder clearfix">
-						<a href="#">Forgot password? Click here to reset</a>
+						<a href="javascript:forgot();" "onclick="forgot();">
+							Forgot password? Enter Email Address and Click Here
+						</a> 
 					</div>
 					<div class="block-holder clearfix" style="margin-top: 20px; width: 150px;">
 						<button type="submit" class="button submit floating" style="margin-right: 6px;"><span>Login</span></button>
-						<button class="button submit fancy-close floating"><span>Cancel</span></button>
 					</div>
 				</fieldset>
 			</form>
@@ -76,24 +79,23 @@
 {% block body_section %}
 {% endblock %}
 <!--Body section-->
-
 <!--Footer section-->
 <div id="footersection">
 	<footer>
 		<ul id="menu-footer">
-			<li><a href="#">About</a></li>
+			<li><a href="{% url about %}">About</a></li>
 			<li>|</li>
-			<li><a href="#">FAQ</a></li>
+			<li><a href="{% url faq %}">FAQ</a></li>
 			<li>|</li>
-			<li><a href="#">Contact Us</a></li>
+			<li><a href="mailto:info@brightmap.com">Contact Us</a></li>
 		</ul>
 		<p>Copyright 2011 BrightMap LLC</p>
 	</footer>
 </div>
 <!--Footer section-->
-
 {% block script_section %}
 {% endblock %}
 
 </body>
 </html>
+

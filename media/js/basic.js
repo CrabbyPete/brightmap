@@ -13,13 +13,19 @@
 
 jQuery(function ($) {
 	// Load dialog on page load
+	//$('#basic-modal-content').modal();
 
 	// Load dialog on click
-	$(".itlink").click( function (e) { 
-		  								e.preventDefault(); 
-		  								$('a.canceldealq').attr('href',this.href);
-		  								var p = $('a.nokeepdeal').attr('href')
-		  								$("#itlinkcontent").modal(); 
-		    						    return false; 
-									 });
+	$('#itlink').click(function (e) {
+		$('#itlinkcontent').modal();
+		return false;
+	});
+	$('#itlink2').click(function (e) {
+		$('#itlink2content').modal();
+		return false;
+	});
+	$('#itlink3').click(function (e) {
+		$('#itlink3content').modal();
+		return false;
+	});	
 });

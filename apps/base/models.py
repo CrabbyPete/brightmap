@@ -1,3 +1,4 @@
+import re
 
 from difflib                                import SequenceMatcher
 from datetime                               import datetime, date, time, timedelta
@@ -5,7 +6,9 @@ from datetime                               import datetime, date, time, timedel
 from django.db                              import models
 from django.contrib.auth.models             import User
 from django.contrib.localflavor.us.models   import PhoneNumberField
-from django.template.defaultfilters         import slugify 
+from django.template.defaultfilters         import slugify
+from django.db                              import IntegrityError
+
 
 
 class Profile( models.Model ):
@@ -54,12 +57,14 @@ class Invoice( models.Model ):
     title       = models.CharField( max_length = 255, blank = True, null = True )
 
     cost        = models.DecimalField( max_digits = 10, decimal_places = 2, default = 0.00 )
+    credit      = models.DecimalField( max_digits = 10, decimal_places = 2, default = 0.00 )
     issued      = models.DateTimeField( auto_now_add = True )
 
     first_day   = models.DateField()
     last_day    = models.DateField()
     
     status      = models.CharField( max_length = 20, default ='issued' )
+    credit      = models.DecimalField( max_digits = 10, decimal_places = 2, default = 0.00 )
  
     def authorized(self):
         try:
@@ -104,6 +109,7 @@ class Organization( models.Model ):
     def __unicode__(self):
         return self.name
 
+
 class ChapterManager(models.Manager):
 
     def for_user(self, user ):
@@ -115,7 +121,7 @@ class Chapter( models.Model ):
     Base for each Organization chapter
     """
     name          = models.CharField( default = None, max_length = 255 )
-    slug          = models.SlugField( blank = True, null = True )
+    slug          = models.SlugField( blank = True, null = True, unique = True )
     organization  = models.ForeignKey( Organization, default = None, blank = True, null = True )
     organizer     = models.ForeignKey( User )
     paypal        = models.CharField( blank= True, null = True,  max_length = 255 )
@@ -124,15 +130,27 @@ class Chapter( models.Model ):
     letter        = models.ForeignKey('Letter', blank = True, null = True )
     website       = models.URLField(            blank = True, null = True )
     category      = models.CharField( default = None, blank = True, null = True,  max_length = 255 )
+
     average_attend= models.IntegerField( default = 0 )
     ticket_price  = models.DecimalField ( max_digits = 10, decimal_places = 2, default = 0.00 )
  
     objects       = ChapterManager() 
-    
-    def save(self):          
-        self.slug = slugify(self.name)          
-        super(Chapter, self).save() 
-
+    def save(self):        
+        if not self.slug:
+            self.slug = slugify(self.name)  # Where self.name is the field used for 'pre-populate from'
+        
+        while True:
+            try:
+                super(Chapter, self).save()
+            except IntegrityError:
+                match_obj = re.match(r'^(.*)-(\d+)$', self.slug)
+                if match_obj:
+                    next_int = int(match_obj.group(2)) + 1
+                    self.slug = match_obj.group(1) + '-' + str(next_int)
+                else:
+                    self.slug += '-2'
+            else:
+                break
     
     def deals( self ):
         # Get all the deals for this chapter

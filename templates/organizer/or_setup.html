@@ -34,8 +34,10 @@
 			<a href="{% url eventbrite_api %}">CLICK HERE</a>
 			-->
 		</h2>
+		<!--  
 		<p class="addbrighttxt">If this link does not work, make sure you are logged in to your
 			Eventbrite.com page, then click <a href='https://www.eventbrite.com/permissions' target=_blank>Here</a> 
+		-->
 		<p class="singleline"></p>
 		<h2 class="entersettings">
 			<span>2</span>Enter the following settings
@@ -43,8 +45,7 @@
 		<section id="my-border" style="padding:20px 0 10px 0;">
 		<ul class="entersetting">
 
-			<li><strong>Email:</strong> &lt;brightmap
-				login&gt;@brightmap.com <br>(eg "my.community@brightmap.com")</li>
+			<li><strong>Email:</strong> {{chapter.slug}}@brightmap.com </li>
 			<li><strong>Grant access to:</strong> All events</li>
 			<li><strong>Actions to perform:</strong>Selected actions only
 				<ul>

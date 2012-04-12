@@ -31,6 +31,8 @@ class SignUpView( FormView ):
     password      ='2434&)%*%%^$#@' 
     
     def get_initial( self ):
+        self.initial = {}
+        
         if self.request.method == 'GET':
  
             if 'chapter' in self.request.GET:
@@ -45,8 +47,6 @@ class SignUpView( FormView ):
                 user = self.request.user
                 profile = user.get_profile()
                 
-                
-                
                 self.initial = dict ( email         = user.email,
                                       email_verify  = user.email,
                                       first_name    = user.first_name,
@@ -57,13 +57,11 @@ class SignUpView( FormView ):
                                     )
                 
                 if not 'user' in self.request.GET:
-                    self.initial.update( dict( chapter = chapter_name,
-                                               pay_pal = chapter.paypal
-                                             )
-                                       )
-        else:
-            self.initial = {}
-        
+                    if chapter.paypal:
+                        self.initial.update( {'pay_pal':chapter.paypal} )
+                    if chapter_name:
+                        self.initial.update( {'chapter': chapter_name } )
+  
         return self.initial
 
    
@@ -257,13 +255,18 @@ class InviteView(FormView):
     template_name = 'organizer/or_invite.html'
     form_class = InviteForm
     
-    def get_initial(self):
+    def get_initial(self):       
         if self.request.method == 'GET':
             if 'chapter' in self.request.GET:
                 chapter = self.request.GET['chapter']
-                return dict ( chapter = chapter )
+            return dict ( chapter = chapter )
     
-    
+    def get_context_data(self,**kwargs):
+        if self.request.method == 'GET' and 'dash' in self.request.GET:
+            kwargs.update( dict( dash = True) )
+        return kwargs
+        
+        
     def form_valid( self, form ):
         chapter = Chapter.objects.get(pk = form.cleaned_data['chapter'])
 
@@ -284,8 +287,10 @@ class InviteView(FormView):
                        )
             mail.send()
         
-        return HttpResponseRedirect( reverse('or_setup') )
-  
+        if chapter.configured():
+            return HttpResponseRedirect( reverse('or_dash') )
+        else:
+            return HttpResponseRedirect( reverse('or_setup')+'?chapter='+str(chapter.id) )
    
 @login_required
 def leadb( request ):
@@ -308,6 +313,9 @@ def setup( request ):
             context = { 'header':False }
         else: 
             context = { 'header':True }
+        if 'chapter' in request.GET:
+            chapter = Chapter.objects.get(pk = request.GET['chapter'])
+            context.update({'chapter':chapter})
             
     return render_to_response('organizer/or_setup.html',context, context_instance=RequestContext(request) )
 
