@@ -2126,9 +2126,27 @@ nav.topmenu a.reg:hover {
             font-size: 28px;
             margin-bottom: 24px;
         }
-        .pop-up-learnmore img {
+        .pop-up-learnmore .text {
+        	width:600px;
+        	height:320px;
+        	margin: 0 auto;
+        }
+        .pop-up-learnmore .alltext {
+        	width:600px;
+        	height:320px;
+        	margin: 0 auto;
+        }
+        
+        .pop-up-learnmore .text img {
             float: left;
             margin: 0 12px 12px 0;
+            width: 260px;
+            position:relative;
+        }
+        .pop-up-learnmore .text p {
+        	float:right;
+        	width:300px;
+        	 position:relative;
         }
         .pop-up-learnmore .ok-holder {
             padding-top: 18px;
