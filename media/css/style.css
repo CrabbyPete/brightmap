@@ -2074,6 +2074,7 @@ img.ultralight{
 	float:right;
 	padding-right:8px;
 	padding-bottom:8px;
+	max-width:460px;
 }
 .community-insidetable{
 	width:100%;
