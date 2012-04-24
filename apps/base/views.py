@@ -158,8 +158,8 @@ def forgot( request, username ):
 def login(request):
     # Login users
 
-    def submit_form(form, pop = False ):
-        c = {'login':form, 'homepage':True }
+    def submit_form(form, forgot = False ):
+        c = {'login':form, 'homepage':True, 'forgot':forgot }
         return render_to_response('homepage.html', c, context_instance=RequestContext(request))
 
     if request.method == 'GET':
@@ -182,7 +182,7 @@ def login(request):
         # Force an error so the javascript pops up 
         
         #form._errors.update({'username': ErrorList(["pop"])})
-        return submit_form(form, pop = True)
+        return submit_form(form, forgot = True)
     
     try:
         user = User.objects.get(username = username)

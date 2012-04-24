@@ -170,10 +170,12 @@ class  SignUpView( FormView ):
                 profile = Profile( user = user)
                 profile.save()
             else:
-                # Is an existing user signing up as a leadbuyer
-                if not user.check_password(password) and not invite:
-                    form._errors['email'] = ErrorList(["This email already exists"])
-                    return self.form_invalid( form )
+                # Is an existing user signing up as a leadbuyer, check if they were an attendee
+                profile = user.get_profile()
+                if profile.is_agreed:
+                    if not user.check_password(password) and not invite:
+                        form._errors['email'] = ErrorList(["This email already exists"])
+                        return self.form_invalid( form )
                     
         elif email != user.email:
             try:

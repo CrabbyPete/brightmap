@@ -1,4 +1,6 @@
 # Python imports
+import re
+
 from datetime                       import date, datetime
 import  logging
 logger = logging.getLogger('organizer')
@@ -26,6 +28,9 @@ from forms                          import OrganizerForm, CategoryForm, InviteFo
 from base.forms                     import LoginForm
 
 class SignUpView( FormView ):
+    """
+    Sign up class view
+    """
     template_name = 'organizer/signup.html'
     form_class    = OrganizerForm
     password      ='2434&)%*%%^$#@' 
@@ -111,9 +116,12 @@ class SignUpView( FormView ):
                 profile = Profile( user = user)
                 profile.save()
             else:
-                if not user.check_password(password):
-                    form._errors['email'] = ErrorList(["This email already exists"])
-                    return self.form_invalid(form)
+                # This is an attendee who is now signing up.
+                profile = user.get_profile()
+                if profile.is_agreed:
+                    if not user.check_password(password):
+                        form._errors['email'] = ErrorList(["This email already exists"])
+                        return self.form_invalid(form)
         
         # An existing user is changing their email address
         elif email != user.email:
@@ -209,6 +217,9 @@ class SignUpView( FormView ):
             return HttpResponseRedirect( reverse('or_invite')+'?chapter='+str(chapter.id) )
         
 class CategoryView( FormView ):
+    """
+    Category Class process and render chapter categories
+    """
     template_name = 'organizer/or_category.html'
     form_class    = CategoryForm
     
@@ -252,6 +263,9 @@ class CategoryView( FormView ):
         return HttpResponseRedirect( reverse('or_setup') )
 
 class InviteView(FormView):
+    """
+    Invite class. Renders and process organizer invite leadbuy form
+    """
     template_name = 'organizer/or_invite.html'
     form_class = InviteForm
     
@@ -273,19 +287,21 @@ class InviteView(FormView):
         emails  = form.cleaned_data['invites']
         emails.replace('\r\n',',')
         emails  = emails.split(',')
-        
+                
         template_name = 'invite.tmpl'
         subject       = 'Become a preferred service provider for %s'%( chapter.name, )
         url = '/sponsor/' + chapter.slug
         for email in emails:
-            mail = Mail( chapter.organizer.email,
-                         email, 
-                         subject, 
-                         template_name = template_name,
-                         chapter = chapter,
-                         url =  url
-                       )
-            mail.send()
+            # Make sure its a legit email address
+            if re.match("^[a-zA-Z0-9._%-+]+@[a-zA-Z0-9._%-]+.[a-zA-Z]{2,6}$", email ):
+                mail = Mail( chapter.organizer.email,
+                             email, 
+                             subject, 
+                             template_name = template_name,
+                             chapter = chapter,
+                             url =  url
+                           )
+                mail.send()
         
         if chapter.configured():
             return HttpResponseRedirect( reverse('or_dash') )
@@ -294,6 +310,9 @@ class InviteView(FormView):
    
 @login_required
 def leadb( request ):
+    """
+    
+    """
     template_name = 'organizer/or_leadbuyer.html'
     
     if 'term' in request.GET:
@@ -351,7 +370,13 @@ def dashboard( request ):
                 canceled.append(term)
     today = date.today()      
     return render_to_response( 'organizer/or_dash.html', 
-                               {'chapter':chapter,'state':state, 'today':today, 'active':active, 'pending':pending, 'canceled':canceled }, 
+                               {'chapter':chapter,
+                                'state':state, 
+                                'today':today, 
+                                'active':active, 
+                                'pending':pending, 
+                                'canceled':canceled 
+                                }, 
                                context_instance=RequestContext(request) 
                              )
 

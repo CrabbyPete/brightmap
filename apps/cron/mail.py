@@ -1,78 +1,83 @@
 #-------------------------------------------------------------------------------
 # Name:        mail.py
-# Purpose:     Support Amazon SES and STMP mail interfaces
+# Purpose:     Centralize email
 #
 # Author:      Douma
 #
 # Created:     14/08/2011
 # Copyright:   (c) Douma 2011
-# Licence:     <your licence>
 #-------------------------------------------------------------------------------
 #!/usr/bin/env python
 
-# Standard smpt interfaces such as gmail
-from smtplib            import SMTP_SSL
-from smtplib            import SMTP
-from smtplib            import SMTPAuthenticationError
-from email.mime.text    import MIMEText
+from django.template                import  loader, Context
+from django.core.mail               import  EmailMessage, get_connection
 
-# Support for Amazon SES
-from boto               import ses
+from settings                       import SEND_EMAIL, SITE_BASE
+from datetime                       import datetime
 
 
-class Mailer(object):
-
+class Mail():
+    """
+    Mail class
+    """
+    def __init__(self):
+        """
+        Open the connection once  
+        """
+        self.connection = get_connection()
+        self.connection.open()
+        
+    def __del__(self):
+        """
+        Close the connection when done
+        """
+        self.connection.close()
+        
+        
     # Initialize with Gmail address and password
-    def __init__( self, mailer     = 'smtp',
-                        access_key = None,
-                        secret_key = None,
-                        user       = None,
-                        password   = None,
-                        server     = 'smtp.gmail.com'  ):
+    def message( self, sender, receivers, subject, template_name, bcc = None, **kwargs ):
+        self.sender    = sender
+        self.receivers = receivers
+        self.subject   = subject
 
-
-        self.mailer= mailer
-        if mailer == 'amazon':
-            self.ses = ses.SESConnection( aws_access_key_id     = access_key,
-                                          aws_secret_access_key = secret_key
-                                        )
+        self.bcc = ['bcc@brightmap.com']
+        if bcc:
+            self.bcc.extend(bcc)
         else:
-            self.mail = self.email_connect( user     = user,
-                                            password = password,
-                                            server   = server     )
-
-    # Connect to the gmail stmp server
-    def email_connect( self,
-                       user     = None,
-                       password = None,
-                       server   = 'smtp.gmail.com' ):
-
-        em = SMTP(server, 587)
-
-        em.set_debuglevel(False)
-        em.ehlo()
-        em.starttls()
-        em.ehlo()
-        em.login(user, password)
-        return em
-
-    # Mail the message. It will alway be from the current gmail address.
-    def email_to( self, text, to, me, subject ):
-        if self.mailer == 'amazon':
-               return self.ses.send_email( me, subject, text, to )
-
-        msg = MIMEText( text )
-        msg['Subject'] = subject
-        msg['From'] = me
-
-        # To is a list of To addresses
-        COMMASPACE = ', '
-        msg['To'] = COMMASPACE.join(to)
-        return self.mail.sendmail(me, to, msg.as_string())
+            self.bcc = ['bcc@brightmap.com']
 
 
-def main():
-    pass
+        # Get the template
+        template = loader.get_template('letters/'+template_name )
+        
+        # Set up the context
+        if 'url' in kwargs:
+            kwargs['url'] = SITE_BASE+kwargs['url']
+        if 'kwargs' in kwargs:
+            kwargs = kwargs['kwargs']
+        
+        c = Context( kwargs )
 
-if __name__ == '__main__':
-    main()
+        # Render the message and log it
+        self.body = template.render(c)
+
+        if not SEND_EMAIL:
+            self.receivers = ['pete.douma@gmail.com']
+            #self.bcc = ['test@brightmap.com']
+            self.bcc = []
+    
+        msg = EmailMessage ( subject    = self.subject,
+                             body       = self.body,
+                             from_email = self.sender,
+                             to         = self.receivers,
+                             bcc        = self.bcc,
+                             connection = self.connection
+                            )
+        
+        try:
+            msg.send()
+        except Exception, e:
+            err = "Email Send Error " + str(e)
+            return False
+           
+        return True

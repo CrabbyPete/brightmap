@@ -14,11 +14,18 @@
 <div id="bodysection">
 	<div class="insidesection">
 		<section class="leadbuyer">
-			{% if state %}
+			{% if state == 'profile' %}
 			<p class="profileupdate">
 			<span>Profile Updated</span>
-			</p>
+			</p>		
 			{% endif %}
+			
+			{% if chapter.configured %}
+			<p class="profileupdate">
+			<span>Welcome</span>
+			</p>		
+			{% endif %}
+			
 			<h2 class="leadbuyer">Event Organizer Dashboard - {{chapter.name}} </h2>
 		</section>
 		<nav class="leadbuyer">

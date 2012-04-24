@@ -10,13 +10,10 @@
 #!/usr/bin/env python
 
 from django.template                import  loader, Context
-from django.core.mail               import  EmailMultiAlternatives
+from django.core.mail               import  EmailMessage
 
 from settings                       import SEND_EMAIL, SITE_BASE
 from datetime                       import datetime
-
-import logging
-logger = logging.getLogger('main.py')
 
 
 
@@ -64,19 +61,21 @@ class Mail():
 
         if not SEND_EMAIL:
             self.receivers = ['pete.douma@gmail.com']
-            self.bcc = ['test@brightmap.com']
+            #self.bcc = ['test@brightmap.com']
+            self.bcc = []
     
-        msg = EmailMultiAlternatives( subject    = self.subject,
-                                      body       = self.body,
-                                      from_email = self.sender,
-                                      to         = self.receivers,
-                                      bcc        = self.bcc
-                                    )
+        msg = EmailMessage ( subject    = self.subject,
+                             body       = self.body,
+                             from_email = self.sender,
+                             to         = self.receivers,
+                             bcc        = self.bcc
+                            )
+        
         try:
-            msg.send( fail_silently = False )
+            msg.send()
         except Exception, e:
-            err = "Email Send Error" + e
-            logger.error(self.log(err))
+            err = "Email Send Error " + str(e)
+            #logger.error(self.log(err))
             return False
-                
+           
         return True

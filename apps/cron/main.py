@@ -9,6 +9,7 @@ from termcolor                      import  colored
 from django.contrib.auth.models     import  User
 from django.core.urlresolvers       import  reverse
 
+
 # Local libraries
 from nameparser                     import  HumanName
 from eventapi                       import  EventBrite
@@ -19,7 +20,9 @@ from base.models                    import ( Event, Profile, Survey, Interest, D
 
 from social.models                  import AuthToken
 
-from base.mail                      import  Mail 
+from mail                           import  Mail
+Mail = Mail()
+ 
 from base.passw                     import  gen
 
 
@@ -41,9 +44,10 @@ def log(message, color = None):
     Time stamp all messages
     """
     string = TODAY.strftime("%Y-%m-%d %H:%M")+ ',  ' + message
+
     if color:
         string = colored(string, color )
-        
+   
     return string
 
 
@@ -87,12 +91,17 @@ def mail_buyer ( user, invite ):
     """ 
     Send email to potential leadbuyer asking them to join 
     """
+    if PROMPT:
+        ans = raw_input('Send Leadbuyer request? (y/n)')
+        if ans != 'y':
+            return
+    
     sender   = invite.chapter.organizer.email
     receivers = [ user.email ]
     subject  = 'Become a preferred provider for '+ invite.chapter.name
     url      = reverse('or_landing')+'?invite='+ str(invite.pk)
 
-    mail = Mail( sender        = sender, 
+    Mail.message( sender        = sender, 
                  receivers     = receivers,
                  subject       = subject,
                  template_name = 'leadbuyer.tmpl',
@@ -102,16 +111,7 @@ def mail_buyer ( user, invite ):
                  chapter       = invite.chapter
                )
     
-    if PROMPT:
-        ans = raw_input('Send Leadbuyer request? (y/n)')
-        if ans != 'y':
-            return
-    
-    if mail.send():
-        print log( "New lead buyer: " + user.email )
-
-
-
+ 
 def attendee_user( attendee ):
     """
     Return a user record for the attendee, if non exists create a new one
@@ -133,7 +133,7 @@ def attendee_user( attendee ):
                                             )
         except Exception, e:
             message = "Exception creating user:" + str(e)
-            print "Exception:" + str(e)
+            print message
             logger.error( message )
             return None
             
@@ -178,7 +178,7 @@ def database_attendees( event, api ):
         user = attendee_user( attendee )
         if not user:
             continue
-        #print user.first_name + ' ' + user.last_name
+
         try:
             profile = user.get_profile()
         except:
@@ -193,6 +193,7 @@ def database_attendees( event, api ):
         
         if 'cell_phone' in attendee:
             profile.phone = attendee['cell_phone'].rstrip()
+        
         profile.save()
 
         # Return attendees who answered the survey
@@ -219,6 +220,8 @@ def database_attendees( event, api ):
                                            attendee = user
                                          )
             if len(query) == 0:
+                #print user.first_name + ' ' + user.last_name
+                
                 survey  = Survey( event    = event,
                                   attendee = user
                                 )
@@ -241,6 +244,7 @@ def database_attendees( event, api ):
             # Is this a new interest?
             if normal_interest == None:
                 print log( "New Interest: " + interest )
+                
                 """ If you want to automatically save interests
                 normal_interest = Interest( interest = interest )
                 normal_intest.save()
@@ -265,9 +269,10 @@ def database_attendees( event, api ):
             surveys.append(survey)
 
         # Yield all the surveys for this user
+        #print "Yield " + user.first_name + ' ' + user.last_name
         yield surveys
 
-    return
+    #print "Return"
 
 
 def days_of_month (month = None):
@@ -325,8 +330,10 @@ def make_contact( survey, deal, letter ):
         return
 
     # Go through all the active deals
-    for term in deal.active():
+    active = deal.active()
+    for term in active:
         
+        #print "Term " + str( term.pk )+ " Active "+ str( len(active) )
         # During test sometimes None would be set to a term, make sure term exists
         if term == None:
             continue
@@ -370,13 +377,21 @@ def make_contact( survey, deal, letter ):
   
         # Render the message and log it
         print_connection( attendee, sponser, interest )
+        
+        # If the prompt was set ask before sending
+        if PROMPT:
+            ans = raw_input('Send Connection? (y/n)')
+            if ans != 'y':
+                continue
+        
+        
         subject = deal.chapter.organization.name + ' Intro: '+ interest.interest + ' for ' + attendee.first_name + ' ' + attendee.last_name
         recipients = [ '%s %s <%s>'% ( attendee.first_name, attendee.last_name, attendee.email ),
                        '%s %s <%s>'% ( sponser.first_name, sponser.last_name, sponser.email )
                      ]
 
         sender =  '%s %s <%s>' % ( organizer.first_name, organizer.last_name, organizer.email )    
-        mail  = Mail( sender, recipients, subject, letter, bcc = [sender],
+        Mail.message( sender, recipients, subject, letter, bcc = [sender],
                       interest   = interest,
                       attendee   = attendee,
                       sponser    = sponser,
@@ -385,27 +400,7 @@ def make_contact( survey, deal, letter ):
                       event      = event,
                       company    = company
                     ) 
-                    
-
-        # If the prompt was set ask before sending
-        if PROMPT:
-            ans = raw_input('Send Connection? (y/n)')
-            if ans != 'y':
-                continue
-
-        # Try and send the message
-        log_mess = "%s,%s,%s,%s"%( attendee.email,
-                                   sponser.email,
-                                   chapter,
-                                   interest
-                                  )
-
-        logger.info(log(log_mess))
-        if not mail.send():
-            print log( "Error sending mail for %s"%(sender,) )
-                
-
-
+                      
 def print_event(event):
     """
     Print Event details
@@ -415,8 +410,9 @@ def print_event(event):
     try:
         print log('Chapter: '+ event.chapter.name  + ' Event: ' +  event.describe + ' ' + date + ' ' + str(delta.days) )
     except:
-        logger.error( "Error printing event %s",event.chapter.name )
-        
+        #logger.error( "Error printing event %s",event.chapter.name )
+        pass
+    
 def print_connection( attendee, sponser, interest ):
     """
     Print Connection details
@@ -433,7 +429,8 @@ def print_connection( attendee, sponser, interest ):
                   interest.interest
                  )
     except:
-        logger.error( "Error printing connection")
+        #logger.error( "Error printing connection")
+        pass
 
 
 def get_ticket(chapter):
