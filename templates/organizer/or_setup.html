@@ -29,7 +29,7 @@
 
 		<h2 class="eventbrite">
 			<span>1</span>Add BrightMap to your Eventbrite Page 
-			<a href='https://www.eventbrite.com/permissions' target=_blank>CLICK HERE</a>
+			<a href='https://www.eventbrite.com/permissions?user=new' target=_blank>CLICK HERE</a>
 			<!--  
 			<a href="{% url eventbrite_api %}">CLICK HERE</a>
 			-->
@@ -47,12 +47,13 @@
 
 			<li><strong>Email:</strong> {{chapter.slug}}@brightmap.com </li>
 			<li><strong>Grant access to:</strong> All events</li>
-			<li><strong>Actions to perform:</strong>Selected actions only
+			<li><strong>Actions to perform:</strong>Selected actions only (Deselect All Actions)
 				<ul>
 					<li>Edit event details not including the payment options</li>
-					<li class="middletext">Edit survey questions</li>
+					<li class="middletext">Customize the registration page</li>
 					<li>View order and attendee reports (read-only)</li>
-				</ul></li>
+				</ul>
+			</li>
 
 			<li class="spacer"><strong>Receive copies of:</strong> No emails</li>
 		</ul>
@@ -65,7 +66,7 @@
 		<p class="singleline"></p>
 
 		<p class="eventdetails">
-			<a href="{% url or_dash %}">Show Eventbrite Details</a>
+			<a href="{% url or_dash %}">Save & Continue</a>
 		</p>
 
 		</section>

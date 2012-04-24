@@ -180,7 +180,8 @@ def login(request):
         
         form = LoginForm(initial={'forgot':False, 'username':username})
         # Force an error so the javascript pops up 
-        form._errors.update({'username': ErrorList(["pop"])})
+        
+        #form._errors.update({'username': ErrorList(["pop"])})
         return submit_form(form, pop = True)
     
     try:
