@@ -8,7 +8,7 @@ from base.forms                     import LoginForm
 #from organizer.forms                import ServiceForm
 
 
-def sponsor(request, slug ):
+def sponsor( request, slug ):
     try:
         chapter = Chapter.objects.get(slug = slug)
     except Chapter.DoesNotExist:

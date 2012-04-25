@@ -9,7 +9,7 @@
     		{% if not chapter.configured %}
     		<a href = '{% url remind %}?chapter={{chapter.pk}}'>Send Reminder</a>
     		{% endif %}
-    		<a href ='{% url or_landing %}{{chapter.slug}}'>{{chapter.slug}}</a>
+    		<a href ='{% url sponsor slug=chapter.slug %}'>{{chapter.slug}}</a>
     		<br />
  		{% endfor %}
  		</br>
