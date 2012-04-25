@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load fortyfive %}
+{% load smartif %}
 
 {% block javascript %}
 <!--popup script start-->
@@ -18,9 +19,7 @@
 			<p class="profileupdate">
 			<span>Profile Updated</span>
 			</p>		
-			{% endif %}
-			
-			{% if chapter.configured %}
+			{% elif chapter.configured %}
 			<p class="profileupdate">
 			<span>Welcome</span>
 			</p>		
