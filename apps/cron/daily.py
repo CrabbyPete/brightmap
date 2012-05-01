@@ -240,7 +240,7 @@ def open_spreadsheet( email, password ):
     spreadsheet.getWorkSheet('Organizations')
     return spreadsheet
 
-MONTH =  ['jan','feb','mar','apr','may','june','jul','aug','sep','oct','nov','dec']
+MONTH =  ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec']
 def metric( email, password ):
     chapters = Chapter.objects.all()
     spreadsheet = open_spreadsheet( email, password )

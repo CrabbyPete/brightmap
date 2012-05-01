@@ -280,6 +280,7 @@ ul.goldbullet {
 	margin: 0;
 	margin-top: 12px;
     margin-left: 35px;
+    width: 530px
 }
     ul.goldbullet li {
         background:url(/media/img/ico-good-gold.png) no-repeat 0 0;
