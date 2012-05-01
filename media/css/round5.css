@@ -69,7 +69,12 @@ body{
         }
         #ceo p {
             padding: 0 8px;
-        }    
+        }
+        #ceo img {
+        	width: 191px;
+        	height: 191px;
+        }
+            
     #ceo-info {
         float: left;
         width: 206px;
