@@ -63,7 +63,7 @@ $(document).ready(function() {
     else 
     	$('#under-30-info .pic.name').height(bq-6);
     
-    $('#ceo').height($('#ceo-info').innerHeight() - 6);
+    //$('#ceo').height($('#ceo-info').innerHeight() - 6);
     
 });
 
