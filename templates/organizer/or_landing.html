@@ -56,6 +56,7 @@
 								</div>
 							</section>
 						</div>
+						<!--  
 						<div class="humungus-holder">
 							{% if invite.pk %}
 							<a href="{% url lb_signup %}?invite={{invite.pk}}" class="btn-humungus-yellow">
@@ -73,6 +74,30 @@
 								for {{chapter.name}}
 							</a>	
 						</div>
+						-->
+						
+						<div class="become-yellow-holder">
+							{% if invite.pk %}
+							<a href="{% url lb_signup %}?invite={{invite.pk}}" class="button become-yellow">
+							{% else %}
+								<a href=
+								{% if user.is_authenticated %}
+                            		"{% url lb_apply %}?chapter={{chapter.pk}}"
+                            	{% else %}
+                            		"{% url lb_signup %}?chapter={{chapter.pk}}" 
+                            	{% endif %}
+								class="button become-yellow">
+							{% endif %}
+								<span>
+									Become a<br />
+									Preferred Provider<br />
+									for {{chapter.name}}
+								</span>
+							</a>	
+						</div>
+						
+						
+						
 					</div>
 				</div>
               </section>

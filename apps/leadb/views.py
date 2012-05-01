@@ -314,7 +314,10 @@ class ApplyView( FormView ):
 
         # Check the type of deal       
         if deal_type == 'Trial':
-            expires = Expire.objects.filter( buyer = self.request.user )
+            expires = Expire.objects.filter( buyer = self.request.user,
+                                             status = 'approved' 
+                                           )
+            
             if len ( expires ) >= settings.MAX_TRIALS:
                 form._errors['deal_type'] = ErrorList(["Sorry. You already have an active trial"])
                 
