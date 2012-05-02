@@ -27,6 +27,7 @@
 	    <nav class="topmenu">
 		   <!--tabpanel -->
             <div class="clearfix">
+            	{% if not user.is_authenticated %}
                 <a href="#loginPop" id="sign-in-btn" class="button submit gray left fancypop" style="margin-right: 6px"><span>Sign In</span></a>
                 {% if homepage %}
                 <a href="{% url or_signup %}" class="button submit orange left"><span>Sign Up</span></a>
@@ -37,6 +38,7 @@
                         $('#sign-in-btn').click();
                     })
                 </script>
+                {% endif %}
                 {% endif %}
             </div>
             {% if homepage %}
