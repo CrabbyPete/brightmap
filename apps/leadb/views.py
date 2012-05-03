@@ -1,7 +1,5 @@
 import re
 import settings
-import logging
-logger = logging.getLogger('leadbuyer')
 
 
 from datetime                       import datetime
@@ -29,6 +27,7 @@ from base.models                    import ( LeadBuyer, Chapter, Expire, Cancel,
                                              Deal, Term, Interest, Profile, Invoice, TERM_STATUS, Expire,
                                              Invite
                                             )
+
 from base.forms                     import LoginForm
 from base.mail                      import Mail 
 

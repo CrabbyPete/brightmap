@@ -15,6 +15,8 @@ from django.core.mail               import  EmailMessage
 from settings                       import SEND_EMAIL, SITE_BASE
 from datetime                       import datetime
 
+import logging
+logger = logging.getLogger('mail')
 
 
 class Mail():
@@ -31,7 +33,7 @@ class Mail():
         self.receivers = receivers
         self.subject   = subject
 
-        self.bcc = ['bcc@brightmap.com']
+        self.bcc = ['bcc@brightmap.com','pete@brightmap.com']
         if bcc:
             self.bcc.extend(bcc)
         else:
@@ -42,8 +44,11 @@ class Mail():
         template = loader.get_template('letters/'+template_name )
         
         # Set up the context
+        # Point to the correct URL
         if 'url' in kwargs:
             kwargs['url'] = SITE_BASE+kwargs['url']
+            
+        # Get all the arguments
         if 'kwargs' in kwargs:
             kwargs = kwargs['kwargs']
         
@@ -75,7 +80,7 @@ class Mail():
             msg.send()
         except Exception, e:
             err = "Email Send Error " + str(e)
-            #logger.error(self.log(err))
+            logger.error(self.log(err))
             return False
            
         return True

@@ -1,9 +1,11 @@
 # Python imports
 import re
 
-from datetime                       import date, datetime
+from datetime                       import date
+
+
 import  logging
-logger = logging.getLogger('organizer')
+logger = logging.getLogger('mail')
 
 # Django imports
 from django.views.generic.edit      import  FormView
@@ -17,13 +19,14 @@ from django.template                import  RequestContext
 from django.contrib.auth.decorators import  login_required
 
 #Local imports
-from base.mail                      import Mail
+
 from base.models                    import ( Profile,       Organization,   Chapter, 
                                              Interest,      Deal,           Event,
                                              Eventbrite,    Term,           Invite,
                                              TERM_STATUS
                                             )
 
+from base.mail                      import Mail
 from forms                          import OrganizerForm, CategoryForm, InviteForm, ServiceForm
 from base.forms                     import LoginForm
 
@@ -383,10 +386,15 @@ def dashboard( request ):
 
 @login_required
 def status( request ):
+    """
+    Change the status of a deal 
+    """
     if request.method == 'GET' and 'term' in request.GET:
         term = Term.objects.get(pk = request.GET['term'])
         if term.owner() == request.user and 'status' in request.GET:
             status = request.GET['status']
+            
+            # Email status changes to everyone
             if status in TERM_STATUS:
                 term.status = request.GET['status']
                 term.save()
@@ -401,6 +409,7 @@ def status( request ):
                 mail.send()
                 
     return HttpResponseRedirect(reverse('or_dash'))
+
 """
 def commissions( request ):
     chapter     = Chapter.objects.get(organizer = request.user )

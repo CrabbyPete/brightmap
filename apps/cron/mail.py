@@ -13,12 +13,14 @@ from django.template                import  loader, Context
 from django.core.mail               import  EmailMessage, get_connection
 
 from settings                       import SEND_EMAIL, SITE_BASE
-from datetime                       import datetime
 
+
+import logging
+logger = logging.getLogger('mail')
 
 class Mail():
     """
-    Mail class
+    Mail class. This version keeps the connection open until everything is finished sending.
     """
     def __init__(self):
         """
@@ -53,6 +55,7 @@ class Mail():
         # Set up the context
         if 'url' in kwargs:
             kwargs['url'] = SITE_BASE+kwargs['url']
+        
         if 'kwargs' in kwargs:
             kwargs = kwargs['kwargs']
         
@@ -78,6 +81,7 @@ class Mail():
             msg.send()
         except Exception, e:
             err = "Email Send Error " + str(e)
+            logger.error(self.log(err))
             return False
            
         return True

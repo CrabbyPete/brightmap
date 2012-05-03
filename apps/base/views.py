@@ -712,6 +712,7 @@ def remind( request ):
         sender     = 'requests@brightmap.com'
         recipients = [ term.deal.chapter.organizer.email ]
         bcc        = []
+    
     elif 'chapter' in request.GET:
         chapter = Chapter.objects.get( pk = request.GET['chapter'] )
         url = 'http://brightmap.com/'+reverse('or_setup')
