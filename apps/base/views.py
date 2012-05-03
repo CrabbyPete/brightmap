@@ -1,6 +1,7 @@
 # Python imports
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('mail')
+
 from datetime                       import datetime, timedelta, time
 
 

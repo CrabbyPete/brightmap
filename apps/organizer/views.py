@@ -481,6 +481,7 @@ def landing(request):
                          login = login, 
                          chapter=invite.chapter )
         else:
+            login = LoginForm(initial={'forgot':False})
             data = {'login':login}
 
     elif request.method == 'POST':

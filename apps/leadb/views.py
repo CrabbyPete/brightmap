@@ -896,11 +896,21 @@ def cancel_term(request):
         mail_organizer( request.user, term.deal, term, deal_type = 'cancel' )
     return HttpResponseRedirect(reverse('lb_dash'))
 
+
+
+import logging
+logger = logging.getLogger('django.request')
+
 def ajax(request):
+    """
+    Handle Ajax requests from invitations
+    """
     if 'chapter' in request.GET:
         try:
             chapter = Chapter.objects.get( name = request.GET['chapter'] )
-        except:
+        except Exception, e:
+            msg = "Chapter Error: %s for %s"%(str(e), request.GET['chapter'])
+            logger.error(msg)
             return
         
     template = loader.get_template('leadb/lb_community.html')
