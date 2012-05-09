@@ -677,13 +677,14 @@ class PaymentBudgetView( MultipleFormsView ):
         profile.address = address+'^'+city+'^'+state+'^'+zipcode
  
         # Create a Authorize.net CIM profile
-        kw = dict ( card_number         = card_number,
-                    expiration_date     = unicode(expiration),
-                    customer_id         = unicode( authorize.customer_id ),
-                    customer_profile_id = unicode( authorize.profile_id ),          
-                    profile_type        = CREDIT_CARD,
-                    email           = user.email,
-                    validation_mode = VALIDATION_LIVE
+        kw = dict ( card_number                 = card_number,
+                    expiration_date             = unicode(expiration),
+                    customer_id                 = unicode( authorize.customer_id ),
+                    customer_profile_id         = unicode( authorize.profile_id ),
+                    customer_payment_profile_id = unicode( authorize.payment_profile),     
+                    profile_type                = CREDIT_CARD,
+                    email                       = user.email,
+                    validation_mode             = VALIDATION_LIVE
                   )
     
         kw.update(billing)
@@ -694,9 +695,10 @@ class PaymentBudgetView( MultipleFormsView ):
                          )
     
         try:
-            response = cim_api.update_profile( **kw )
+            #response = cim_api.update_profile( **kw )
+            response = cim_api.update_payment_profile(**kw)
  
-        except Exception:
+        except Exception, e:
             forms['budget'] = self.budget_form()
             forms['payment']._errors['card_number'] = ErrorList( ['Credit Card Authorization Failed'] )
             return self.forms_invalid(forms)
