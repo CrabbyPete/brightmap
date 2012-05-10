@@ -1,0 +1,17 @@
+{% extends "admin/admin.html" %}
+
+{% block body_block %}
+	<table id = 'leadbuyer'>
+ 	{% for invite in invites %}
+        <tr>
+            <td>{{invite.pk}}</td>
+            <td><a href='{%url profile%}?user={{invite.user.pk}}'>{{invite.user.email}}</td>
+            <td>{{invite.user.first_name}}</td>
+            <td>{{invite.user.last_name}}</td>
+            <td>{{invite.chapter.name}}</td>
+            <td>{{invite.category}}
+            <td>{{invite.date}}
+        </tr>
+    {% endfor %}
+    </table>
+{% endblock %}

@@ -26,7 +26,7 @@ from passw                          import generate
 from models                         import ( Event, Chapter,  Profile,   LeadBuyer, 
                                              Deal,  Survey,   Invoice,   Connection,
                                              Term,  Interest, Eventbrite,Commission,
-                                             Letter  
+                                             Letter,Invite  
                                            )
                                         
 
@@ -702,6 +702,11 @@ def potential(request):
     c = Context({'leads':leadbuyers})         
     return render_to_response('admin/potential.html', c, context_instance=RequestContext(request))
         
+
+def invites(request):
+    invites = Invite.objects.filter( chapter = request.GET['chapter'] ).order_by('date').reverse()
+    c = Context({'invites':invites})         
+    return render_to_response('admin/invites.html', c, context_instance=RequestContext(request))
 
 def remind( request ):
     if 'term' in request.GET:

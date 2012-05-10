@@ -908,12 +908,13 @@ def ajax(request):
     Handle Ajax requests from invitations
     """
     if 'chapter' in request.GET:
+        chapter_name = request['chapter']
         try:
-            chapter = Chapter.objects.get( name = request.GET['chapter'] )
+            chapter = Chapter.objects.get( name = chapter_name )
         except Exception, e:
-            msg = "Chapter Error: %s for %s"%(str(e), request.GET['chapter'])
+            msg = "%s for %s" % (str(e), chapter_name )
             logger.error(msg)
-            return
+            chapter = None
         
     template = loader.get_template('leadb/lb_community.html')
     c = Context({'chapter':chapter})
