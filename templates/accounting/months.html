@@ -1,0 +1,18 @@
+{% extends "admin/admin.html" %}
+
+{% autoescape on %}
+{% block body_block %}
+	{% if months %}
+	<table id = 'invoices'>
+ 	{% for month in months %}
+        <tr>
+            <td>{{month}}</td>
+            <td><a href={% url invoice    %}?title={{month|urlencode}}> Invoices </a>
+            <td><a href={% url commission %}?title={{month|urlencode}}>Commissions</a>
+        </tr>
+    {% endfor %}
+    </table>
+	{% endif %}
+	
+{% endblock %}
+{% endautoescape %}

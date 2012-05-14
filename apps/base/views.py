@@ -596,6 +596,7 @@ class ConnectionView( FormView ):
         connection.save()        
         return HttpResponseRedirect(reverse('invoice'))
 
+""" Move to accounting
 class InvoiceView ( FormView):
     template_name   = 'admin/invoice.html'
     form_class      = InvoiceForm
@@ -625,6 +626,10 @@ class InvoiceView ( FormView):
             pay_commissions( invoice )
             if invoice.status == 'paid':
                 notify_user( invoice )
+        else:
+            invoice.status = form.cleaned_data['status']
+            invoice.credit = form.cleaned_data['credit']
+        
         invoice.save()
         return HttpResponseRedirect(reverse('invoice'))
 
@@ -660,7 +665,7 @@ class CommissionView ( FormView ):
                 commission.status = 'paid'
                 commission.save()
         return HttpResponseRedirect(reverse('commission'))
-            
+"""            
 class LetterView( FormView ):
     initial = {}
     template_name   = 'admin/letter.html'

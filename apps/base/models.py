@@ -94,7 +94,7 @@ class Commission( models.Model ):
     status      = models.CharField( max_length = 20, default ='pending' )
 
     def __unicode__(self):
-        return self.chapter.name +':'+self.invoice
+        return self.chapter.name +':'+self.invoice.title
 
 
 class Organization( models.Model ):
@@ -445,7 +445,7 @@ class Term( models.Model ):
 
     def total( self, dates = None ):
         connections = self.connections( dates )
-        price = 0;
+        price = 0
         for connection in connections:
             if connection.status == 'sent':
                 price += self.cost

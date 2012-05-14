@@ -9,19 +9,13 @@
             <td><a href='{%url invoice%}?invoice={{invoice.pk}}'>{{invoice.user.first_name}}{{invoice.user.last_name}}</a></td>
             <td>{{ invoice.user.email }}</td>
             <td>{{ invoice.title }}</td>
-            <td>{{invoice.issued|date:"M d, Y" }}</td>
+            <td>{{invoice.issued|date:"d M Y" }}</td>
             <td>{{invoice.cost}}</td>
             <td>{{invoice.status}}</td>
-            <!--  
-            <td>{{invoice.commissions|length}}
-            -->
-            <td>{% for c in invoice.commissions %}{{c}}{%endfor %}</td>
-            {% if invoice.authorized %}
-            <td>Billable</td>
-            {% endif %}
         </tr>
     {% endfor %}
     </table>
+    <p>Income = {{income}} Commissions = {{commissions}} Total = {{total}} Split={{split}}</p>
 	{% endif %}
 	
 	{% if form %}
