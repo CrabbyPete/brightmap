@@ -97,6 +97,8 @@ class Commission( models.Model ):
         return self.chapter.name +':'+self.invoice.title
 
 class Split( models.Model ):
+    """ Profit split records
+    """
     payee       = models.CharField( max_length = 200 )
     issued      = models.DateTimeField( auto_now_add = True )
     cost        = models.DecimalField( max_digits = 10, decimal_places = 2, default = 0.00 )
