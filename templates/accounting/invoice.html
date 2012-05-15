@@ -2,7 +2,7 @@
 
 {% block body_block %}
 	{% if invoices %}
-	<table id = 'invoices'>
+	<table id = 'invoices'> 
  	{% for invoice in invoices %}
         <tr>
             <td>{{invoice.pk}}</td>
@@ -15,7 +15,8 @@
         </tr>
     {% endfor %}
     </table>
-    <p>Income = {{income}} Commissions = {{commissions}} Total = {{total}} Split={{split}}</p>
+    <p>Income = {{income}} Commissions = {{commissions}} Total = {{total}} <a href={%url split%}?title={{title|urlencode}}>Split={{split}}</a>
+    </p>
 	{% endif %}
 	
 	{% if form %}

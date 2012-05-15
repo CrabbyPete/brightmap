@@ -1,0 +1,29 @@
+{% extends "admin/admin.html" %}
+
+{% block body_block %}
+	{% if splits %}
+	<table id = 'invoices'>
+ 	{% for split in splits %}
+        <tr>
+            <td><a href={% url splitview %}?split={{split.pk}}>{{split.pk}}</a></td>
+            <td>{{ split.payee }}</td>
+            <td>{{ split.memo }}</td>
+            <td>{{split.issued|date:"d M Y" }}</td>
+            <td>{{split.cost}}</td>
+            <td>{{split.status}}</td>
+        </tr>
+    {% endfor %}
+    </table>
+	{% endif %}
+	
+	{% if form %}
+    	<form action="{% url splitview %}?split={{split.pk}}" method="post" >
+       	{% csrf_token %}
+       		<fieldset>
+ 				{{form}}
+        		<input type="submit" name="submit", value="Issue" />
+    		</fieldset>
+    	</form>
+    </form>
+    {% endif %}
+{% endblock %}
