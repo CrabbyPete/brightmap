@@ -2,28 +2,19 @@
 import logging
 logger = logging.getLogger('mail')
 
-from datetime                       import datetime, timedelta, time
-
-
 # Django imports
-from django.contrib                 import  auth
-from django.contrib.auth.models     import  User
 from django.http                    import  HttpResponseRedirect
-from django.forms.util              import  ErrorList
 from django.shortcuts               import  render_to_response
 from django.template                import  RequestContext
 from django.views.decorators.csrf   import  csrf_protect
 from django.core.urlresolvers       import  reverse
-from django.core.exceptions         import  ObjectDoesNotExist
 from django.views.generic.edit      import  FormView
-from django.template                import  loader, Context
+from django.template                import  Context
 from django.contrib.auth.decorators import  login_required
 
-# Local imports
-import settings
 
 
-from base.models                    import (Chapter, Invoice, Commission)
+from base.models                    import ( Chapter, Invoice, Commission, Split )
 from base.mail                      import Mail
                                         
 
@@ -33,12 +24,15 @@ from authorize                      import cim
 from authorize.gen_xml              import VALIDATION_TEST, AUTH_ONLY
 from authorize.responses            import AuthorizeError, _cim_response_codes
 
-# Import accounting functions
-from cron.accounting                import invoice_user, bill_user, notify_user, pay_commissions
-from paypal                         import pay_commission
+# Import locals
+from cron.accounting                import ( invoice_user, 
+                                             bill_user, 
+                                             notify_user,
+                                             make_commissions 
+                                            )
 
-
-from forms                          import InvoiceForm, CommissionForm
+from paypal                         import pay_user
+from forms                          import InvoiceForm, CommissionForm, SplitForm
 
 @login_required
 def months( request ):
@@ -49,12 +43,67 @@ def months( request ):
     
     c = Context({'months':months})         
     return render_to_response('accounting/months.html', c, context_instance=RequestContext(request))
+
+def calc_split(invoices):
+        income      = 0.0
+        commissions = 0.0
+        
+        for invoice in invoices:
+            if invoice.status == 'paid':
+                income += float(invoice.cost) - float(invoice.credit)
+                for com in invoice.commissions():
+                    if com.status == 'paid':
+                            commissions += float(com.cost)
+        return income, commissions
+
+@login_required
+def split( request ):
+    if request.GET and 'title' in request.GET:
+        invoices = Invoice.objects.filter(title = request.GET['title'])
+        income, commissions = calc_split( invoices )
+        total = income - commissions
+        cost  = .25 * total
+        memo  = request.GET['title']
+        
+        try:
+            pete = Split.objects.get( payee = 'pete.douma@gmail.com',
+                                       memo  = memo
+                                     )
+        except Split.DoesNotExist:
+            pete  = Split( memo = request.GET['title'], 
+                           cost = cost,
+                           payee = 'pete.douma@gmail.com',
+                           status = 'pending'
+                         )
+        else:
+            pete.cost = cost
+        pete.save()
+        
+        try:
+            graham = Split.objects.get( payee = 'graham@ultralightstartups.com',
+                                       memo  = memo
+                                     )
+        except Split.DoesNotExist:
+            graham = Split( memo = request.GET['title'],
+                            cost = cost,
+                            payee = 'graham@ultralightstartups.com',
+                            status = 'pending',
+                          )
+        else:
+            graham.cost = cost
+        
+        graham.save()
     
-class InvoiceView ( FormView):
+    splits = Split.objects.all()
+    c = Context({'splits':splits})         
+    return render_to_response('accounting/split.html', c, context_instance=RequestContext(request))
+        
+class InvoiceView ( FormView ):
     template_name   = 'accounting/invoice.html'
     form_class      = InvoiceForm
     
     def get(self, request, *args, **kwargs):
+        context = {}
         if 'invoice' in request.GET:
             invoice = Invoice.objects.get(pk = request.GET['invoice'])
            
@@ -68,42 +117,39 @@ class InvoiceView ( FormView):
         
             return self.render_to_response( {'form':form, 'invoice':invoice, 'connections':connections} )
         
-        total       = 0.0
-        income      = 0.0
-        commissions = 0.0
+        
         
         if 'title' in request.GET:
             invoices = Invoice.objects.filter(title = request.GET['title'])
-            for invoice in invoices:
-                if invoice.status == 'paid':
-                    income += float(invoice.cost) - float(invoice.credit)
-                    for com in invoice.commissions():
-                        if com.status == 'paid':
-                            commissions += float(com.cost)
-                
-                
-        else:
-            invoices = Invoice.objects.all().order_by('issued').reverse()
-        
-        total = income - commissions
-        return self.render_to_response( {'income'     :income, 
-                                         'commissions':commissions,
-                                         'total'      :total,
-                                         'split'      : 0.25 * total,
-                                         'invoices'   :invoices} )
+            income, commissions = calc_split( invoices )
+            context['title'] = request.GET['title']                
+   
+        context.update( income = income, 
+                        commissions = commissions,
+                        total = income - commissions,
+                        split = .25 * (income - commissions),
+                        invoices = invoices
+                      )
+ 
+        return self.render_to_response( context )
         
          
     def form_valid(self, form ):
         invoice = Invoice.objects.get( pk = self.request.GET['invoice'] )
+        
+        # If any thing changed add it first
+        invoice.status = form.cleaned_data['status']
+        invoice.credit = form.cleaned_data['credit']
+        
+        # Collect pending invoices
         if invoice.status == 'pending' and invoice.cost > 0:
             invoice = bill_user ( invoice )
-            pay_commissions( invoice )
+            
+            # Calculate commissions
+            make_commissions( invoice )
             if invoice.status == 'paid':
                 notify_user( invoice )
-        
-        else:
-            invoice.status = form.cleaned_data['status']
-            invoice.credit = form.cleaned_data['credit']
+  
         invoice.save()
         return HttpResponseRedirect(reverse('months'))
 
@@ -129,8 +175,9 @@ class CommissionView ( FormView ):
         return self.render_to_response( {'commissions':commissions} )
     
     def form_valid(self, form ): 
-        cost    = form.cleaned_data['cost']
+        cost     = form.cleaned_data['cost']
         #chapter = form.cleaned_data['chapter']
+        
         commission = Commission.objects.get( pk = self.request.GET['commission'] )
         paypal = commission.chapter.paypal
         if paypal:
@@ -138,9 +185,35 @@ class CommissionView ( FormView ):
                                                                               commission.invoice.user.first_name,
                                                                               commission.invoice.user.last_name 
                                                                           )
-            if  pay_commission( paypal, cost, memo ):
+            if  pay_user( paypal, cost, memo ):
                 commission.status = 'paid'
                 commission.save()
+        
         return HttpResponseRedirect(reverse('commission'))
             
+
+class SplitView ( FormView ):
+    template_name   = 'accounting/split.html'
+    form_class      = SplitForm
+    
+    def get(self, request, *args, **kwargs):
+        if 'split' in request.GET:
+            split = Split.objects.get(pk = request.GET['split'])
+            form = SplitForm( instance = split )
+        return self.render_to_response( {'form':form, 'split':split}  )
+    
+    def form_valid(self, form, *args, **kwargs ):
+        split = Split.objects.get(pk = self.request.GET['split'] )
+        
+        status = form.cleaned_data['status']
+        memo   = form.cleaned_data['memo']
+        cost   = form.cleaned_data['cost']
+        paypal = form.cleaned_data['payee']
+        
+        if status == 'pending':
+            if  pay_user( paypal, cost, memo ):
+                split.status = 'paid'
+        split.save()
+            
+        return HttpResponseRedirect(reverse('months'))
 

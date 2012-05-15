@@ -28,7 +28,6 @@ from base.mail                      import  Mail
 from accounting                     import  accounting
 #from nameparser                     import  HumanName
 
-
 TODAY = datetime.today()
 
 def log( message ):

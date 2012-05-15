@@ -96,6 +96,12 @@ class Commission( models.Model ):
     def __unicode__(self):
         return self.chapter.name +':'+self.invoice.title
 
+class Split( models.Model ):
+    payee       = models.CharField( max_length = 200 )
+    issued      = models.DateTimeField( auto_now_add = True )
+    cost        = models.DecimalField( max_digits = 10, decimal_places = 2, default = 0.00 )
+    memo        = models.CharField( max_length = 255 ) 
+    status      = models.CharField( max_length = 20, default ='pending' )
 
 class Organization( models.Model ):
     """

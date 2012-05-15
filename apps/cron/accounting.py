@@ -1,5 +1,6 @@
 # Import Python librariess
 import                              django_header
+
 import logging
 logger = logging.getLogger('accounting')
 
@@ -36,8 +37,10 @@ def days_of_month (month = None, year = None):
     return first_day, last_day
 
 
-def pay_commissions( invoice ):
-    
+def make_commissions( invoice ):
+    """ Create all the commission records for an invoice
+        invoice - invoice to use
+    """
     chapters = {}
     for connection in invoice.connections():
         chapter = connection.term.deal.chapter
@@ -122,8 +125,11 @@ def bill_user( invoice ):
         invoice.save()
         return invoice
     
+    # Reconcile costs and credits
+    amount = invoice.cost - invoice.credit
+    
     try:
-        response = cim_api.create_profile_transaction(  amount                      = invoice.cost,
+        response = cim_api.create_profile_transaction(  amount                      = amount,
                                                         customer_profile_id         = authorize.profile_id,
                                                         customer_payment_profile_id = authorize.payment_profile,
                                                         profile_type                = AUTH_CAPTURE,

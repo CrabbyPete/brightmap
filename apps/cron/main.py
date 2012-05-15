@@ -13,9 +13,8 @@ from django.core.urlresolvers       import  reverse
 # Local libraries
 from nameparser                     import  HumanName
 from eventapi                       import  EventBrite
-from base.models                    import ( Event, Profile, Survey, Interest, Deal, Expire,
-                                             Organization, Connection, LeadBuyer, Invoice,
-                                             Cancel, Invite
+from base.models                    import ( Event, Profile, Survey, Interest, Deal, 
+                                             Organization, Connection, LeadBuyer, Invite
                                             )
 
 from social.models                  import AuthToken
@@ -23,9 +22,6 @@ from social.models                  import AuthToken
 from mail                           import  Mail
 Mail = Mail()
  
-from base.passw                     import  gen
-
-
 import logging
 logger = logging.getLogger('main.py')
 
@@ -131,8 +127,8 @@ def attendee_user( attendee ):
                                               email    = attendee['email'],
                                               password = password
                                             )
-        except Exception, e:
-            message = "Exception creating user:" + str(e)
+        except Exception, error:
+            message = "Exception creating user:" + str(error)
             print message
             logger.error( message )
             return None
@@ -155,7 +151,7 @@ def attendee_user( attendee ):
         
     except KeyError:
         if 'email' in attendee:
-            print log("No email address for:%s %s"%(attendee['email'],))
+            print log("No email address for:%s"%(attendee['email'],))
         else:
             print log("No Attendee information recieved",'red')
             return None
@@ -315,9 +311,12 @@ def filter_company( company ):
     """
     if not company:
         return company
-    c = company.lower().strip()
-    if c in ['freelancer','na','n/a','self','']:
+    
+    # Normalize the company name and see if its a company name
+    normalize = company.lower().strip()
+    if normalize in ['freelancer', 'na', 'n/a', 'self', '']:
         return None
+    
     return company
  
 
@@ -532,7 +531,7 @@ if __name__ == '__main__':
     op.add_option('-a', action="store_true", help = 'Do not run accounting')
     op.add_option('-e', action="store_true", help = 'Do not check for trial deal')
 
-    opts,args = op.parse_args()
+    opts, args = op.parse_args()
 
     # Check if options were set
     if opts.d:

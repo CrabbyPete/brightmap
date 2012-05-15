@@ -49,8 +49,6 @@ from authorize.gen_xml              import VALIDATION_TEST, AUTH_ONLY
 from authorize.responses            import AuthorizeError, _cim_response_codes
 
 # Import accounting functions
-from cron.accounting                import invoice_user, bill_user, notify_user, pay_commissions
-from paypal                         import pay_commission
 from base.mail                      import Mail
 
 def homepage( request ):
@@ -596,76 +594,7 @@ class ConnectionView( FormView ):
         connection.save()        
         return HttpResponseRedirect(reverse('invoice'))
 
-""" Move to accounting
-class InvoiceView ( FormView):
-    template_name   = 'admin/invoice.html'
-    form_class      = InvoiceForm
-    
-    def get(self, request, *args, **kwargs):
-        if 'invoice' in request.GET:
-            invoice = Invoice.objects.get(pk = request.GET['invoice'])
-           
-            # Update to the latest invoice
-            updated_invoice = invoice_user ( invoice.user, invoice.first_day, invoice.last_day )
-            if updated_invoice:
-                invoice = updated_invoice
-            
-            connections = invoice.connections()
-            form = InvoiceForm(instance = invoice)
-            
-            return self.render_to_response( {'form':form, 'invoice':invoice, 'connections':connections} )
-        
-        invoices = Invoice.objects.all().order_by('issued').reverse()
-        return self.render_to_response( {'invoices':invoices} )
-        
-         
-    def form_valid(self, form ):
-        invoice = Invoice.objects.get( pk = self.request.GET['invoice'] )
-        if invoice.status == 'pending' and invoice.cost > 0:
-            invoice = bill_user ( invoice )
-            pay_commissions( invoice )
-            if invoice.status == 'paid':
-                notify_user( invoice )
-        else:
-            invoice.status = form.cleaned_data['status']
-            invoice.credit = form.cleaned_data['credit']
-        
-        invoice.save()
-        return HttpResponseRedirect(reverse('invoice'))
 
-class CommissionView ( FormView ):
-    template_name   = 'admin/commission.html'
-    form_class      = CommissionForm
-
-    def get(self, request, *argv, **kwargs ):
-        if 'commission' in request.GET:
-            commission = Commission.objects.get(pk = request.GET['commission'])
-            form = CommissionForm( instance = commission )
-            return self.render_to_response({'form':form, 'commission':commission})
-        
-        if 'chapter' in request.GET:
-            chapter = Chapter.objects.get(pk = request.GET['chapter'])
-            commissions = Commission.objects.filter( chapter = chapter )
-        else:
-            commissions = Commission.objects.all()
-        
-        return self.render_to_response( {'commissions':commissions} )
-    
-    def form_valid(self, form ): 
-        cost    = form.cleaned_data['cost']
-        #chapter = form.cleaned_data['chapter']
-        commission = Commission.objects.get( pk = self.request.GET['commission'] )
-        paypal = commission.chapter.paypal
-        if paypal:
-            memo = ' %s commission payment for leads generated for %s %s'%(commission.chapter.name,
-                                                                              commission.invoice.user.first_name,
-                                                                              commission.invoice.user.last_name 
-                                                                          )
-            if  pay_commission( paypal, cost, memo ):
-                commission.status = 'paid'
-                commission.save()
-        return HttpResponseRedirect(reverse('commission'))
-"""            
 class LetterView( FormView ):
     initial = {}
     template_name   = 'admin/letter.html'
