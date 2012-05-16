@@ -25,7 +25,7 @@ from base.models                    import  ( Term,
                                             )
 
 from base.mail                      import  Mail 
-from accounting                     import  accounting
+from accountant                     import  accounting
 #from nameparser                     import  HumanName
 
 TODAY = datetime.today()
