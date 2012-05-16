@@ -166,6 +166,7 @@ class CommissionView ( FormView ):
         if 'chapter' in request.GET:
             chapter = Chapter.objects.get(pk = request.GET['chapter'])
             commissions = Commission.objects.filter( chapter = chapter )
+        
         elif 'title' in request.GET:
             invoices = Invoice.objects.filter(title = request.GET['title'])
             commissions = []
@@ -189,7 +190,7 @@ class CommissionView ( FormView ):
                 commission.status = 'paid'
                 commission.save()
         
-        return HttpResponseRedirect(reverse('commission'))
+        return HttpResponseRedirect( reverse('commission')+'?title='+str(commission.invoice.title) )
             
 
 class SplitView ( FormView ):
