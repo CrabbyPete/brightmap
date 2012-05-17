@@ -908,7 +908,7 @@ def ajax(request):
     Handle Ajax requests from invitations
     """
     if 'chapter' in request.GET:
-        chapter_name = request['chapter']
+        chapter_name = request.GET['chapter']
         try:
             chapter = Chapter.objects.get( name = chapter_name )
         except Exception, e:
