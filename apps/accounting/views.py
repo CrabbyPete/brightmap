@@ -115,21 +115,22 @@ class InvoiceView ( FormView ):
             connections = invoice.connections()
             form = InvoiceForm(instance = invoice)
         
-            return self.render_to_response( {'form':form, 'invoice':invoice, 'connections':connections} )
-        
+            context = {'form':form, 'invoice':invoice, 'connections':connections}
+ 
         
         
         if 'title' in request.GET:
             invoices = Invoice.objects.filter(title = request.GET['title'])
             income, commissions = calc_split( invoices )
-            context['title'] = request.GET['title']                
-   
-        context.update( income = income, 
-                        commissions = commissions,
-                        total = income - commissions,
-                        split = .25 * (income - commissions),
-                        invoices = invoices
-                      )
+    
+            context.update(
+                           title = request.GET['title'], 
+                           income = income, 
+                           commissions = commissions,
+                           total = income - commissions,
+                           split = .25 * (income - commissions),
+                           invoices = invoices
+                           )
  
         return self.render_to_response( context )
         

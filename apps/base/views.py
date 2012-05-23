@@ -592,7 +592,7 @@ class ConnectionView( FormView ):
         status = form.cleaned_data['status']
         connection.status = status
         connection.save()        
-        return HttpResponseRedirect(reverse('invoice'))
+        return HttpResponseRedirect(reverse('months'))
 
 
 class LetterView( FormView ):
