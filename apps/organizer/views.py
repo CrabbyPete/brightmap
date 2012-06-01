@@ -298,7 +298,7 @@ class InviteView(FormView):
             # Make sure its a legit email address
             if re.match("^[a-zA-Z0-9._%-+]+@[a-zA-Z0-9._%-]+.[a-zA-Z]{2,6}$", email ):
                 mail = Mail( chapter.organizer.email,
-                             email, 
+                             [email], 
                              subject, 
                              template_name = template_name,
                              chapter = chapter,

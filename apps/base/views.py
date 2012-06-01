@@ -203,11 +203,11 @@ def login(request):
         form._errors['username']  = ErrorList(["User does not exist or wrong password"])
         return submit_form(form)
 
-
+"""
 def community(request):
     return render_to_response('community.html', {},
                                context_instance=RequestContext(request))
-
+"""
 def terms(request):
     return render_to_response('terms.html', {},
                                context_instance=RequestContext(request))
