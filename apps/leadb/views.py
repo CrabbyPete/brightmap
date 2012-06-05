@@ -450,6 +450,8 @@ class BillView( TemplateView ):
     def get_context_data(self):
         if 'invoice' in self.request.GET:
             invoice = Invoice.objects.get(pk=self.request.GET['invoice'])
+            if invoice.user != self.request.user:
+                return {}
         else:
             try:
                 invoice = Invoice.objects.filter(user = self.request.user).latest('issued')
