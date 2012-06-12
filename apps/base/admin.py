@@ -23,6 +23,7 @@ admin.site.register( Invite )
 
 class ProfileAdmin(admin.ModelAdmin):
     ordering = ['user__email'] 
+    search_fields = ['user__email']
       
 admin.site.register(Profile, ProfileAdmin)
 
