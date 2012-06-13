@@ -485,11 +485,26 @@ def landing(request):
             data = {'login':login}
 
     elif request.method == 'POST':
-        invite = Invite.objects.get(pk = request.POST['invite'])
-        invite.category = request.POST['service']
-        invite.save()
         login = LoginForm(initial={'forgot':False})
-        data = dict( invite = invite, pop = False, login = login, chapter = invite.chapter )    
+        if 'invite' in request.POST:
+            try:
+                invite = Invite.objects.get(pk = request.POST['invite'])
+            except Invite.DoesNotExist:
+                invite  = None
+                chapter = None
+            else:
+                if 'service' in request.POST:
+                    invite.category = request.POST['service']
+                    invite.save()
+                chapter = invite.chapter
+                
+            data = dict( invite = invite, 
+                         pop = False, 
+                         login = login, 
+                         chapter = chapter )    
+    
+        else:
+            data = dict( pop = False, login = login )
     
     return render_to_response( 'organizer/or_landing.html', 
                                 data, 

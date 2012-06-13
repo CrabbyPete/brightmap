@@ -239,7 +239,7 @@ class Invite( models.Model ):
     date          = models.DateTimeField( auto_now_add = True )
     
     def __unicode__(self):
-        return self.chapter.name +'-'+self.email
+        return str(self.pk)+'-'+self.chapter.name +'-'+self.user.email
     
 class Eventbrite( models.Model ):
     """
