@@ -93,6 +93,8 @@ def warn_user( term, warning = False ):
     return
 
 def check_expired():
+    """ Check if a trial deal expires
+    """
     expires = Expire.objects.filter(status='approved')
     for expire in expires:
         
@@ -124,7 +126,15 @@ def check_expired():
         elif expire.date == warning_day and connections > 0:
             print str( expire.pk ) + ' ' + expire.buyer.last_name +' ' + expire.date.strftime("%Y-%m-%d %H:%M")
             warn_user( expire, warning = True )
-            
+        
+        elif connections > 20:
+            print str( expire.pk ) + ' ' + expire.buyer.last_name +' ' +\
+                  expire.date.strftime("%Y-%m-%d %H:%M") + ' ' + 'connections' + ' ' + str(connections)
+            warn_user( expire) 
+        
+        elif days_left.days < -100:
+            expire.canceled()            
+
 def convert_pending_deals():
     terms = Term.objects.filter( status = 'pending' )
     
@@ -156,7 +166,7 @@ def convert_pending_deals():
             expires = Expire.objects.filter ( deal = term.deal, status='approved' )
             if len ( expires ) > 0:
                 continue
-            
+                   
         term.status = 'approved'
         term.save()
         print "Converting deal: " + term.deal.chapter.name + '-' +\
