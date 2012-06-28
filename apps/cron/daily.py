@@ -127,15 +127,17 @@ def check_expired():
             print str( expire.pk ) + ' ' + expire.buyer.last_name +' ' + expire.date.strftime("%Y-%m-%d %H:%M")
             warn_user( expire, warning = True )
         
+        elif days_left.days < -100:
+            expire.canceled()            
+
         """
         elif connections > 20:
             print str( expire.pk ) + ' ' + expire.buyer.last_name +' ' +\
                   expire.date.strftime("%Y-%m-%d %H:%M") + ' ' + 'connections' + ' ' + str(connections)
             warn_user( expire) 
         """
-        elif days_left.days < -100:
-            expire.canceled()            
-
+        
+        
 def convert_pending_deals():
     terms = Term.objects.filter( status = 'pending' )
     
