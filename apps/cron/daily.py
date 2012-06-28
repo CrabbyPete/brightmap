@@ -127,11 +127,12 @@ def check_expired():
             print str( expire.pk ) + ' ' + expire.buyer.last_name +' ' + expire.date.strftime("%Y-%m-%d %H:%M")
             warn_user( expire, warning = True )
         
+        """
         elif connections > 20:
             print str( expire.pk ) + ' ' + expire.buyer.last_name +' ' +\
                   expire.date.strftime("%Y-%m-%d %H:%M") + ' ' + 'connections' + ' ' + str(connections)
             warn_user( expire) 
-        
+        """
         elif days_left.days < -100:
             expire.canceled()            
 
@@ -167,12 +168,17 @@ def convert_pending_deals():
             if len ( expires ) > 0:
                 continue
                    
+        print "Deal: " + term.deal.chapter.name + '-' +\
+                        term.deal.interest.interest + ' for ' +\
+                        term.buyer.first_name + ' ' + term.buyer.last_name 
+                                    
+        ans = raw_input('Convert? (y/n)')
+        if not ans == 'y':
+            continue
+            
         term.status = 'approved'
         term.save()
-        print "Converting deal: " + term.deal.chapter.name + '-' +\
-                                    term.deal.interest.interest + ' for ' +\
-                                    term.buyer.first_name + ' ' + term.buyer.last_name 
-                                    
+ 
         subject = term.deal.chapter.name + ' sponsorship approved'
         mail = Mail( "deals@brightmap.com",
                      [term.buyer.email, term.deal.chapter.organizer.email],
