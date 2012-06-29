@@ -3,7 +3,14 @@ import settings
 
 # Python libraries
 from datetime                       import  datetime, timedelta
-from termcolor                      import  colored
+
+# Termcolor only works on Linux or Posix systems
+import os
+if not os.name == 'nt':
+    from termcolor                      import  colored
+else:
+    def colored( string, color ):
+        return string
 
 # Django libraries
 from django.contrib.auth.models     import  User
@@ -328,8 +335,9 @@ def make_contact( survey, deal, letter ):
     if deal == None:
         return
 
-    # Go through all the active deals
-    active = deal.active()
+    # Set the interest and go through all the active deals
+    interest = deal.interest
+    active   = deal.active()
     for term in active:
         
         #print "Term " + str( term.pk )+ " Active "+ str( len(active) )
@@ -362,7 +370,6 @@ def make_contact( survey, deal, letter ):
         sponser      = term.buyer
         attendee     = survey.attendee
         event        = survey.event
-        interest     = deal.interest
         organizer    = survey.event.chapter.organizer
         chapter      = event.chapter
         
