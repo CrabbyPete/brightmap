@@ -461,11 +461,13 @@ class Term( models.Model ):
 
     
     def this_month(self):
-        first = datetime.today().replace(day = 1)
+        first = datetime.combine( datetime.today().replace(day = 1), time.min)
         if first.month == 12:
             last = first.replace(day = 31)
         else:
             last  = first.replace (month = first.month + 1 ) - timedelta( days = 1 )
+        last = datetime.combine( last, time.max ) 
+        
         return (first,last)
     
     def monthly_connections( self ):
