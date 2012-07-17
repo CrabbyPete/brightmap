@@ -7,7 +7,7 @@
     		<a href='{% url deal %}?deal={{deal.pk}}'>{{ deal }} {{deal.active|length}}</a><br/>
  		{% endfor %}
  		</br>
- 		<a href='{% url term %}?chapter={{chapter.pk}}'>View all Terms</a><br/>
+ 		<a href='{% url term %}?chapter={{chapter.pk}}'>View all active Terms</a><br/>
  		<a href='{% url deal %}?deal=new'}>Create New Deal</a>
  	{% endif %}
  	

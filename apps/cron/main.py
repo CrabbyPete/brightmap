@@ -3,6 +3,8 @@ import settings
 
 # Python libraries
 from datetime                       import  datetime, timedelta
+from decimal                        import  Decimal
+
 
 # Termcolor only works on Linux or Posix systems
 import os
@@ -295,21 +297,47 @@ def days_of_month (month = None):
 
 
 
-def check_budget( term ):
+def check_budget( terms ):
+    """ Return a list of terms, that don't exceed the budget in order of budget size
     """
-    Check if the LeadBuy has gone over budget
-    """
-    leadbuyer = LeadBuyer.objects.get( user = term.buyer )
-    if not leadbuyer.budget:
-        return True
-           
-    connections = Connection.objects.for_buyer( term.buyer, days_of_month() )
-    total = sum( connection.term.cost for connection in connections if connection.status == 'sent' )
- 
-    if total >= leadbuyer.budget:
-        return False
     
-    return True
+    term_list = []
+    budget    = []
+    for term in terms:
+        if term == None:
+            continue
+        
+        leadbuyer = LeadBuyer.objects.get( user = term.buyer )
+    
+        # If the budget is 0 they get unlimited leads, make it 1 million to sort correctly 
+        if not leadbuyer.budget:
+            term_list.append(term)
+            budget.append(Decimal(1000000))
+            continue
+
+           
+        # Count the number of connections sent
+        connections = Connection.objects.for_buyer( term.buyer, days_of_month() )
+        total = sum( connection.term.cost for connection in connections if connection.status == 'sent' )
+ 
+        if total >= leadbuyer.budget:
+            continue
+    
+        term_list.append(term)
+        budget.append(leadbuyer.budget)
+    
+    
+    # If you have more that 1 sort the list according to size of budget
+    if len( term_list ) > 1:
+        sort_list = zip( budget, term_list)
+        sort_list.sort()
+        
+        # Undo the zip and return a list
+        term_list = list ( zip(*sort_list)[1])
+    
+    return term_list
+    
+    
 
 
 def filter_company( company ):
@@ -327,6 +355,62 @@ def filter_company( company ):
     return company
  
 
+def add_connection( survey, term, letter ):
+    """ Add the connection and send email to user and leadbuyer
+    """
+    # Determine if you did this or not
+    connection = survey.event.add_connection( survey, term )
+    if not connection:
+        return
+
+    # Count email so you don't spam
+    survey.mailed += 1
+    survey.save()
+
+    # Set up the email template
+    sponser      = term.buyer
+    attendee     = survey.attendee
+    event        = survey.event
+    organizer    = survey.event.chapter.organizer
+    chapter      = event.chapter
+        
+    # Check if they put in a company or junk
+    company      = attendee.get_profile().company
+    company      = filter_company(company)
+  
+    # Check if the leadbuyer is the organizer and if they have a letter
+    if sponser == organizer:
+        letter = 'self_referral.tmpl'
+  
+    # Render the message and log it
+    deal        = term.deal
+    interest    = deal.interest
+    print_connection( attendee, sponser, interest )
+        
+    # If the prompt was set ask before sending
+    if PROMPT:
+        ans = raw_input('Send Connection? (y/n)')
+        if ans != 'y':
+            return
+        
+        
+    subject = deal.chapter.organization.name + ' Intro: '+ interest.interest + ' for ' + attendee.first_name + ' ' + attendee.last_name
+    recipients = [ '%s %s <%s>'% ( attendee.first_name, attendee.last_name, attendee.email ),
+                       '%s %s <%s>'% ( sponser.first_name, sponser.last_name, sponser.email )
+                 ]
+
+    sender =  '%s %s <%s>' % ( organizer.first_name, organizer.last_name, organizer.email )    
+    Mail.message( sender, recipients, subject, letter, bcc = [sender],
+                      interest   = interest,
+                      attendee   = attendee,
+                      sponser    = sponser,
+                      organizer  = organizer,
+                      chapter    = chapter,
+                      event      = event,
+                      company    = company
+                ) 
+
+
 def make_contact( survey, deal, letter ):
     """
     Send an email to those attendees who answered the survey and have a
@@ -336,9 +420,9 @@ def make_contact( survey, deal, letter ):
         return
 
     # Set the interest and go through all the active deals
-    interest = deal.interest
     active   = deal.active()
-    for term in active:
+    terms    = check_budget( active )
+    for term in terms:
         
         #print "Term " + str( term.pk )+ " Active "+ str( len(active) )
         # During test sometimes None would be set to a term, make sure term exists
@@ -353,59 +437,9 @@ def make_contact( survey, deal, letter ):
         if survey.mails_for() > MAX_MAIL_SEND:
             continue
            
-        # Determine if the budget is exceeded, don't send the connection
-        if not check_budget( term ):
-            continue
-            
-        # Determine if you did this or not
-        connection = survey.event.add_connection( survey, term )
-        if not connection:
-            continue
+        add_connection(survey, term, letter)
+        break
 
-        # Count email so you don't spam
-        survey.mailed += 1
-        survey.save()
-
-        # Set up the email template
-        sponser      = term.buyer
-        attendee     = survey.attendee
-        event        = survey.event
-        organizer    = survey.event.chapter.organizer
-        chapter      = event.chapter
-        
-        # Check if they put in a company or junk
-        company      = attendee.get_profile().company
-        company      = filter_company(company)
-  
-        # Check if the leadbuyer is the organizer and if they have a letter
-        if sponser == organizer:
-            letter = 'self_referral.tmpl'
-  
-        # Render the message and log it
-        print_connection( attendee, sponser, interest )
-        
-        # If the prompt was set ask before sending
-        if PROMPT:
-            ans = raw_input('Send Connection? (y/n)')
-            if ans != 'y':
-                continue
-        
-        
-        subject = deal.chapter.organization.name + ' Intro: '+ interest.interest + ' for ' + attendee.first_name + ' ' + attendee.last_name
-        recipients = [ '%s %s <%s>'% ( attendee.first_name, attendee.last_name, attendee.email ),
-                       '%s %s <%s>'% ( sponser.first_name, sponser.last_name, sponser.email )
-                     ]
-
-        sender =  '%s %s <%s>' % ( organizer.first_name, organizer.last_name, organizer.email )    
-        Mail.message( sender, recipients, subject, letter, bcc = [sender],
-                      interest   = interest,
-                      attendee   = attendee,
-                      sponser    = sponser,
-                      organizer  = organizer,
-                      chapter    = chapter,
-                      event      = event,
-                      company    = company
-                    ) 
                       
 def print_event(event):
     """

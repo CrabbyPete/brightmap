@@ -7,7 +7,7 @@
             <td><a href='{%url term %}?term={{term.pk}}'>{{term.pk}}</a></td>
             <td>{{term.deal.interest.interest}}
             <td>{{term.deal.chapter.name}}</td>
-            <td><a href='{%url profile %}?user={{term.buyer.pk}}'>{{term.buyer.first_name}}&nbsp;{{term.buyer.last_name}}</td>
+            <td><a href='{%url leadbuyer %}?user={{term.buyer.pk}}'>{{term.buyer.first_name}}&nbsp;{{term.buyer.last_name}}</td>
             <td>{{term.cost}}</td>
             {% if term.exclusive %} 
             	<td>Exclusive</td>

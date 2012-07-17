@@ -455,7 +455,7 @@ class TermView( FormView ):
             chapter = Chapter.objects.get( pk = request.GET['chapter'])
             terms = []
             for deal in chapter.deals():
-                terms.extend( deal.terms() )
+                terms.extend( deal.active() )
             
             return self.render_to_response( {'terms':terms} )
         
@@ -485,7 +485,13 @@ class LeadBuyerView( FormView ):
     form_class      = LeadBuyerForm
     
     def get(self, request, *args, **kwargs):
-        if 'leadbuyer' in request.GET:
+        
+        if 'user' in request.GET:
+            leadbuyer = LeadBuyer.objects.get( user = request.GET['user'])
+            form = LeadBuyerForm( instance = leadbuyer )
+            return self.render_to_response( {'form': form, 'leadbuyer':leadbuyer} )
+        
+        elif 'leadbuyer' in request.GET:
             leadbuyer = LeadBuyer.objects.get(pk = request.GET['leadbuyer'])
             form = LeadBuyerForm( instance = leadbuyer )
             return self.render_to_response( {'form': form, 'leadbuyer':leadbuyer} )
