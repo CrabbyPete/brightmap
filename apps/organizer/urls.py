@@ -4,6 +4,7 @@ from django.conf.urls.defaults      import  patterns, url
 from views                          import  ( SignUpView, CategoryView, InviteView )
                                              
 urlpatterns = patterns('organizer.views',
+    url(r'^$',              'dashboard',                                name='or_dash'      ),
     url(r'^signup/$',       SignUpView.as_view(),                       name='or_signup'    ),
     url(r'^category/$',     login_required( CategoryView.as_view()),    name='or_category'  ),
     url(r'^invite/$',       login_required( InviteView.as_view()),      name='or_invite'    ),

@@ -60,10 +60,12 @@ def database_events( ticket, api ):
     """
     Put the latest event in the database
     """
+    """ Force it to get the organizers
     if 'organizer_id' in ticket:
         organizer_ids = [ ticket['organizer_id'] ]
     else:
-        organizer_ids = api.get_organizers()
+    """
+    organizer_ids = api.get_organizers()
     
     event_list = []
     for organizer_id in organizer_ids:
