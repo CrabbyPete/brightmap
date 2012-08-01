@@ -155,7 +155,8 @@ def bill_user( invoice ):
      
 def notify_user( invoice ):
     # Set up the context
-    c = Context({'invoice' :invoice })
+    total = invoice.cost - invoice.credit
+    c = Context({'invoice' :invoice, 'total':total })
 
     # Render the message and log it
     template = loader.get_template('letters/invoice.tmpl')
