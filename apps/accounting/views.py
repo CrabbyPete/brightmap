@@ -59,7 +59,7 @@ def calc_split(invoices):
 @login_required
 def split( request ):
     if request.GET and 'title' in request.GET:
-        invoices = Invoice.objects.filter(title = request.GET['title'])
+        invoices = Invoice.objects.filter(title = request.GET['title'], status = 'paid')
         income, commissions = calc_split( invoices )
         total = income - commissions
         cost  = .25 * total

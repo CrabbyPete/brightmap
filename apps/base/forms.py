@@ -79,7 +79,7 @@ class LeadBuyerForm( ModelForm ):
 class ChapterForm(ModelForm):
     class Meta:
         model = Chapter
-        exclude = ('slug',)
+        #exclude = ('slug',)
     
 class EventbriteForm(ModelForm):
     class Meta:

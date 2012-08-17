@@ -41,6 +41,9 @@ def make_commissions( invoice ):
     """ Create all the commission records for an invoice
         invoice - invoice to use
     """
+    if invoice.status != 'paid':
+        return
+    
     chapters = {}
     for connection in invoice.connections():
         chapter = connection.term.deal.chapter

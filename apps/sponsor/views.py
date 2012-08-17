@@ -9,10 +9,14 @@ from base.forms                     import LoginForm
 
 
 def sponsor( request, slug ):
+    if len(slug) <= 2:
+        return HttpResponseRedirect(reverse('homepage'))
+    
     try:
         chapter = Chapter.objects.get(slug = slug)
     except Chapter.DoesNotExist:
         return HttpResponseRedirect(reverse('homepage'))
+
     """ If you want to keep track uncomment, but every crawler will create an invite
     invite = Invite( chapter = chapter )
     invite.save()

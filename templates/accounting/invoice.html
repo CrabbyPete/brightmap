@@ -5,8 +5,8 @@
 	<table id = 'invoices'> 
  	{% for invoice in invoices %}
         <tr>
-            <td>{{invoice.pk}}</td>
-            <td><a href='{%url invoice%}?invoice={{invoice.pk}}'>{{invoice.user.first_name}}{{invoice.user.last_name}}</a></td>
+            <td><a href='{%url invoice%}?invoice={{invoice.pk}}'>{{invoice.pk}}</a></td>
+            <td><a href= '{%url leadbuyer%}?user={{invoice.user.pk}}'>{{invoice.user.first_name}}{{invoice.user.last_name}}</a></td>
             <td>{{ invoice.user.email }}</td>
             <td>{{ invoice.title }}</td>
             <td>{{invoice.issued|date:"d M Y" }}</td>

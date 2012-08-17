@@ -45,17 +45,27 @@ def warn_user( term, warning = False ):
     if isinstance(child, Expire) or isinstance(term, Expire):
         buyer     = term.buyer
         organizer = term.deal.chapter.organizer
+    
         if warning:
             template_name = 'expire_warning.tmpl'
             subject  = 'BrightMap Trial Expiring: ' + term.deal.chapter.name
             connects = term.connections()
             chapter  = term.deal.chapter
         else:
-            template_name = 'expire_notice.tmpl'
-            subject  = 'BrightMap Trial Expired: ' + term.deal.chapter.name
-            connects = term.connections()
-            chapter = term.deal.chapter
-
+            # Check if they are authorized
+            leadbuyer = LeadBuyer.objects.get( user = buyer)
+            if leadbuyer.authorized():
+                template_name = 'expire_notice.tmpl'
+                subject  = 'BrightMap Trial Expired: ' + term.deal.chapter.name
+                connects = term.connections()
+                chapter = term.deal.chapter
+                cancel = False
+            else:
+                template_name = 'expire_cancel.tmpl'
+                subject  = 'BrightMap Trial Expired: ' + term.deal.chapter.name
+                connects = term.connections()
+                chapter = term.deal.chapter
+                cancel = True
             
         msg = Mail( organizer.email,
                     [buyer.email], 
@@ -76,6 +86,9 @@ def warn_user( term, warning = False ):
         # If this is not warning, delete the trial and make it a standard deal
         if not warning:
             term.canceled()
+            if cancel:
+                return
+            
             new_term = Cancel(  deal  = term.deal,
                                 cost  = 20,
                                 buyer = term.buyer,

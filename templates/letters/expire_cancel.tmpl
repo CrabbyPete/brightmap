@@ -1,0 +1,17 @@
+
+{{buyer.first_name}},
+
+You registered for a 30-day free trial of leads from {{term.deal.chapter.name}} on {{term.date}}.
+
+30 days have passed  or you have receive more that 20 free leads. You received the following leads:
+{% for connect in connections %}
+{{connect.survey.attendee.first_name}} {{connect.survey.attendee.last_name}}
+{% endfor %}
+
+This trial has now expired.  We have no credit card on file, so we must end your trial with {{term.deal.chapter.name}}.
+
+You can request a new deal anytime from your BrightMap dashboard at:
+{{url}}
+
+Best regards,
+{{chapter.organizer.first_name}}

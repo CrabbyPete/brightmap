@@ -27,6 +27,13 @@
         	<input type="submit" name="submit" />
     	</fieldset>
     </form>
+    {% if leadbuyer.authorized %}
+    	<p>Authorized &nbsp;
+    	{% for i in leadbuyer.interests %} {{i}}&nbsp;{% endfor %} </p>
+    {% else %}
+        <p>Not Authorized</p>
+    {% endif %}
+    
     <menu>
    		<li><a href='{% url connection %}?leadbuyer={{leadbuyer.pk}}'>Connections</a></li>
         <li><a href='{% url term       %}?leadbuyer={{leadbuyer.pk}}'>Terms</a> {{leadbuyer.deals|length}} </li>
