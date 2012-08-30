@@ -190,10 +190,12 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'base',
     'leadb',
-    'organ',
+    'organizer',
     'social',
     #'api',
     'authorize',
+    'sponsor',
+    'accounting',
     'south',
 )
 
@@ -228,9 +230,14 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
-        'main.py': {
-            'handlers': ['main'],
-            'level': 'DEBUG',
+        'mail': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'paypal': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
             'propagate': True,
         }
     }
