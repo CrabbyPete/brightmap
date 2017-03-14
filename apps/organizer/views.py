@@ -335,6 +335,7 @@ def setup( request ):
             context = { 'header':False }
         else: 
             context = { 'header':True }
+        
         if 'chapter' in request.GET:
             chapter = Chapter.objects.get(pk = request.GET['chapter'])
             context.update({'chapter':chapter})

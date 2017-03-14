@@ -46,6 +46,9 @@ def make_commissions( invoice ):
     
     chapters = {}
     for connection in invoice.connections():
+        if connection.status != 'sent':
+            continue
+        
         chapter = connection.term.deal.chapter
         if chapter.pk in chapters:
             chapters[chapter.pk] += connection.term.cost
@@ -62,7 +65,10 @@ def make_commissions( invoice ):
             commission = Commission.objects.get( invoice = invoice, chapter = chapter )
         except Commission.DoesNotExist:
             commission = Commission(invoice = invoice, chapter = chapter)
-        commission.cost = "%.2f"%( float( chapters[chapter_pk] ) * 0.45, ) 
+        
+        if 
+        commission.cost = "%.2f"%( float( chapters[chapter_pk] ) * 0.45, )
+        if invoice.credit > 0: 
         commission.save()
 
         
